@@ -1,17 +1,38 @@
 import Link from "next/link";
 import Image from "next/image";
 import {motion} from "framer-motion";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faFacebookSquare, faInstagramSquare, faTwitterSquare, faDiscord} from "@fortawesome/free-brands-svg-icons"
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 const Navbar = () => {
     const [isNavOpen, setIsNavOpen] = useState(false);
+    const [game, setGame] = useState("")
+
+
 
     const refreshPage = () => {
         if(window.location.pathname == "/") {
             window.location.reload()
         }
+    }
+
+    const valorant = () => {
+        setGame("valorant")
+    }
+
+    const leagueoflegends = () => {
+        setGame("lol")
+    }
+
+    const tft = () => {
+        setGame("tft")
+    }
+
+    const lor = () => {
+        setGame("lor")
+    }
+
+    const home = () => {
+        setGame("")
     }
 
     const handleClick = () => {
@@ -20,76 +41,147 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className={"bg-navbar-color h-16 shadow-lg"}>
-                <div className="container mx-auto">
-                    <div className="flex justify-between h-16">
-                        <motion.div whileHover={{scale: 1.1}} className={"items-center flex cursor-pointer text-white text-lg font-bold"}>
-                            <Link href={"/"}>
-                                <h1>Summoner Searcher</h1>
-                            </Link>
-                        </motion.div>
-                        <div className="items-center md:flex hidden">
-                            <ul className="space-x-5 text-2xl text-white">
-                                <li className="li sm:inline-block">
-                                    <a href="#"><FontAwesomeIcon icon={faFacebookSquare}/></a>
-                                </li>
-                                <li className="li sm:inline-block">
-                                    <a href="#"><FontAwesomeIcon icon={faInstagramSquare}/></a>
-                                </li>
-                                <li className="li sm:inline-block">
-                                    <a href="#"><FontAwesomeIcon icon={faTwitterSquare}/></a>
-                                </li>
-                                <li className="li sm:inline-block">
-                                    <a href="#"><FontAwesomeIcon icon={faDiscord}/></a>
-                                </li>
-                            </ul>
-                            <ul className="text-gray-400 sm:self-center ml-12 border-t sm:border-none text-sm space-x-2">
-                                <li className="sm:inline-block">
-                                    <Link href={"/login"}><button className="bg-button-color2 hover:bg-button-hover2 h-8 w-16 rounded text-white">Log In</button></Link>
-                                </li>
-                                <li className="sm:inline-block">
-                                    <Link href={"/register"}><button className="bg-button-color hover:bg-button-hover h-8 w-16 rounded text-white">Sign Up</button></Link>
-                                </li>
-                            </ul>
-                        </div>
-                        <div onClick={handleClick} className={"flex md:hidden mt-1"}>
-                            <div className="p-4 space-y-2 rounded cursor-pointer shadow">
-                                <span className="block w-8 h-0.5 bg-gray-100"></span>
-                                <span className="block w-8 h-0.5 bg-gray-100"></span>
-                                <span className="block w-8 h-0.5 bg-gray-100"></span>
+            <nav className={" h-10 shadow-lg"}>
+                <div className={"flex flex-row"}>
+                    <div className={"h-10 " + (game === "valorant" ? 'bg-valorant-color w-52' : game === "lol" ? 'w-72 bg-leagueoflegends-color' : game === "tft" ? 'bg-tft-color w-64' : game === "lor" ? 'w-72 bg-lor-color' :"w-20 bg-default-color")}>
+                        <div className="container mx-auto">
+                            <div className="flex justify-between items-center ml-2 h-10">
+                                <div className={"flex cursor-pointer items-center text-white text-lg font-bold"}>
+                                    <div className={"flex"}>
+                                        <Link href={"/"}>
+                                            <h1 onClick={home}>SS.gg</h1>
+                                        </Link>
+                                        {game === "valorant" ?
+                                        <div className={"flex items-center cursor-pointer ml-3"}>
+                                            <Image src={"/game-icons/valorant.svg"} width={30} height={20}/>
+                                            <p className={"text-xs"}>Valorant</p>
+                                        </div>
+                                        :
+                                        game === "lol" ?
+                                        <div className={"flex items-center cursor-pointer ml-3"}>
+                                            <Image src={"/game-icons/leagueoflegends.svg"} width={30} height={20}/>
+                                            <p className={"text-xs"}>League of Legends</p>
+                                        </div>
+                                        :
+                                        game === "tft" ?
+                                        <div className={"flex items-center cursor-pointer ml-3"}>
+                                            <Image src={"/game-icons/teamfighttactics.png"} width={20} height={20}/>
+                                            <p className={"text-xs"}>Teamfight Tactics</p>
+                                        </div>
+                                        :
+                                        game === "lor" ?
+                                        <div className={"flex items-center cursor-pointer ml-3"}>
+                                            <Image src={"/game-icons/legendsofrunterra.png"} width={30} height={20}/>
+                                            <p className={"text-xs"}>Legends of Runterra</p>
+                                        </div>
+                                        :""}
+                                    </div>
+                                </div>
                             </div>
+                        </div>
+                    </div>
+                    <div className={"h-10 w-full bg-navbar-color items-center"}>
+                        <div className="items-center md:flex hidden h-10 ml-4">
+                            <ul className="space-x-10 text-2xl text-white">
+                                {game !== "valorant" ? (
+                                <li className="li sm:inline-block">
+                                    <Link href={"/valorant"}>
+                                        <div onClick={valorant} className={"flex items-center cursor-pointer"}>
+                                            <Image src={"/game-icons/valorant.svg"} width={30} height={20}/>
+                                            <p className={"text-xs"}>Valorant</p>
+                                        </div>
+                                    </Link>
+                                </li>
+                                ):""}
+                                {game !== "lol" ? (
+                                <li className="li sm:inline-block">
+                                    <Link href={"/lol"}>
+                                        <div onClick={leagueoflegends} className={"flex items-center cursor-pointer"}>
+                                            <Image src={"/game-icons/leagueoflegends.svg"} width={30} height={20}/>
+                                            <p className={"text-xs"}>League of Legends</p>
+                                        </div>
+                                    </Link>
+                                </li>
+                                ):""}
+                                {game !== "tft" ? (
+                                <li className="li sm:inline-block">
+                                    <Link href={"/tft"}>
+                                        <div onClick={tft} className={"flex items-center cursor-pointer"}>
+                                            <Image src={"/game-icons/teamfighttactics.png"} width={20} height={20}/>
+                                            <p className={"text-xs"}>Teamfight Tactics</p>
+                                        </div>
+                                    </Link>
+                                </li>
+                                ):""}
+                                {game !== "lor" ? (
+                                <li className="li sm:inline-block">
+                                    <Link href={"/lor"}>
+                                        <div onClick={lor} className={"flex items-center cursor-pointer"}>
+                                            <Image src={"/game-icons/legendsofrunterra.png"} width={25} height={20}/>
+                                            <p className={"text-xs"}>Legends of Runterra</p>
+                                        </div>
+                                    </Link>
+                                </li>
+                                ):""}
+                            </ul>
                         </div>
                     </div>
                 </div>
             </nav>
-            {isNavOpen ? (
-                <div className={"md:hidden w-auto w-full"}>
-                    <div className={"w-60 h-auto fixed z-10 right-0"}>
-                        <div className="items-center text-center justify-center flex bg-navbar-color">
-                            <ul className="sm:border-none text-sm">
-                                <li className={"mt-5"}>
-                                    <p className={"text-white hover:underline cursor-pointer"}>Facebook</p>
-                                </li>
-                                <li className={"mt-5"}>
-                                    <p className={"text-white hover:underline cursor-pointer"}>Instagram</p>
-                                </li>
-                                <li className={"mt-5"}>
-                                    <p className={"text-white hover:underline cursor-pointer"}>Twitter</p>
-                                </li>
-                                <li className={"mt-5"}>
-                                    <p className={"text-white hover:underline cursor-pointer"}>Discord</p>
-                                </li>
-                                <li className="mt-20">
-                                    <Link href={"/login"}><button className="bg-button-color2 hover:bg-button-hover2 h-8 w-32 rounded text-white">Log In</button></Link>
-                                </li>
-                                <li className="mt-5 mb-10">
-                                    <Link href={"/register"}><button className="bg-button-color hover:bg-button-hover h-8 w-32 rounded text-white">Sign Up</button></Link>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+            <nav className={"h-12 items-center " + (game === "valorant" ? 'bg-valorant-color' : game === "lol" ? 'bg-leagueoflegends-color' : game === "tft" ? 'bg-tft-color' : game === "lor" ? 'bg-lor-color':"bg-default-color")}>
+                <div className="items-center md:flex h-12 hidden ml-40">
+                    {game === "lol" ?
+                    <ul className={"space-x-5 text-gray-300"}>
+                        <Link href={"/"+game}>
+                            <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Home</li>
+                        </Link>
+                        <Link href={"/lol/champions"}>
+                            <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Champions</li>
+                        </Link>
+                        <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Game Mode</li>
+                        <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Stats</li>
+                        <Link href={"/lol/leaderboard"}>
+                            <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Leaderboard</li>
+                        </Link>
+                    </ul>
+                    :
+                    game === "valorant" ?
+                    <ul className={"space-x-5 text-gray-300"}>
+                        <Link href={"/"+game}>
+                            <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Home</li>
+                        </Link>
+                        <Link href={"/valorant/agents"}>
+                            <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Agents</li>
+                        </Link>
+                        <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Game Mode</li>
+                        <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Stats</li>
+                        <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Leaderboard</li>
+                    </ul>
+                    :
+                    game === "tft" ?
+                    <ul className={"space-x-5 text-gray-300"}>
+                        <Link href={"/"+game}>
+                            <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Home</li>
+                        </Link>
+                        <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Champions</li>
+                        <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Game Mode</li>
+                        <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Stats</li>
+                        <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Leaderboard</li>
+                    </ul>
+                    :
+                    game === "lor" ?
+                    <ul className={"space-x-5 text-gray-300"}>
+                        <Link href={"/"+game}>
+                            <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Home</li>
+                        </Link>
+                        <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Cards</li>
+                        <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Game Mode</li>
+                        <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Stats</li>
+                        <li className={"li sm:inline-block hover:text-white cursor-pointer"}>Leaderboard</li>
+                    </ul>
+                    :""}
                 </div>
-            ) : null}
+            </nav>
         </>
     )
 }

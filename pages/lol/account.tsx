@@ -1,10 +1,11 @@
 import {useEffect, useState} from "react";
-import {Summoner} from "../utils/types/summoner.t";
-import apiFacade from "../store/apiFacade";
+import {Summoner} from "../../utils/types/summoner.t";
+import apiFacade from "../../store/apiFacade";
 import Image from "next/image";
-import Match from "../components/Match";
+import Match from "../../components/Match";
 
 import Link from "next/link";
+import {motion} from "framer-motion";
 
 const Account = () => {
     const [summoner, setSummoner] = useState<Summoner>()
@@ -47,6 +48,12 @@ const Account = () => {
                             </div>
                             <div className={"ml-3"}>
                                 <p className={"text-white text-2xl font-bold"}>{summoner?.name}</p>
+                                <p className={"text-summoner-gray text-xs mt-2"}>Ladder Rank</p>
+                                <div className={"mt-3"}>
+                                    <motion.button whileHover={{scale: 1.1}} className={"bg-leagueoflegends-color text-white w-16 h-10 rounded text-sm"}>Update</motion.button>
+                                    <motion.button whileHover={{scale: 1.1}} className={"bg-transparent border-leagueoflegends-color border ml-2 text-leagueoflegends-color w-20 h-10 rounded text-sm"}>Tier-Graph</motion.button>
+                                </div>
+                                <p className={"text-summoner-gray text-xs mt-2"}>Last updated:</p>
                             </div>
                         </div>
                         <hr className={"border-1 border-black mt-16"}/>
@@ -109,7 +116,7 @@ const Account = () => {
                             </div>
                             <div className={"divide-y divide-black bg-summoner-light mt-2 ml-40 w-80 h-96 text-white rounded"}>
                                 <div>
-                                    <p className={"text-sm ml-2"}>her skal der være noget</p>
+                                    <p className={"text-sm ml-2"}>pik</p>
                                 </div>
                                 <div>
 
@@ -119,14 +126,16 @@ const Account = () => {
                         <div className={"flex flex-col w-1/2 ml-2 mt-2 h-auto"}>
                             <div className={"divide-y divide-black bg-summoner-light w-full h-48 text-white rounded"}>
                                 <div className={"h-7 flex items-center"}>
-                                    <p className={"text-sm ml-2"}>Her skal der være noget</p>
+                                    <p className={"text-sm ml-2"}>loui er sej</p>
                                 </div>
                                 <div>
                                 </div>
                             </div>
                             <div className={"flex flex-col mb-10"}>
-                                <Match won={false}/>
                                 <Match won={true}/>
+                                <Match won={true}/>
+                                <Match won={true}/>
+                                <Match won={false}/>
                                 <Match won={true}/>
                                 <Match won={false}/>
                             </div>

@@ -1,0 +1,269 @@
+import Image from "next/image";
+import Link from "next/link";
+import {useEffect, useState} from "react";
+import apiFacade from "../../store/apiFacade";
+import {Ladder} from "../../utils/types/ladder.t";
+import {motion} from "framer-motion";
+import Modal from "../../components/Modal";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faSearch} from "@fortawesome/free-solid-svg-icons";
+
+const Leaderboard = () => {
+    const icon = "https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/1665.png"
+    const [modalShowing, setModalShowing] = useState(false)
+    const [ladder, setLadder] = useState<Ladder[]>([])
+    const [region, setRegion] = useState("Europa West")
+    const [gameMode, setGameMode] = useState("RANKED_SOLO_5x5")
+    const [page, setPage] = useState(1)
+
+    const getRegion = (regionData) => {
+        setRegion(regionData)
+    }
+
+    const modalShow = () => {
+        setModalShowing(true)
+    }
+
+    const modalClose = () => {
+        setModalShowing(false)
+    }
+
+    useEffect(()  => {
+        async function getLadder(){
+            apiFacade.getLadder(region, gameMode)
+                .then((data) => setLadder(data))
+
+        }
+        getLadder()
+
+    }, [])
+
+    useEffect(() => {
+        const temp: Ladder[] = ladder.sort((a,b)=> b.leaguePoints - a.leaguePoints)
+        setLadder(temp)
+    })
+
+    const calculateWinRate = (wins, loss) => {
+        const sum = wins + loss
+        const deci = wins / sum
+        const winrate = deci * 100
+
+        return Math.round(winrate)
+    }
+
+    const calculateRange = (data, rowsPerPage) => {
+        const range = []
+        const num = Math.ceil(data.length / rowsPerPage);
+        let i = 1;
+        for (let i = 1; i <= num; i++) {
+            range.push(i);
+        }
+        return range;
+    }
+
+    const sliceData = (data, page, rowsPerPage) => {
+        return data.slice((page - 1) * rowsPerPage, page * rowsPerPage)
+    }
+
+    const useTable = (data, page, rowsPerPage) => {
+        const [tableRange, setTableRange] = useState([]);
+        const [slice, setSlice] = useState([]);
+
+        useEffect(() => {
+            const range = calculateRange(data, rowsPerPage);
+            setTableRange([...range]);
+
+            const slice = sliceData(data, page, rowsPerPage);
+            setSlice([...slice]);
+        }, [data, setTableRange, page, setSlice]);
+
+        return { slice, range: tableRange };
+    };
+
+    const {slice, range} = useTable(ladder, page, 100)
+
+
+
+    useEffect(() => {
+        if (slice.length < 1 && page !== 1) {
+            setPage(page - 1);
+        }
+    }, [slice, page, setPage]);
+
+
+    const nextPage = () => {
+        setPage(page + 1)
+        window.scrollTo({top: 0, left: 0});
+    }
+
+    const previousPage = () => {
+        setPage(page - 1)
+        window.scrollTo({top:0, left: 0})
+    }
+
+    return(
+        <>
+            <div className={"flex flex-col divide-black divide-y"}>
+                <div className={"bg-summoner-light w-full h-16 flex items-center"}>
+                    <h1 className={"text-white text-2xl font-bold ml-40"}>Leaderboards</h1>
+                </div>
+                <div className={"bg-summoner-light w-full h-12"}>
+
+                </div>
+            </div>
+            <div className={"container mx-auto px-20 mt-10"}>
+                <div className={"flex justify-between text-xs text-summoner-gray"}>
+                    <div>
+                        There are currently {ladder.length} challengers summoners on Summoner's Rift
+                    </div>
+                    <div>
+                        Displaying summoners that are in the challenger. Rankings are updated periodically.
+                    </div>
+                </div>
+                <div className={"w-full h-auto mt-4"}>
+                    <div className={"w-full h-12 rounded bg-summoner-light flex justify-between items-center"}>
+                        <button onClick={modalShow} className={"flex flex-row text-summoner-gray ml-2 border rounded text-sm w-auto justify-center h-10 items-center border-summoner-dark"}>
+                            <span>{region}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20"
+                                 fill="currentColor">
+                                <path fill-rule="evenodd"
+                                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                      clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        <div className={"bg-summoner-dark rounded w-60 mr-2 h-9 flex justify-between items-center"}>
+                            <input className={"bg-summoner-dark indent-3 ml-1 text-xs text-white w-48 h-9 rounded"} type="text" placeholder={"Summoner Name"}/>
+                            <FontAwesomeIcon className={"text-summoner-gray mr-3"} icon={faSearch}/>
+                        </div>
+                    </div>
+                    <div className={"w-full h-auto mt-2"}>
+                        <table className={"border-collapse border-spacing-0"}>
+                            <colgroup className={"display: table-caption;"}>
+                                <col width={"40"}/>
+                                <col width="560"/>
+                                <col width="110"/>
+                                <col width="60"/>
+                                <col width="130"/>
+                                <col width="50"/>
+                                <col width="172"/>
+                            </colgroup>
+                            <thead className={"table-header-group align-middle border-inherit"}>
+                                <tr className={"table-row border-inherit"}>
+                                    <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border pl-3 rounded-t"} align="left" scope="col">#</th>
+                                    <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">Summoners</th>
+                                    <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">Tier</th>
+                                    <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">LP</th>
+                                    <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">Most champions</th>
+                                    <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">Level</th>
+                                    <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border rounded-t"} align="left" scope="col">Win Ratio</th>
+                                </tr>
+                            </thead>
+                            <tbody className={"table-row-group align-middle border-inherit"}>
+                                {slice.map((el, index) => (
+                                    <tr className={"table-row border-inherit text-xs text-summoner-gray"} key={el.summonerId}>
+                                        <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light pl-3"}>
+                                            {index+1}
+                                        </td>
+                                        <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light box-border font-normal align-middle p-1"}>
+                                            <a className={"flex items-center"} href={""}>
+                                                <Image className={"rounded-full"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/1665.png`} height={30} width={30}/>
+                                                <strong className={"pl-2 flex-1 box-border text-white text-xs"}>
+                                                    {el.summonerName}
+                                                </strong>
+                                            </a>
+                                        </td>
+                                        <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
+                                            Challenger
+                                        </td>
+                                        <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
+                                            {el.leaguePoints}
+                                            LP
+                                        </td>
+                                        <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
+                                            <a className={"align-middle inline-block cursor-pointer p-1"} href="">
+                                                <div className={"relative block"}>
+                                                    <Image className={"rounded-full"} src={icon} loader={() => icon} height={30} width={30}/>
+                                                </div>
+                                            </a>
+                                            <a className={"align-middle inline-block p-1"} href="">
+                                                <div className={"relative block cursor-pointer"}>
+                                                    <Image className={"rounded-full"} src={icon} loader={() => icon} height={30} width={30}/>
+                                                </div>
+                                            </a>
+                                            <a className={"align-middle inline-block cursor-pointer"} href="">
+                                                <div className={"relative block"}>
+                                                    <Image className={"rounded-full"} src={icon} loader={() => icon} height={30} width={30}/>
+                                                </div>
+                                            </a>
+                                        </td>
+                                        <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
+                                            100
+                                        </td>
+                                        <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
+                                            <div className={""}>
+                                                <div>
+                                                    {calculateWinRate(el.wins,el.losses)}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        <div className={"bg-summoner-light w-full h-24 rounded-b text-center text-summoner-gray text-xs overflow-hidden"}>
+                            <p className={"mb-6 mt-5"}>
+                                #1 ~#100/Total {ladder.length} Summoners
+                            </p>
+                            <div className={"flex justify-between"}>
+                                <motion.div whileHover={{scale: 1.1}} onClick={previousPage} className={"box-border block w-7 h-7 bg-summoner-dark leading-7 rounded ml-3 cursor-pointer"}>
+                                    <Image src={"/lol/icon-arrow-left.svg"} width={20} height={28}/>
+                                </motion.div>
+                                <div className={"flex justify-between space-x-1"}>
+                                    <a className={"box-border block w-7 h-7 leading-7 rounded border border-solid border-black bg-summoner-light font-bold text-center text-white cursor-pointer"} href="">
+                                        1
+                                    </a>
+                                    <a className={"box-border block w-7 h-7 leading-7 rounded border border-solid border-summoner-light bg-summoner-dark font-bold text-center text-summoner-gray cursor-pointer"} href="">
+                                        2
+                                    </a>
+                                    <a className={"box-border block w-7 h-7 leading-7 rounded border border-solid border-summoner-light font-bold bg-summoner-dark text-center text-summoner-gray cursor-pointer"} href="">
+                                        3
+                                    </a>
+                                    <a className={"box-border block w-7 h-7 leading-7 rounded border border-solid border-summoner-light bg-summoner-dark font-bold text-center text-summoner-gray cursor-pointer"} href="">
+                                        4
+                                    </a>
+                                    <a className={"box-border block w-7 h-7 leading-7 rounded border border-solid border-summoner-light bg-summoner-dark font-bold text-center text-summoner-gray cursor-pointer"} href="">
+                                        5
+                                    </a>
+                                    <a className={"box-border block w-7 h-7 leading-7 rounded border border-solid border-summoner-light bg-summoner-dark font-bold text-center text-summoner-gray cursor-pointer"} href="">
+                                        6
+                                    </a>
+                                    <a className={"box-border block w-7 h-7 leading-7 rounded border border-solid border-summoner-light bg-summoner-dark font-bold text-center text-summoner-gray cursor-pointer"} href="">
+                                        7
+                                    </a>
+                                    <a className={"box-border block w-7 h-7 leading-7 rounded border border-solid border-summoner-light bg-summoner-dark font-bold text-center text-summoner-gray cursor-pointer"} href="">
+                                        8
+                                    </a>
+                                    <a className={"box-border block w-7 h-7 leading-7 rounded border border-solid border-summoner-light bg-summoner-dark font-bold text-center text-summoner-gray cursor-pointer"} href="">
+                                        9
+                                    </a>
+                                    <a className={"box-border block w-7 h-7 leading-7 rounded border border-solid border-summoner-light bg-summoner-dark font-bold text-center text-summoner-gray cursor-pointer"} href="">
+                                        10
+                                    </a>
+                                </div>
+                                <motion.div whileHover={{scale: 1.1}} onClick={nextPage} className={"box-border block w-7 h-7 bg-summoner-dark leading-7 rounded mr-3 cursor-pointer"}>
+                                    <Image src={"/lol/icon-arrow-right.svg"} width={20} height={28}/>
+                                </motion.div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className={"mt-20"}>
+
+                </div>
+                <Modal getRegion={getRegion} onClose={modalClose} visible={modalShowing} name={"lort"}/>
+            </div>
+        </>
+    )
+}
+
+export default Leaderboard
