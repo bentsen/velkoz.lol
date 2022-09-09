@@ -1,3 +1,4 @@
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",
@@ -22,6 +23,7 @@ module.exports = {
         'win-border' : 'rgb(86,134,229)',
         'win' : 'rgb(41,53,77)',
         'win-button' : 'rgb(48,68,109)',
+        'game-hover' : 'rgb(47, 58, 82)',
       }
     },
   },

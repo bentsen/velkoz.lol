@@ -6,32 +6,25 @@ import {useState} from "react";
 import {motion} from "framer-motion";
 import Link from "next/link";
 import {Summoner} from "../../utils/types/summoner.t";
+import DoughnutChart from "../../components/DoughnutChart";
 
 const Lol: NextPage = () => {
-    const [modalShowing, setModalShowing] = useState(false)
-    const [region, setRegion] = useState("Europa West")
+    const [isOpen, setIsOpen] = useState(false)
+    const [region, setRegion] = useState<string>("Europa West")
     const [summonerName, setSummonerName] = useState("")
-    const [summoner, setSummoner] = useState<Summoner[]>([])
-
-    const getRegion = (regionData) => {
-        setRegion(regionData)
-    }
+    const regions: Map<string, string> = new Map([
+        ["Europa West", "euw1"],
+        ["Europe Nordic & East", "eun1"]
+    ])
 
     const handleClick = () => {
-        localStorage.setItem("region", region)
+        localStorage.setItem("region", regions.get(region)!)
+
         localStorage.setItem("summonerName", summonerName)
     }
 
-    const handleChange = (e) => {
+    const handleChange = (e : any) => {
         setSummonerName(e.target.value)
-    }
-
-    const modalShow = () => {
-        setModalShowing(true)
-    }
-
-    const modalClose = () => {
-        setModalShowing(false)
     }
 
     return (
@@ -42,7 +35,7 @@ const Lol: NextPage = () => {
                 </div>
                 <div className={"flex flex-row bg-summoner-light w-2/5 h-14 rounded-3xl items-center"}>
                     <div>
-                        <div onClick={modalShow} className={"text-sm ml-4 w-44 text-white cursor-pointer"}>
+                        <div onClick={() => setIsOpen(true)} className={"text-sm ml-4 w-44 text-white cursor-pointer"}>
                             <p>Region</p>
                             <div className={"flex flex-row text-summoner-gray"}>
                                 <span>{region}</span>
@@ -63,11 +56,11 @@ const Lol: NextPage = () => {
                         <input onChange={handleChange} className={"w-80 h-7 bg-summoner-light text-summoner-gray"} type="text" placeholder={"Summoner Name"}/>
                     </div>
                 </div>
-                <Link href={"/lol/account"}>
+                <Link href={"/lol/" + summonerName}>
                     <motion.button onClick={handleClick} whileHover={{scale: 1.1}} className={"bg-leagueoflegends-color text-white w-32 h-10 rounded"}>Search</motion.button>
                 </Link>
             </div>
-            <Modal getRegion={getRegion} onClose={modalClose} visible={modalShowing} name={"lort"}/>
+            <Modal isOpen={isOpen} setIsOpen={setIsOpen} region={region} setRegion={setRegion}/>
         </>
     )
 }

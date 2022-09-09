@@ -1,0 +1,24 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+}
+
+datasource db {
+  provider = "mysql"
+  url = env("DATABASE_URL")
+  referentialIntegrity = "prisma"
+}
+
+model Summoner{
+    id Int @id @default(autoincrement())
+    summonerId string
+    puuid string
+    name string
+    summonerLeavel Int
+    accountId string
+    profileIconId Int
+    revisionDate Int
+}

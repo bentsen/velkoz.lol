@@ -13,7 +13,6 @@ const Leaderboard = () => {
     const [modalShowing, setModalShowing] = useState(false)
     const [ladder, setLadder] = useState<Ladder[]>([])
     const [region, setRegion] = useState("Europa West")
-    const [gameMode, setGameMode] = useState("RANKED_SOLO_5x5")
     const [page, setPage] = useState(1)
 
     const getRegion = (regionData) => {
@@ -30,7 +29,7 @@ const Leaderboard = () => {
 
     useEffect(()  => {
         async function getLadder(){
-            apiFacade.getLadder(region, gameMode)
+            apiFacade.getTftLadder(region)
                 .then((data) => setLadder(data))
 
         }
@@ -124,7 +123,7 @@ const Leaderboard = () => {
             <div className={"container mx-auto px-20 mt-10"}>
                 <div className={"flex justify-between text-xs text-summoner-gray"}>
                     <div>
-                        There are currently {ladder.length} challengers summoners on Summoner's Rift
+                        There are currently {ladder.length} challengers on the Tft Arena
                     </div>
                     <div>
                         Displaying summoners that are in the challenger. Rankings are updated periodically.
@@ -158,66 +157,66 @@ const Leaderboard = () => {
                                 <col width="172"/>
                             </colgroup>
                             <thead className={"table-header-group align-middle border-inherit"}>
-                                <tr className={"table-row border-inherit"}>
-                                    <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border pl-3 rounded-t"} align="left" scope="col">#</th>
-                                    <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">Summoners</th>
-                                    <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">Tier</th>
-                                    <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">LP</th>
-                                    <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">Most champions</th>
-                                    <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">Level</th>
-                                    <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border rounded-t"} align="left" scope="col">Win Ratio</th>
-                                </tr>
+                            <tr className={"table-row border-inherit"}>
+                                <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border pl-3 rounded-t"} align="left" scope="col">#</th>
+                                <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">Summoners</th>
+                                <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">Tier</th>
+                                <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">LP</th>
+                                <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">Most champions</th>
+                                <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">Level</th>
+                                <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border rounded-t"} align="left" scope="col">Win Ratio</th>
+                            </tr>
                             </thead>
                             <tbody className={"table-row-group align-middle border-inherit"}>
-                                {slice.map((el, index) => (
-                                    <tr className={"table-row border-inherit text-xs text-summoner-gray"} key={el.summonerId}>
-                                        <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light pl-3"}>
-                                                {page === 1 ? index+1 : page === 2 ? index + 1 + 100 : page === 3 ? index+1 + 200 : ""}
-                                        </td>
-                                        <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light box-border font-normal align-middle p-1"}>
-                                            <a className={"flex items-center"} href={""}>
-                                                <Image className={"rounded-full"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/1665.png`} height={30} width={30}/>
-                                                <strong className={"pl-2 flex-1 box-border text-white text-xs"}>
-                                                    {el.summonerName}
-                                                </strong>
-                                            </a>
-                                        </td>
-                                        <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
-                                            Challenger
-                                        </td>
-                                        <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
-                                            {el.leaguePoints}
-                                            LP
-                                        </td>
-                                        <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
-                                            <a className={"align-middle inline-block cursor-pointer p-1"} href="">
-                                                <div className={"relative block"}>
-                                                    <Image className={"rounded-full"} src={icon} loader={() => icon} height={30} width={30}/>
-                                                </div>
-                                            </a>
-                                            <a className={"align-middle inline-block p-1"} href="">
-                                                <div className={"relative block cursor-pointer"}>
-                                                    <Image className={"rounded-full"} src={icon} loader={() => icon} height={30} width={30}/>
-                                                </div>
-                                            </a>
-                                            <a className={"align-middle inline-block cursor-pointer"} href="">
-                                                <div className={"relative block"}>
-                                                    <Image className={"rounded-full"} src={icon} loader={() => icon} height={30} width={30}/>
-                                                </div>
-                                            </a>
-                                        </td>
-                                        <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
-                                            100
-                                        </td>
-                                        <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
-                                            <div className={""}>
-                                                <div>
-                                                    {calculateWinRate(el.wins,el.losses)}%
-                                                </div>
+                            {slice.map((el, index) => (
+                                <tr className={"table-row border-inherit text-xs text-summoner-gray"} key={el.summonerId}>
+                                    <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light pl-3"}>
+                                        {page === 1 ? index+1 : page === 2 ? index + 1 + 100 : page === 3 ? index+1 + 200 : ""}
+                                    </td>
+                                    <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light box-border font-normal align-middle p-1"}>
+                                        <a className={"flex items-center"} href={""}>
+                                            <Image className={"rounded-full"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/1665.png`} height={30} width={30}/>
+                                            <strong className={"pl-2 flex-1 box-border text-white text-xs"}>
+                                                {el.summonerName}
+                                            </strong>
+                                        </a>
+                                    </td>
+                                    <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
+                                        Challenger
+                                    </td>
+                                    <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
+                                        {el.leaguePoints}
+                                        LP
+                                    </td>
+                                    <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
+                                        <a className={"align-middle inline-block cursor-pointer p-1"} href="">
+                                            <div className={"relative block"}>
+                                                <Image className={"rounded-full"} src={icon} loader={() => icon} height={30} width={30}/>
                                             </div>
-                                        </td>
-                                    </tr>
-                                ))}
+                                        </a>
+                                        <a className={"align-middle inline-block p-1"} href="">
+                                            <div className={"relative block cursor-pointer"}>
+                                                <Image className={"rounded-full"} src={icon} loader={() => icon} height={30} width={30}/>
+                                            </div>
+                                        </a>
+                                        <a className={"align-middle inline-block cursor-pointer"} href="">
+                                            <div className={"relative block"}>
+                                                <Image className={"rounded-full"} src={icon} loader={() => icon} height={30} width={30}/>
+                                            </div>
+                                        </a>
+                                    </td>
+                                    <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
+                                        100
+                                    </td>
+                                    <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
+                                        <div className={""}>
+                                            <div>
+                                                {calculateWinRate(el.wins,el.losses)}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
                             </tbody>
                         </table>
                         <div className={"bg-summoner-light w-full h-24 rounded-b text-center text-summoner-gray text-xs overflow-hidden"}>
