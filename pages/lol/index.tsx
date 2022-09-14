@@ -5,24 +5,32 @@ import Modal from "../../components/Modal";
 import {useState} from "react";
 import {motion} from "framer-motion";
 import Link from "next/link";
-import {Summoner} from "../../utils/types/summoner.t";
-import DoughnutChart from "../../components/DoughnutChart";
+
+/*
+* Name: Mikkel Bentsen
+* Date: 14/9-2022
+*/
 
 const Lol: NextPage = () => {
+    /*useState for state of modal*/
     const [isOpen, setIsOpen] = useState(false)
+    /*useSate for selected region*/
     const [region, setRegion] = useState<string>("Europa West")
+    /*useSate for typed summonerName*/
     const [summonerName, setSummonerName] = useState("")
+    /*Map to translate region string to usable region string*/
     const regions: Map<string, string> = new Map([
         ["Europa West", "euw1"],
         ["Europe Nordic & East", "eun1"]
     ])
 
+    /*Saves region and summonerName in localStorage*/
     const handleClick = () => {
         localStorage.setItem("region", regions.get(region)!)
-
         localStorage.setItem("summonerName", summonerName)
     }
 
+    /*sets summonerName on input change*/
     const handleChange = (e : any) => {
         setSummonerName(e.target.value)
     }

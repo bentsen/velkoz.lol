@@ -8,17 +8,26 @@ import {IMatch, Participant} from "reksai/src/@types/match";
 import useSWR from 'swr'
 import DoughnutChart from "../../components/DoughnutChart";
 
+/*
+* Name: Mikkel Bentsen
+* Date: 14/9-2022
+*/
 
 const Account = () => {
+    /*Summoner Instance*/
     const [summoner, setSummoner] = useState<ISummoner>()
+    /*Matches Instance*/
     const [matches, setMatches] = useState<IMatch[]>([])
+    /*Icon url*/
     const icon = `https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/${summoner?.profileIconId}.png`
+    /*Match fetcher using SWR and axios*/
     const fetcher = async (url: any) => await axios.get(url).then((res) => res.data)
     const { data, error } = useSWR<IMatch[]>("/api/summoner/matches?summonerName="+localStorage.getItem("summonerName")+"&region="+localStorage.getItem("region"), fetcher)
 
+    /*Summoner fetcher using axios*/
     useEffect(()  => {
         async function getSummoner(){
-            const response = await axios.get<ISummoner>("/api/summoner?summonerName="+localStorage.getItem("summonerName")+"&region="+localStorage.getItem("region"))
+            const response = await axios.get<ISummoner>("/api/summoner?name="+localStorage.getItem("summonerName")+"&region="+localStorage.getItem("region"))
             const data:ISummoner = await response.data
             setSummoner(data)
         }
@@ -26,6 +35,7 @@ const Account = () => {
 
     }, [])
 
+    /*Matches fetcher should be deleted and replace everywhere with SWR fetch*/
     useEffect(() => {
         async function getMatches(){
             const response = await axios.get<IMatch[]>("/api/summoner/matches?summonerName="+localStorage.getItem("summonerName")+"&region="+localStorage.getItem("region"))
@@ -35,6 +45,7 @@ const Account = () => {
         getMatches()
     }, [])
 
+    /*Calculates the win rate of a summoner*/
     const calculateWinRate = (wins: number, loss: number) => {
         const sum = wins + loss
         const deci = wins / sum
@@ -43,14 +54,12 @@ const Account = () => {
         return Math.round(winrate)
     }
 
+    /*Gets the most frequent role played by a summoner (needs fix)*/
     const getMostFrequent = (arr: string[]) => {
-        const hashmap = arr.reduce( (acc: any, val : any) => {
-            acc[val] = (acc[val] || 0 ) + 1
-            return acc
-        },{})
-        return Object.keys(hashmap).reduce((a, b) => hashmap[a] > hashmap[b] ? a : b)
+
     }
 
+    /*Gets the most played champion played by a summoner (not done)*/
     const getMostPlayeChamps = () => {
         let champArray: string[] = []
         for(let i = 0; i < matches.length; i++){
@@ -60,15 +69,21 @@ const Account = () => {
         return champArray
     }
 
+    /*Calculates a summoners favorite position by reason matches*/
     const calculateFavoritePosition = () => {
         let positionArray: string[] = []
         for(let i = 0; i < matches.length; i++){
             positionArray.push(getSummerParticipantFromMatch(matches[i])?.individualPosition as string)
         }
 
-        return getMostFrequent(positionArray)
+        const hashmap = positionArray.reduce( (acc: any, val : any) => {
+            acc[val] = (acc[val] || 0 ) + 1
+            return acc
+        },{})
+        return Object.keys(hashmap).reduce((a, b) => hashmap[a] > hashmap[b] ? a : b)
     }
 
+    /*Identifies the summoner in all matches*/
     const getSummerParticipantFromMatch = (match: IMatch) => {
         let participant: Participant
 
@@ -85,6 +100,7 @@ const Account = () => {
         }
     }
 
+    /*Gets the total kills by the summoners team*/
     const getTeamKillsRecentGames = () => {
         let number1: number = 0
         let number2: number = 0
@@ -102,6 +118,7 @@ const Account = () => {
         return number2
     }
 
+    /*Calculates the average kills in all recent games*/
     const calculateAverageKillsRecentGames = () => {
         let totalKills: number = 0
         let numberOfmatches: number = 0
@@ -116,6 +133,7 @@ const Account = () => {
         return parseFloat(String(averageKills)).toFixed(1)
     }
 
+    /*Calculates the average assists in all recent games*/
     const calculateAverageAssistsRecentGames = () => {
         let totalAssists: number = 0
         let numberOfmatches: number = 0
@@ -130,6 +148,7 @@ const Account = () => {
         return parseFloat(String(averageAssists)).toFixed(1)
     }
 
+    /*Calculates the average deaths in all recent games*/
     const calculateAverageDeathsRecentGames = () => {
         let totalDeaths: number = 0
         let numberOfmatches: number = 0
@@ -144,6 +163,7 @@ const Account = () => {
         return parseFloat(String(averageDeaths)).toFixed(1)
     }
 
+    /*Calculates summoners kill participation in all recent games*/
     const calculateKillPerticipationRecentGames = () => {
         const teamKill = getTeamKillsRecentGames()
         let number1: number = 0
@@ -165,7 +185,7 @@ const Account = () => {
         return Math.round(kp)
     }
 
-
+    /*Calculates summoners kda in all recent games*/
     const calculateKDARecentGames = () => {
         let number1: number = 0
         let number2: number = 0
@@ -193,6 +213,7 @@ const Account = () => {
         return parseFloat(String(number2)).toFixed(2)
     }
 
+    /*get wins for all recent games*/
     const getWinsRecentGames = () => {
         let wins: number = 0
 
@@ -211,6 +232,7 @@ const Account = () => {
         return wins
     }
 
+    /*get losses for all recent games*/
     const getLossesRecentGames = () => {
         let losses: number = 0
 
@@ -225,7 +247,6 @@ const Account = () => {
                 }
             }
         }
-
         return losses
     }
 
