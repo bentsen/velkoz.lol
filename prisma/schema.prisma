@@ -13,12 +13,12 @@ datasource db {
 }
 
 model Summoner{
-    id Int @id @default(autoincrement())
-    summonerId string
-    puuid string
-    name string
-    summonerLeavel Int
-    accountId string
+    id String @unique
+    accountId String @unique
+    puuid String @unique
+    name String
+    summonerLevel Int
     profileIconId Int
-    revisionDate Int
+    revisionDate String
+    region String
 }
