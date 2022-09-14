@@ -6,13 +6,22 @@ import axios from "axios";
 import {Runes} from "../utils/types/runes.t";
 import {Spell} from "../utils/types/spell.t"
 
+/*
+* Name: Mikkel Bentsen
+* Date: 14/9-2022
+*/
+
 const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
+    /*useStake for match state*/
     const [matchWon, setMatchWon] = useState<boolean>()
+    /*useStake for summoner*/
     const [summonerParticipant, setSummonerParticipant] = useState<ISummoner>(summoner)
-    const [matchCount, setMatchCount] = useState(0)
+    /*useState for Runes array*/
     const [runes, setRunes] = useState<Runes[]>([])
+    /*useState for Spell array*/
     const [spells, setSpells] = useState<Spell[]>([])
 
+    /*useEffect to fetch all spells*/
     useEffect(() => {
         async function getSpells(){
             const response = await axios.get<Spell[]>("/api/spells/")
@@ -22,7 +31,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         getSpells()
     },[])
 
-
+    /*useEffect to check if match is won or lost*/
     useEffect(()  => {
         const matchWon = () => {
             for(let i = 0; i < match.info.participants.length; i++){
@@ -36,6 +45,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         matchWon()
     })
 
+    /*useEffect to fetch all runes*/
     useEffect(() => {
         async function getRunes(){
             const response = await axios.get<Runes[]>("/api/runes/")
@@ -45,6 +55,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         getRunes()
     }, [])
 
+    /*Get summoner spell by id*/
     const getSummonerSpell = (id: number | undefined) => {
         if(id != undefined){
             for(let i = 0; i < spells.length; i++){
@@ -55,6 +66,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
+    /*Get runeIcon by id*/
     const getRuneIcon = (id: number | undefined) => {
         if(id != undefined) {
             for(let i = 0; i < runes.length; i++) {
@@ -69,6 +81,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
+    /*Get runeStyleIcon by id*/
     const getRuneStyle = (id: number | undefined) => {
         if(id != undefined){
             for(let i = 0; i < runes.length; i++) {
@@ -80,6 +93,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
 
     }
 
+    /*Get summoner from match*/
     const getSummerParticipant = () => {
         let participant: Participant
 
@@ -96,18 +110,21 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
+    /*Get first team in match*/
     const getFirstHalf = () => {
         const half_length = Math.ceil(match.info.participants.length / 2)
 
         return match.info.participants.slice(0, half_length)
     }
 
+    /*Get second team in match*/
     const getLastHalf = () => {
         const half_length = Math.ceil(match.info.participants.length / 2)
 
         return match.info.participants.slice(half_length)
     }
 
+    /*Check length of name and cut to fit*/
     const checkLength = (name: string) => {
         if(name.length > 5) {
             return name.substring(0, 5) + ".."
@@ -117,6 +134,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
+    /*Calculate kda of summoner*/
     const calculateKDA = (kills:number | undefined, deaths:number | undefined, assists:number | undefined) => {
        if(kills != undefined && deaths != undefined && assists != undefined) {
             const KDA: number = (kills + assists) / deaths
@@ -129,6 +147,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
        }
     }
 
+    /*Calculate total cs of summoner*/
     const calculateTotalCs = () => {
         const totalMinions = getSummerParticipant()?.totalMinionsKilled
         const totalJungleMonsters = getSummerParticipant()?.neutralMinionsKilled
@@ -137,7 +156,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
-
+    /*Get time since match was played*/
     const timeSince = () => {
         const timeStamp = match.info.gameEndTimestamp
         const date = new Date(timeStamp).valueOf()
@@ -168,8 +187,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         return Math.floor(seconds) + " seconds";
     }
 
-
-
+    /*Calculate summoner cs per minute*/
     const calculateCsPerMin = () => {
         const matchDuration = match.info.gameDuration
         const totalMinions = calculateTotalCs()
@@ -183,6 +201,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
        }
     }
 
+    /*Get summoners team total kills*/
     const getTeamKills = () => {
         for(let i = 0; i < match.info.teams.length; i++){
             if(match.info.teams[i].teamId == getSummerParticipant()?.teamId){
@@ -191,6 +210,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
+    /*Calculate summoner kill participation*/
     const calculateKillPerticipation = () => {
         const teamKill = getTeamKills()
         const personalAssists = getSummerParticipant()?.assists
@@ -203,7 +223,6 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
-    // @ts-ignore
     return(
         <>
             {!matchWon ? (

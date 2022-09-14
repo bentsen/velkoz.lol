@@ -1,8 +1,12 @@
 import Image from "next/image";
 import {Dialog} from "@headlessui/react";
 
-const Modal = ({isOpen, setIsOpen, region, setRegion} : any) => {
+/*
+* Name: Mikkel Bentsen
+* Date: 14/9-2022
+*/
 
+const Modal = ({isOpen, setIsOpen, region, setRegion} : any) => {
     return (
         <>
             <Dialog open={isOpen} onClose={() => setIsOpen(false)}>

@@ -1,56 +1,52 @@
 import Link from "next/link";
 import Image from "next/image";
-import {motion} from "framer-motion";
 import {useEffect, useState} from "react";
-import axios from "axios";
-import {ISummoner} from "reksai/src/@types/summoner";
+
+/*
+* Name: Mikkel Bentsen
+* Date: 14/9-2022
+*/
 
 const Navbar = () => {
-    const [isNavOpen, setIsNavOpen] = useState(false);
+    /*Usestate for game that is chosen on navbar*/
     const [game, setGame] = useState("")
 
-
+    /*UseEffect that sets game-useState as localStorage*/
     useEffect(()  => {
         const tempgame = localStorage.getItem("game") as string
         if(tempgame){
             setGame(tempgame)
         }
-        console.log("jeg sætter game med localstorage")
     }, [])
 
-    const refreshPage = () => {
-        if(window.location.pathname == "/") {
-            window.location.reload()
-        }
-    }
-
+    /*Setes localStorage to valorant*/
     const valorant = () => {
         setGame("valorant")
         localStorage.setItem("game", "valorant")
     }
 
+    /*Sets localStorage to league of legends*/
     const leagueoflegends = () => {
         setGame("lol")
         localStorage.setItem("game", "lol")
     }
 
+    /*Sets localStorage to teamfight tactics*/
     const tft = () => {
         setGame("tft")
         localStorage.setItem("game", "tft")
     }
 
+    /*Sets localStorage to leagends of runterrea*/
     const lor = () => {
         setGame("lor")
         localStorage.setItem("game","lor")
     }
 
+    /*Sets localStorage to none*/
     const home = () => {
         setGame("")
         localStorage.setItem("game","")
-    }
-
-    const handleClick = () => {
-        setIsNavOpen(!isNavOpen);
     }
 
     return (
