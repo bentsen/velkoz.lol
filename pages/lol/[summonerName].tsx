@@ -7,6 +7,7 @@ import {ISummoner} from "reksai/src/@types/summoner";
 import {IMatch, Participant} from "reksai/src/@types/match";
 import useSWR from 'swr'
 import DoughnutChart from "../../components/DoughnutChart";
+import Reksai from "reksai";
 
 /*
 * Name: Mikkel Bentsen
@@ -27,7 +28,10 @@ const Account = () => {
     /*Summoner fetcher using axios*/
     useEffect(()  => {
         async function getSummoner(){
-            const response = await axios.get<ISummoner>("/api/summoner?name="+localStorage.getItem("summonerName")+"&region="+localStorage.getItem("region"))
+            const response = await axios.get<ISummoner>("/api/summoner?name="+localStorage.getItem("summonerName")+"&region="+localStorage.getItem("region"),
+                {
+                    method: "GET"
+                })
             const data:ISummoner = await response.data
             setSummoner(data)
         }
@@ -44,6 +48,29 @@ const Account = () => {
         }
         getMatches()
     }, [])
+
+    const updateSummoner = async () => {
+        const reksai = new Reksai(process.env.RIOT_API_KEY)
+        const newSummoner: ISummoner = await reksai.summoner.bySummonerName(summoner?.name as string,localStorage.getItem("region") as string)
+
+        const body = {
+            id: newSummoner.id,
+            accountId: newSummoner.accountId,
+            puuid: newSummoner.puuid,
+            name: newSummoner.name,
+            summonerLevel: newSummoner.summonerLevel,
+            profileIconId: newSummoner.profileIconId,
+            revisionDate: String(newSummoner.revisionDate),
+            region: String(localStorage.getItem("region"))
+        }
+        const response = await axios.get<ISummoner>("/api/summoner/", {
+            method: 'POST',
+            data: JSON.stringify(body)
+        });
+        if(response.status !== 200){
+            console.log("something went wrong")
+        }
+    }
 
     /*Calculates the win rate of a summoner*/
     const calculateWinRate = (wins: number, loss: number) => {
@@ -271,7 +298,7 @@ const Account = () => {
                                     <p className={"text-white text-2xl font-bold"}>{summoner.name}</p>
                                     <p className={"text-summoner-gray text-xs mt-2"}>Ladder Rank</p>
                                     <div className={"mt-3"}>
-                                        <motion.button whileHover={{scale: 1.1}} className={"bg-leagueoflegends-color text-white w-16 h-10 rounded text-sm"}>Update</motion.button>
+                                        <motion.button onClick={updateSummoner} whileHover={{scale: 1.1}} className={"bg-leagueoflegends-color text-white w-16 h-10 rounded text-sm"}>Update</motion.button>
                                         <motion.button whileHover={{scale: 1.1}} className={"bg-transparent border-leagueoflegends-color border ml-2 text-leagueoflegends-color w-20 h-10 rounded text-sm"}>Tier-Graph</motion.button>
                                     </div>
                                     <p className={"text-summoner-gray text-xs mt-2"}>Last updated:</p>

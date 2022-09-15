@@ -19,6 +19,7 @@ model Summoner{
     name String
     summonerLevel Int
     profileIconId Int
-    revisionDate String
+    revisionDate String 
     region String
+    lastUpdated DateTime @default(now())
 }

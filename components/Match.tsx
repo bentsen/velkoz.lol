@@ -384,8 +384,8 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                         <div className={"relative w-10 h-24 rounded-tr rounded-br overflow-hidden"}>
                             <button className={"w-10 h-24 bg-loss-button flex justify-center items-end hover:bg-loss"}>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-loss-border mb-2" fill="none"
-                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                     viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <path strokeLinecap="round" strokeLinejoin="round"
                                           d="M19 9l-7 7-7-7"/>
                                 </svg>
                             </button>
@@ -552,8 +552,8 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                             <div className={"relative w-10 h-24 rounded-tr rounded-br overflow-hidden"}>
                                 <button className={"w-10 h-24 bg-win-button flex justify-center items-end hover:bg-win"}>
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-win-border mb-2" fill="none"
-                                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                         viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                        <path strokeLinecap="round" strokeLinejoin="round"
                                               d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </button>
