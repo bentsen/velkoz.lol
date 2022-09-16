@@ -49,6 +49,7 @@ const Account = () => {
         getMatches()
     }, [])
 
+    /*Update summoner in database*/
     const updateSummoner = async () => {
         const reksai = new Reksai(process.env.RIOT_API_KEY)
         const newSummoner: ISummoner = await reksai.summoner.bySummonerName(summoner?.name as string,localStorage.getItem("region") as string)

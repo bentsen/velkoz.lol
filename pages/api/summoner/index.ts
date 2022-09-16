@@ -47,7 +47,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
             try{
                 await prisma.summoner.create({
                     data: {
-                        id: summoner.id,
+                        summonerid: summoner.id,
                         accountId: summoner.accountId,
                         puuid: summoner.puuid,
                         name: summoner.name,
