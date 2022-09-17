@@ -11,7 +11,7 @@ import { prisma } from "../../../lib/prisma";
 export default async (req: NextApiRequest, res: NextApiResponse) =>  {
 
     if(req.method === 'POST') {
-        return await addSummoner(req, res);
+        return await updateSummoner(req, res);
     } else if (req.method === 'GET'){
         return await readSummoner(req, res);
     }
@@ -19,7 +19,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
         return res.status(405).json({message: 'Method not allowed'})
     }
 
-    async function addSummoner(req: NextApiRequest, res: NextApiResponse){
+    async function updateSummoner(req: NextApiRequest, res: NextApiResponse){
 
     }
 
@@ -27,13 +27,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
     async function readSummoner(req: NextApiRequest, res: NextApiResponse){
         /*Name and region typed in url*/
         const query = req.query
-        const {name, region} = query
+        const {summonerName, region} = query
 
         /*Checks if a summoner exists in database by name and region*/
         let placeCount = await prisma.summoner.count(
             {
                 where: {
-                    name: String(name),
+                    name: String(summonerName),
                     region: String(region)
                 }
             }
@@ -42,7 +42,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
         /*If no summoner exists in database fetch and push summoner to database and return json*/
         if(placeCount == 0){
             const reksai = new Reksai(process.env.RIOT_API_KEY)
-            const summoner: ISummoner = await reksai.summoner.bySummonerName(String(name), String(region))
+            const summoner: ISummoner = await reksai.summoner.bySummonerName(String(summonerName), String(region))
 
             try{
                 await prisma.summoner.create({
@@ -68,7 +68,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
             try{
                 const summoner = await prisma.summoner.findFirst({
                     where: {
-                        name: String(name),
+                        name: String(summonerName),
                         region: String(region)
                     }
                 })

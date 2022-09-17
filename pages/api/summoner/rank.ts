@@ -10,7 +10,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
     const rank: ILeague[] = await reksai.league.entriesBySummonerId(summoner.id)
     const rank2: ILeague = await reksai.league.grandmasterLeaguesByQueue("RANKED_SOLO_5x5")
 
-    console.log(rank)
-
-    res.status(200).json(rank[0].entries[0].rank)
+    res.status(200).json(rank2)
 }

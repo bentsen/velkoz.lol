@@ -5,6 +5,8 @@ import Modal from "../../components/Modal";
 import {useState} from "react";
 import {motion} from "framer-motion";
 import Link from "next/link";
+import axios from "axios";
+import {ISummoner} from "reksai/src/@types/summoner";
 
 /*
 * Name: Mikkel Bentsen
@@ -25,7 +27,7 @@ const Lol: NextPage = () => {
     ])
 
     /*Saves region and summonerName in localStorage*/
-    const handleClick = () => {
+    const handleClick = async () => {
         localStorage.setItem("region", regions.get(region)!)
         localStorage.setItem("summonerName", summonerName)
     }

@@ -15,39 +15,21 @@ import Reksai from "reksai";
 */
 
 const Account = () => {
-    /*Summoner Instance*/
-    const [summoner, setSummoner] = useState<ISummoner>()
-    /*Matches Instance*/
-    const [matches, setMatches] = useState<IMatch[]>([])
+    /*fetcher engine*/
+    const fetcher = async (url: any) => await axios.get(url).then((res) => res.data)
+    /*Summoner fetcher using SWR and axios*/
+    const {data: summoner} = useSWR<ISummoner>("/api/summoner?summonerName="+localStorage.getItem("summonerName")+"&region="+localStorage.getItem("region"), fetcher)
+    /*Match fetcher using SWR and axios*/
+    const { data: matches, error } = useSWR<IMatch[]>("/api/summoner/matches?summonerName="+localStorage.getItem("summonerName")+"&region="+localStorage.getItem("region"), fetcher)
     /*Icon url*/
     const icon = `https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/${summoner?.profileIconId}.png`
-    /*Match fetcher using SWR and axios*/
-    const fetcher = async (url: any) => await axios.get(url).then((res) => res.data)
-    const { data, error } = useSWR<IMatch[]>("/api/summoner/matches?summonerName="+localStorage.getItem("summonerName")+"&region="+localStorage.getItem("region"), fetcher)
 
-    /*Summoner fetcher using axios*/
-    useEffect(()  => {
-        async function getSummoner(){
-            const response = await axios.get<ISummoner>("/api/summoner?name="+localStorage.getItem("summonerName")+"&region="+localStorage.getItem("region"),
-                {
-                    method: "GET"
-                })
-            const data:ISummoner = await response.data
-            setSummoner(data)
-        }
-        getSummoner()
-
-    }, [])
-
-    /*Matches fetcher should be deleted and replace everywhere with SWR fetch*/
-    useEffect(() => {
-        async function getMatches(){
-            const response = await axios.get<IMatch[]>("/api/summoner/matches?summonerName="+localStorage.getItem("summonerName")+"&region="+localStorage.getItem("region"))
-            const data:IMatch[] = await response.data
-            setMatches(data)
-        }
-        getMatches()
-    }, [])
+    /*Sorting match array by TimeStamp*/
+    const sortMatches = () => {
+        matches?.sort(function (x, y) {
+            return Number(y.info.gameEndTimestamp) - Number(x.info.gameEndTimestamp)
+        })
+    }
 
     /*Update summoner in database*/
     const updateSummoner = async () => {
@@ -90,8 +72,10 @@ const Account = () => {
     /*Gets the most played champion played by a summoner (not done)*/
     const getMostPlayeChamps = () => {
         let champArray: string[] = []
-        for(let i = 0; i < matches.length; i++){
-            champArray.push(getSummerParticipantFromMatch(matches[i])?.championName as string)
+        if(matches != undefined) {
+            for (let i = 0; i < matches.length; i++) {
+                champArray.push(getSummerParticipantFromMatch(matches[i])?.championName as string)
+            }
         }
 
         return champArray
@@ -100,8 +84,10 @@ const Account = () => {
     /*Calculates a summoners favorite position by reason matches*/
     const calculateFavoritePosition = () => {
         let positionArray: string[] = []
-        for(let i = 0; i < matches.length; i++){
-            positionArray.push(getSummerParticipantFromMatch(matches[i])?.individualPosition as string)
+        if(matches != undefined) {
+            for (let i = 0; i < matches.length; i++) {
+                positionArray.push(getSummerParticipantFromMatch(matches[i])?.individualPosition as string)
+            }
         }
 
         const hashmap = positionArray.reduce( (acc: any, val : any) => {
@@ -133,16 +119,16 @@ const Account = () => {
         let number1: number = 0
         let number2: number = 0
 
-        for(let i = 0; i < matches.length; i++){
-            for(let j = 0; j < matches[i].info.teams.length; j++)
-            {
-                if (matches[i].info.teams[j].teamId == getSummerParticipantFromMatch(matches[i])?.teamId) {
-                    number1 = matches[i].info.teams[j].objectives.champion.kills
-                    number2 = number2 + number1
+        if(matches != undefined) {
+            for (let i = 0; i < matches.length; i++) {
+                for (let j = 0; j < matches[i].info.teams.length; j++) {
+                    if (matches[i].info.teams[j].teamId == getSummerParticipantFromMatch(matches[i])?.teamId) {
+                        number1 = matches[i].info.teams[j].objectives.champion.kills
+                        number2 = number2 + number1
+                    }
                 }
             }
         }
-
         return number2
     }
 
@@ -150,11 +136,13 @@ const Account = () => {
     const calculateAverageKillsRecentGames = () => {
         let totalKills: number = 0
         let numberOfmatches: number = 0
-        for(let i = 0; i < matches.length; i++){
-            const kills =  getSummerParticipantFromMatch(matches[i])?.kills
-            if(kills != undefined) {
-                totalKills = totalKills + kills
-                numberOfmatches = numberOfmatches + 1
+        if(matches != undefined) {
+            for (let i = 0; i < matches.length; i++) {
+                const kills = getSummerParticipantFromMatch(matches[i])?.kills
+                if (kills != undefined) {
+                    totalKills = totalKills + kills
+                    numberOfmatches = numberOfmatches + 1
+                }
             }
         }
         const averageKills =  totalKills / numberOfmatches
@@ -165,11 +153,13 @@ const Account = () => {
     const calculateAverageAssistsRecentGames = () => {
         let totalAssists: number = 0
         let numberOfmatches: number = 0
-        for(let i = 0; i < matches.length; i++){
-            const assists =  getSummerParticipantFromMatch(matches[i])?.assists
-            if(assists != undefined) {
-                totalAssists = totalAssists + assists
-                numberOfmatches = numberOfmatches + 1
+        if(matches != undefined) {
+            for (let i = 0; i < matches.length; i++) {
+                const assists = getSummerParticipantFromMatch(matches[i])?.assists
+                if (assists != undefined) {
+                    totalAssists = totalAssists + assists
+                    numberOfmatches = numberOfmatches + 1
+                }
             }
         }
         const averageAssists =  totalAssists / numberOfmatches
@@ -180,11 +170,13 @@ const Account = () => {
     const calculateAverageDeathsRecentGames = () => {
         let totalDeaths: number = 0
         let numberOfmatches: number = 0
-        for(let i = 0; i < matches.length; i++){
-            const deaths =  getSummerParticipantFromMatch(matches[i])?.deaths
-            if(deaths != undefined) {
-                totalDeaths = totalDeaths + deaths
-                numberOfmatches = numberOfmatches + 1
+        if(matches != null) {
+            for (let i = 0; i < matches.length; i++) {
+                const deaths = getSummerParticipantFromMatch(matches[i])?.deaths
+                if (deaths != undefined) {
+                    totalDeaths = totalDeaths + deaths
+                    numberOfmatches = numberOfmatches + 1
+                }
             }
         }
         const averageDeaths =  totalDeaths / numberOfmatches
@@ -198,14 +190,16 @@ const Account = () => {
         let number2: number = 0
         let number3: number = 0
 
-        for(let i = 0; i < matches.length; i++){
-            const personalKills = getSummerParticipantFromMatch(matches[i])?.kills
-            const personalAssits = getSummerParticipantFromMatch(matches[i])?.assists
+        if(matches != undefined) {
+            for (let i = 0; i < matches.length; i++) {
+                const personalKills = getSummerParticipantFromMatch(matches[i])?.kills
+                const personalAssits = getSummerParticipantFromMatch(matches[i])?.assists
 
-            if(teamKill != undefined && personalKills != undefined && personalAssits != undefined){
-                const sum = personalKills + personalAssits
-                number1 = sum;
-                number2 = number2 + sum
+                if (teamKill != undefined && personalKills != undefined && personalAssits != undefined) {
+                    const sum = personalKills + personalAssits
+                    number1 = sum;
+                    number2 = number2 + sum
+                }
             }
         }
 
@@ -218,23 +212,24 @@ const Account = () => {
         let number1: number = 0
         let number2: number = 0
         let number3: number = 0
-        for(let i = 0; i < matches.length; i++)
-        {
-          const kills = getSummerParticipantFromMatch(matches[i])?.kills
-          const deaths = getSummerParticipantFromMatch(matches[i])?.deaths
-          const assists = getSummerParticipantFromMatch(matches[i])?.assists
 
-          if(kills != undefined && deaths != undefined && assists != undefined) {
-              const KDA: number = (kills + assists) / deaths
-              const temp = KDA
+        if(matches != undefined) {
+            for (let i = 0; i < matches.length; i++) {
+                const kills = getSummerParticipantFromMatch(matches[i])?.kills
+                const deaths = getSummerParticipantFromMatch(matches[i])?.deaths
+                const assists = getSummerParticipantFromMatch(matches[i])?.assists
 
-              number1 = temp
-              number2 = number2 + temp
-              number3 = number3 + 1
-          }
-          else{
-              console.log("undefined")
-          }
+                if (kills != undefined && deaths != undefined && assists != undefined) {
+                    const KDA: number = (kills + assists) / deaths
+                    const temp = KDA
+
+                    number1 = temp
+                    number2 = number2 + temp
+                    number3 = number3 + 1
+                } else {
+                    console.log("undefined")
+                }
+            }
         }
 
         number2 = number2 / number3
@@ -245,12 +240,14 @@ const Account = () => {
     const getWinsRecentGames = () => {
         let wins: number = 0
 
-        for(let i = 0; i < matches.length; i++){
-            for(let j = 0; j < matches[i].info.participants.length; j++) {
-                if (matches[i].info.participants[j]?.puuid != undefined) {
-                    if (matches[i].info.participants[j].puuid == summoner?.puuid) {
-                        if (matches[i].info.participants[j].win) {
-                            wins = wins + 1
+        if(matches != undefined) {
+            for (let i = 0; i < matches.length; i++) {
+                for (let j = 0; j < matches[i].info.participants.length; j++) {
+                    if (matches[i].info.participants[j]?.puuid != undefined) {
+                        if (matches[i].info.participants[j].puuid == summoner?.puuid) {
+                            if (matches[i].info.participants[j].win) {
+                                wins = wins + 1
+                            }
                         }
                     }
                 }
@@ -264,12 +261,14 @@ const Account = () => {
     const getLossesRecentGames = () => {
         let losses: number = 0
 
-        for(let i = 0; i < matches.length; i++){
-            for(let j = 0; j < matches[i].info.participants.length; j++) {
-                if (matches[i].info.participants[j]?.puuid != undefined) {
-                    if (matches[i].info.participants[j].puuid == summoner?.puuid) {
-                        if (!matches[i].info.participants[j].win) {
-                            losses = losses + 1
+        if(matches != undefined) {
+            for (let i = 0; i < matches.length; i++) {
+                for (let j = 0; j < matches[i].info.participants.length; j++) {
+                    if (matches[i].info.participants[j]?.puuid != undefined) {
+                        if (matches[i].info.participants[j].puuid == summoner?.puuid) {
+                            if (!matches[i].info.participants[j].win) {
+                                losses = losses + 1
+                            }
                         }
                     }
                 }
@@ -378,7 +377,7 @@ const Account = () => {
                                         <p className={"text-sm ml-2"}>Match History Stats</p>
                                     </div>
                                     <div>
-                                        {data ? (
+                                        {matches ? (
                                         <div className={"flex flex-row gap-4"}>
                                             <div className={"flex flex-col items-center justify-end h-full w-32 text-xs text-summoner-gray mt-3"}>
                                                 <div className={"text-left w-full ml-10"}>
@@ -454,8 +453,9 @@ const Account = () => {
                                     </div>
                                 </div>
                                 <div className={"flex flex-col mb-10"}>
-                                    {data ? (
-                                        data.map((match) => (
+                                    {matches ? (
+                                        sortMatches(),
+                                        matches.map((match) => (
                                             <Match key={match.info.gameId} match={match} summoner={summoner}/>
                                         ))
                                     ) : error ? (<div className={"w-full flex items-center justify-center h-14 text-white font-bold text-xl"}>Something went wrong</div>) : (

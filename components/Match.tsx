@@ -158,7 +158,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
 
     /*Get time since match was played*/
     const timeSince = () => {
-        const timeStamp = match.info.gameEndTimestamp
+        const timeStamp = Number(match.info.gameEndTimestamp)
         const date = new Date(timeStamp).valueOf()
 
         const seconds = Math.floor((new Date().valueOf() - date) / 1000)
@@ -363,7 +363,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                         <img className={"block w-4 h-4 rounded"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${player.championName}.png`} alt=""/>
                                     </div>
                                     <div className={"inline-block align-middle text-summoner-gray"}>
-                                        <p className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden " + (player.summonerName == summonerParticipant.name ? "text-white" : "")}>{checkLength(player.summonerName)}</p>
+                                        <p className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden " + (player.puuid == summonerParticipant.puuid ? "text-white" : "")}>{checkLength(player.summonerName)}</p>
                                     </div>
                                 </li>
                                 ))}
@@ -375,7 +375,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                         <img className={"block w-4 h-4 rounded"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${player.championName}.png`} alt=""/>
                                     </div>
                                     <div className={"inline-block align-middle text-summoner-gray"}>
-                                        <p className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden " + (player.summonerName == summonerParticipant.name ? "text-white" : "")}>{checkLength(player.summonerName)}</p>
+                                        <p className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden " + (player.puuid == summonerParticipant.puuid ? "text-white" : "")}>{checkLength(player.summonerName)}</p>
                                     </div>
                                 </li>
                                 ))}
@@ -531,7 +531,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                                 <img className={"block w-4 h-4 rounded"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${player.championName}.png`} alt=""/>
                                             </div>
                                             <div className={"inline-block align-middle text-summoner-gray"}>
-                                                <p className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden " + (player.summonerName == summonerParticipant.name ? "text-white" : "")}>{checkLength(player.summonerName)}</p>
+                                                <p className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden " + (player.puuid == summonerParticipant.puuid ? "text-white" : "")}>{checkLength(player.summonerName)}</p>
                                             </div>
                                         </li>
                                     ))}
@@ -543,7 +543,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                                 <img className={"block w-4 h-4 rounded"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${player.championName}.png`} alt=""/>
                                             </div>
                                             <div key={index} className={"inline-block align-middle text-summoner-gray"}>
-                                                <p className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden " + (player.summonerName  == summonerParticipant.name ? "text-white" : "")}>{checkLength(player.summonerName)}</p>
+                                                <p className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden " + (player.puuid  == summonerParticipant.puuid ? "text-white" : "")}>{checkLength(player.summonerName)}</p>
                                             </div>
                                         </li>
                                     ))}

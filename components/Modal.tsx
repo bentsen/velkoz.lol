@@ -23,7 +23,7 @@ const Modal = ({isOpen, setIsOpen, region, setRegion} : any) => {
                                         <div className={"grid grid-cols-3 gap-4 mt-1"}>
                                             <div className={"flex flex-row gap-2 items-center text-sm"}>
                                                 <input className={""} onChange={() => setRegion("Europe Nordic & East")} type="radio" name={"region"} value={"Europe Nordic & East"} checked={region === "Europe Nordic & East"}/>
-                                                <Image src={"/lol/regions/icon-eune.svg"} width={25} height={25}/>
+                                                <Image src={"/lol/regions/icon-eune.svg"} width={25} height={25} alt={"icon"}/>
                                                 <p className={"ml-1"}>Europe Nordic & East</p>
                                             </div>
                                             <div className={"flex flex-row gap-2 items-center text-sm"}>
