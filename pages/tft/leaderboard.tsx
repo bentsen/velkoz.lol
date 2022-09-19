@@ -9,22 +9,14 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSearch} from "@fortawesome/free-solid-svg-icons";
 
 const Leaderboard = () => {
+    const [isOpen, setIsOpen] = useState(false)
     const icon = "https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/1665.png"
-    const [modalShowing, setModalShowing] = useState(false)
     const [ladder, setLadder] = useState<Ladder[]>([])
     const [region, setRegion] = useState("Europa West")
     const [page, setPage] = useState(1)
 
     const getRegion = (regionData: any) => {
         setRegion(regionData)
-    }
-
-    const modalShow = () => {
-        setModalShowing(true)
-    }
-
-    const modalClose = () => {
-        setModalShowing(false)
     }
 
     useEffect(()  => {
@@ -131,7 +123,7 @@ const Leaderboard = () => {
                 </div>
                 <div className={"w-full h-auto mt-4"}>
                     <div className={"w-full h-12 rounded bg-summoner-light flex justify-between items-center"}>
-                        <button onClick={modalShow} className={"flex flex-row text-summoner-gray ml-2 border rounded text-sm w-auto justify-center h-10 items-center border-summoner-dark"}>
+                        <button onClick={() => setIsOpen(true)} className={"flex flex-row text-summoner-gray ml-2 border rounded text-sm w-auto justify-center h-10 items-center border-summoner-dark"}>
                             <span>{region}</span>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20"
                                  fill="currentColor">
@@ -252,7 +244,7 @@ const Leaderboard = () => {
                 <div className={"mt-20"}>
 
                 </div>
-                <Modal getRegion={getRegion} onClose={modalClose} visible={modalShowing} name={"lort"}/>
+                <Modal isOpen={isOpen} setIsOpen={setIsOpen} region={region} setRegion={setRegion}/>
             </div>
         </>
     )

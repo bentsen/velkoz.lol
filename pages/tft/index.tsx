@@ -7,7 +7,9 @@ import {Summoner} from "../../utils/types/summoner.t";
 import Modal from "../../components/Modal";
 
 const Tft: NextPage = () => {
-    const [modalShowing, setModalShowing] = useState(false)
+    /*useState for state of modal*/
+    const [isOpen, setIsOpen] = useState(false)
+
     const [region, setRegion] = useState("Europa West")
     const [summonerName, setSummonerName] = useState("")
     const [summoner, setSummoner] = useState<Summoner[]>([])
@@ -25,14 +27,6 @@ const Tft: NextPage = () => {
         setSummonerName(e.target.value)
     }
 
-    const modalShow = () => {
-        setModalShowing(true)
-    }
-
-    const modalClose = () => {
-        setModalShowing(false)
-    }
-
     return (
         <>
             <div className={"bg-[url('/tft/poster.jpeg')] h-screen w-full bg-cover overflow-hidden"}>
@@ -42,7 +36,7 @@ const Tft: NextPage = () => {
                     </div>
                     <div className={"flex flex-row bg-white w-2/5 h-14 rounded-3xl items-center"}>
                         <div>
-                            <div onClick={modalShow} className={"text-sm ml-4 w-44 text-black cursor-pointer"}>
+                            <div onClick={() => setIsOpen(true)} className={"text-sm ml-4 w-44 text-black cursor-pointer"}>
                                 <p>Region</p>
                                 <div className={"flex flex-row text-black"}>
                                     <span>{region}</span>
@@ -68,7 +62,7 @@ const Tft: NextPage = () => {
                     </Link>
                 </div>
             </div>
-            <Modal getRegion={getRegion} onClose={modalClose} visible={modalShowing} name={"lort"}/>
+            <Modal isOpen={isOpen} setIsOpen={setIsOpen} region={region} setRegion={setRegion}/>
         </>
     )
 }

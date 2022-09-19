@@ -15,15 +15,26 @@ import Reksai, {ddragon} from "reksai";
 */
 
 const Account = () => {
-    const [region, setRegion] = useState(localStorage.getItem("region"))
+    /*useState for region*/
+    const [region, setRegion] = useState<string>("")
+    /*useState for summonerName*/
+    const [summonerName, setSummonerName] = useState<string>("")
     /*fetcher engine*/
     const fetcher = async (url: any) => await axios.get(url).then((res) => res.data)
     /*Summoner fetcher using SWR and axios*/
-    const { data: summoner} = useSWR<ISummoner>("/api/summoner?summonerName="+localStorage.getItem("summonerName")+"&region="+localStorage.getItem("region"), fetcher)
+    const { data: summoner} = useSWR<ISummoner>("/api/summoner?summonerName="+summonerName+"&region="+region, fetcher)
     /*Match fetcher using SWR and axios*/
-    const { data: matches, error } = useSWR<IMatch[]>("/api/summoner/matches?summonerName="+localStorage.getItem("summonerName")+"&region="+localStorage.getItem("region"), fetcher)
+    const { data: matches, error } = useSWR<IMatch[]>("/api/summoner/matches?summonerName="+summonerName+"&region="+region, fetcher)
     /*Icon url*/
     const icon = `https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/${summoner?.profileIconId}.png`
+
+    /*useEffect that get localstorage when window is ready*/
+    useEffect(() => {
+        if(typeof window !== 'undefined') {
+            setRegion(localStorage.getItem("region") as string)
+            setSummonerName(localStorage.getItem("summonerName") as string)
+        }
+    }, [])
 
     /*Sorting match array by TimeStamp*/
     const sortMatches = () => {
