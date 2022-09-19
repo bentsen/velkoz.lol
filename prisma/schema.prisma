@@ -32,14 +32,14 @@ model Match {
   id         Int       @id @unique @default(autoincrement())
   metaData   Metadata?
   info       Info?
-  summoner   Summoner  @relation(fields: [summonerId], references: [id])
+  summoner   Summoner  @relation(fields: [summonerId], references: [id], onDelete: Cascade)
   summonerId Int
 }
 
 //Meta table
 model Metadata {
   id           Int               @id @unique @default(autoincrement())
-  game         Match             @relation(fields: [gameId], references: [id])
+  game         Match             @relation(fields: [gameId], references: [id], onDelete: Cascade)
   gameId       Int               @unique
   matchId      String
   dataVersion  String
@@ -49,7 +49,7 @@ model Metadata {
 model MetaParticipant {
   id              Int      @id @unique @default(autoincrement())
   metaParticipant String
-  metadata        Metadata @relation(fields: [metadataId], references: [id])
+  metadata        Metadata @relation(fields: [metadataId], references: [id], onDelete: Cascade)
   metadataId      Int
 }
 
@@ -70,7 +70,7 @@ model Info {
   queueId            Int
   teams              Team[]
   tournamentCode     String
-  match              Match         @relation(fields: [matchId], references: [id])
+  match              Match         @relation(fields: [matchId], references: [id], onDelete: Cascade)
   matchId            Int           @unique
 }
 
@@ -181,7 +181,7 @@ model Participant {
   wardsKilled                    Int
   wardsPlaced                    Int
   win                            Boolean
-  info                           Info    @relation(fields: [infoId], references: [id])
+  info                           Info    @relation(fields: [infoId], references: [id], onDelete: Cascade)
   infoId                         Int
 }
 
@@ -189,7 +189,7 @@ model Perks {
   id            Int         @id @unique @default(autoincrement())
   statPerks     PerkStats?
   styles        PerkStyle[]
-  participant   Participant @relation(fields: [participantId], references: [id])
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
   participantId Int         @unique
 }
 
@@ -198,7 +198,7 @@ model PerkStats {
   defense Int
   flex    Int
   offense Int
-  perks   Perks @relation(fields: [perksId], references: [id])
+  perks   Perks @relation(fields: [perksId], references: [id], onDelete: Cascade)
   perksId Int   @unique
 }
 
@@ -207,7 +207,7 @@ model PerkStyle {
   description String
   selections  PerkStyleSelection[]
   style       Int
-  perks       Perks                @relation(fields: [perksId], references: [id])
+  perks       Perks                @relation(fields: [perksId], references: [id], onDelete: Cascade)
   perksId     Int
 }
 
@@ -217,7 +217,7 @@ model PerkStyleSelection {
   var1        Int
   var2        Int
   var3        Int
-  perkStyle   PerkStyle @relation(fields: [perkStyleId], references: [id])
+  perkStyle   PerkStyle @relation(fields: [perkStyleId], references: [id], onDelete: Cascade)
   perkStyleId Int
 }
 
@@ -227,7 +227,7 @@ model Team {
   objectives Objectives?
   teamId     Int
   win        Boolean
-  info       Info        @relation(fields: [infoId], references: [id])
+  info       Info        @relation(fields: [infoId], references: [id], onDelete: Cascade)
   infoId     Int
 }
 
@@ -235,7 +235,7 @@ model Ban {
   id         Int  @id @unique @default(autoincrement())
   championId Int
   pickTurn   Int
-  team       Team @relation(fields: [teamId], references: [id])
+  team       Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
   teamId     Int
 }
 
@@ -247,7 +247,7 @@ model Objectives {
   inhibitor  Objective? @relation("inhibitor", map: "inhibitorId")
   riftHerald Objective? @relation("riftHerald", map: "riftHeraldId")
   tower      Objective? @relation("tower", map: "towerId")
-  team       Team       @relation(fields: [teamId], references: [id])
+  team       Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
   teamId     Int        @unique
 }
 
@@ -255,16 +255,16 @@ model Objective {
   id           Int         @id @unique @default(autoincrement())
   first        Boolean
   kills        Int
-  baron        Objectives? @relation("baron", fields: [baronId], references: [id])
+  baron        Objectives? @relation("baron", fields: [baronId], references: [id], onDelete: Cascade)
   baronId      Int?        @unique
-  champion     Objectives? @relation("champion", fields: [championId], references: [id])
+  champion     Objectives? @relation("champion", fields: [championId], references: [id], onDelete: Cascade)
   championId   Int?        @unique
-  dragon       Objectives? @relation("dragon", fields: [dragonId], references: [id])
+  dragon       Objectives? @relation("dragon", fields: [dragonId], references: [id], onDelete: Cascade)
   dragonId     Int?        @unique
-  inhibitor    Objectives? @relation("inhibitor", fields: [inhibitorId], references: [id])
+  inhibitor    Objectives? @relation("inhibitor", fields: [inhibitorId], references: [id], onDelete: Cascade)
   inhibitorId  Int?        @unique
-  riftHerald   Objectives? @relation("riftHerald", fields: [riftHeraldId], references: [id])
+  riftHerald   Objectives? @relation("riftHerald", fields: [riftHeraldId], references: [id], onDelete: Cascade)
   riftHeraldId Int?        @unique
-  tower        Objectives? @relation("tower", fields: [towerId], references: [id])
+  tower        Objectives? @relation("tower", fields: [towerId], references: [id], onDelete: Cascade)
   towerId      Int?        @unique
 }
