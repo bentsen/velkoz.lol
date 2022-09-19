@@ -10,13 +10,13 @@ import {faSearch} from "@fortawesome/free-solid-svg-icons";
 
 const Leaderboard = () => {
     const icon = "https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/1665.png"
-    const [modalShowing, setModalShowing] = useState(false)
+    const [modalShowing, setModalShowing] = useState<boolean>(false)
     const [ladder, setLadder] = useState<Ladder[]>([])
     const [region, setRegion] = useState("Europa West")
     const [gameMode, setGameMode] = useState("RANKED_SOLO_5x5")
     const [page, setPage] = useState(1)
 
-    const getRegion = (regionData) => {
+    const getRegion = (regionData: any) => {
         setRegion(regionData)
     }
 
@@ -43,7 +43,7 @@ const Leaderboard = () => {
         setLadder(temp)
     })
 
-    const calculateWinRate = (wins, loss) => {
+    const calculateWinRate = (wins: any, loss: any) => {
         const sum = wins + loss
         const deci = wins / sum
         const winrate = deci * 100
@@ -51,8 +51,8 @@ const Leaderboard = () => {
         return Math.round(winrate)
     }
 
-    const calculateRange = (data, rowsPerPage) => {
-        const range = []
+    const calculateRange = (data: any, rowsPerPage: any) => {
+        const range: any[] = []
         const num = Math.ceil(data.length / rowsPerPage);
         let i = 1;
         for (let i = 1; i <= num; i++) {
@@ -61,19 +61,19 @@ const Leaderboard = () => {
         return range;
     }
 
-    const sliceData = (data, page, rowsPerPage) => {
+    const sliceData = (data: any, page: any, rowsPerPage: any) => {
         return data.slice((page - 1) * rowsPerPage, page * rowsPerPage)
     }
 
-    const useTable = (data, page, rowsPerPage) => {
-        const [tableRange, setTableRange] = useState([]);
-        const [slice, setSlice] = useState([]);
+    const useTable = (data: any, page: any, rowsPerPage: any) => {
+        const [tableRange, setTableRange] = useState<any>([]);
+        const [slice, setSlice] = useState<any[]>([]);
 
         useEffect(() => {
-            const range = calculateRange(data, rowsPerPage);
+            const range: any[] = calculateRange(data, rowsPerPage);
             setTableRange([...range]);
 
-            const slice = sliceData(data, page, rowsPerPage);
+            const slice: any[] = sliceData(data, page, rowsPerPage);
             setSlice([...slice]);
         }, [data, setTableRange, page, setSlice]);
 
@@ -95,7 +95,7 @@ const Leaderboard = () => {
         window.scrollTo({top: 0, left: 0});
     }
 
-    const specificPage = (numb) => {
+    const specificPage = (numb : number) => {
         setPage(numb)
         window.scrollTo({top:0, left: 0})
     }
@@ -124,7 +124,7 @@ const Leaderboard = () => {
             <div className={"container mx-auto px-20 mt-10"}>
                 <div className={"flex justify-between text-xs text-summoner-gray"}>
                     <div>
-                        There are currently {ladder.length} challengers summoners on Summoner's Rift
+                        There are currently {ladder.length} challengers summoners on Summoner&apos;s Rift
                     </div>
                     <div>
                         Displaying summoners that are in the challenger. Rankings are updated periodically.
@@ -136,14 +136,18 @@ const Leaderboard = () => {
                             <span>{region}</span>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20"
                                  fill="currentColor">
-                                <path fill-rule="evenodd"
+                                <path fillRule="evenodd"
                                       d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                      clip-rule="evenodd"/>
+                                      clipRule="evenodd"/>
                             </svg>
                         </button>
                         <div className={"bg-summoner-dark rounded w-60 mr-2 h-9 flex justify-between items-center"}>
                             <input className={"bg-summoner-dark indent-3 ml-1 text-xs text-white w-48 h-9 rounded"} type="text" placeholder={"Summoner Name"}/>
-                            <FontAwesomeIcon className={"text-summoner-gray mr-3"} icon={faSearch}/>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
+                                 stroke="currentColor" className="w-6 h-6 text-summoner-gray">
+                                <path strokeLinecap="round" strokeLinejoin="round"
+                                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+                            </svg>
                         </div>
                     </div>
                     <div className={"w-full h-auto mt-2"}>

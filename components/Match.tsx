@@ -5,6 +5,7 @@ import {ISummoner} from "reksai/src/@types/summoner";
 import axios from "axios";
 import {Runes} from "../utils/types/runes.t";
 import {Spell} from "../utils/types/spell.t"
+import {ddragon} from "reksai";
 
 /*
 * Name: Mikkel Bentsen
@@ -411,7 +412,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                     <div className={"flex items-center"}>
                                         <div>
                                             <Link className={"relative block w-12 h-12"} href={"habib"}>
-                                                <img className={"rounded-full block w-12 h-12"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${getSummerParticipant()?.championName}.png`}/>
+                                                <img className={"rounded-full block w-13 h-12 object-cover"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${getSummerParticipant()?.championName}.png`}/>
                                             </Link>
                                         </div>
                                         <div className={"block ml-1"}>

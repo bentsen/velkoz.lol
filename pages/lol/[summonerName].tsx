@@ -5,9 +5,9 @@ import {motion} from "framer-motion";
 import axios from "axios";
 import {ISummoner} from "reksai/src/@types/summoner";
 import {IMatch, Participant} from "reksai/src/@types/match";
-import useSWR from 'swr'
+import useSWR, {mutate} from 'swr'
 import DoughnutChart from "../../components/DoughnutChart";
-import Reksai from "reksai";
+import Reksai, {ddragon} from "reksai";
 
 /*
 * Name: Mikkel Bentsen
@@ -15,10 +15,11 @@ import Reksai from "reksai";
 */
 
 const Account = () => {
+    const [region, setRegion] = useState(localStorage.getItem("region"))
     /*fetcher engine*/
     const fetcher = async (url: any) => await axios.get(url).then((res) => res.data)
     /*Summoner fetcher using SWR and axios*/
-    const {data: summoner} = useSWR<ISummoner>("/api/summoner?summonerName="+localStorage.getItem("summonerName")+"&region="+localStorage.getItem("region"), fetcher)
+    const { data: summoner} = useSWR<ISummoner>("/api/summoner?summonerName="+localStorage.getItem("summonerName")+"&region="+localStorage.getItem("region"), fetcher)
     /*Match fetcher using SWR and axios*/
     const { data: matches, error } = useSWR<IMatch[]>("/api/summoner/matches?summonerName="+localStorage.getItem("summonerName")+"&region="+localStorage.getItem("region"), fetcher)
     /*Icon url*/
@@ -33,23 +34,7 @@ const Account = () => {
 
     /*Update summoner in database*/
     const updateSummoner = async () => {
-        const reksai = new Reksai(process.env.RIOT_API_KEY)
-        const newSummoner: ISummoner = await reksai.summoner.bySummonerName(summoner?.name as string,localStorage.getItem("region") as string)
-
-        const body = {
-            id: newSummoner.id,
-            accountId: newSummoner.accountId,
-            puuid: newSummoner.puuid,
-            name: newSummoner.name,
-            summonerLevel: newSummoner.summonerLevel,
-            profileIconId: newSummoner.profileIconId,
-            revisionDate: String(newSummoner.revisionDate),
-            region: String(localStorage.getItem("region"))
-        }
-        const response = await axios.get<ISummoner>("/api/summoner/", {
-            method: 'POST',
-            data: JSON.stringify(body)
-        });
+        const response = await axios.put<ISummoner>("/api/summoner/="+localStorage.getItem("summonerName")+"region="+localStorage.getItem("region"));
         if(response.status !== 200){
             console.log("something went wrong")
         }

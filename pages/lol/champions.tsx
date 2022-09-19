@@ -2,23 +2,30 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSearch} from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
 import {useContext, useEffect, useState} from "react";
-import {Champion} from "../../utils/types/champion.t";
 import {motion} from "framer-motion";
-import {ChampionContext} from "../../store/ChampionContext/ChampionList";
 import {VersionContext} from "../../store/VersionContext/VersionList";
-import Reksai from "reksai";
+import Reksai, {ddragon} from "reksai";
+import {IChampion} from "reksai/src/@types/champion";
+import apiFacade from "../../store/apiFacade";
 
 
 const Champions = () => {
-    const reksai = new Reksai()
-    const Champions: Champion[] = useContext();
+    const [champions, setChampions] = useState<IChampion[]>([])
     const Version = useContext(VersionContext);
     const [role, setRole] = useState("all")
     const [inputValue, setInputValue] = useState<string>("")
-    const [filteredList, setFilteredList] = useState<Champion[] | undefined>([])
+    const [filteredList, setFilteredList] = useState<IChampion[] | undefined>([])
 
     useEffect(() => {
-        setFilteredList(Champions)
+        async function getChampions(){
+            await ddragon.champion.getAll()
+                .then((data) => setChampions(data))
+        }
+        getChampions()
+    }, [])
+
+    useEffect(() => {
+        setFilteredList(champions)
     }, []);
 
 
@@ -26,8 +33,8 @@ const Champions = () => {
         const keyword = e.target.value
 
         if(keyword !== ''){
-            if(Champions) {
-                const results: Champion[] | undefined = Champions?.filter((items) => {
+            if(champions) {
+                const results: IChampion[] | undefined = champions?.filter((items) => {
                     return items.name.toLowerCase().startsWith(keyword.toLowerCase())
                 })
                 //if text fields has an input
@@ -37,13 +44,12 @@ const Champions = () => {
                 console.log('no champions exits')
         } else {
             //if text fields is empty
-            setFilteredList(Champions)
+            setFilteredList(champions)
         }
         setInputValue(keyword)
     }
 
-    // @ts-ignore
-    // @ts-ignore
+
     return(
         <>
             <div className={"flex flex-col divide-black divide-y"}>
@@ -87,7 +93,11 @@ const Champions = () => {
                         </div>
                         <div className={"bg-summoner-light rounded w-60 mr-2 h-9 flex justify-between items-center"}>
                             <input className={"bg-summoner-light indent-3 ml-1 text-xs text-white w-48 h-9 rounded"} value={inputValue} onChange={filterChampion} type="text" placeholder={"Champion Name"}/>
-                            <FontAwesomeIcon className={"text-summoner-gray mr-3"} icon={faSearch}/>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
+                                 stroke="currentColor" className="w-6 h-6 text-summoner-gray">
+                                <path strokeLinecap="round" strokeLinejoin="round"
+                                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+                            </svg>
                         </div>
                     </div>
                 </div>

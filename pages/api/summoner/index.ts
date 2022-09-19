@@ -10,7 +10,7 @@ import { prisma } from "../../../lib/prisma";
 
 export default async (req: NextApiRequest, res: NextApiResponse) =>  {
 
-    if(req.method === 'POST') {
+    if(req.method === 'PUT') {
         return await updateSummoner(req, res);
     } else if (req.method === 'GET'){
         return await readSummoner(req, res);
@@ -20,7 +20,30 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
     }
 
     async function updateSummoner(req: NextApiRequest, res: NextApiResponse){
+        const query = req.query
+        const {summonerName, region} = query
 
+        const reksai = new Reksai(process.env.RIOT_API_KEY)
+        if (typeof summonerName === "string" && typeof region === "string") {
+            const newSummoner: ISummoner = await reksai.summoner.bySummonerName(summonerName, region)
+
+            await prisma.summoner.update({
+                data: {
+                    summonerid: newSummoner.id,
+                    accountId: newSummoner.accountId,
+                    puuid: newSummoner.puuid,
+                    name: newSummoner.name,
+                    summonerLevel: newSummoner.summonerLevel,
+                    profileIconId: newSummoner.profileIconId,
+                    revisionDate: String(newSummoner.revisionDate),
+                    region: String(region)
+                },
+                where: {
+                    puuid: newSummoner.puuid
+                }
+            })
+            return res.status(200).json(newSummoner);
+        }
     }
 
 

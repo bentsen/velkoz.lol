@@ -13,7 +13,7 @@ const Account = () => {
 
     useEffect(()  => {
         async function getSummoner(){
-            apiFacade.getSummoner(localStorage.getItem("region"), localStorage.getItem("summonerName"))
+            apiFacade.getSummoner(localStorage.getItem("region") as string, localStorage.getItem("summonerName") as string)
                 .then((data) => setSummoner(data))
 
         }
@@ -21,7 +21,7 @@ const Account = () => {
 
     }, [])
 
-    const calculateWinRate = (wins, loss) => {
+    const calculateWinRate = (wins: number, loss: number) => {
         const sum = wins + loss
         const deci = wins / sum
         const winrate = deci * 100
@@ -132,11 +132,6 @@ const Account = () => {
                                     </div>
                                 </div>
                                 <div className={"flex flex-col mb-10"}>
-                                    <Match won={false}/>
-                                    <Match won={true}/>
-                                    <Match won={true}/>
-                                    <Match won={false}/>
-                                    <Match won={true}/>
                                 </div>
                             </div>
                         </div>
