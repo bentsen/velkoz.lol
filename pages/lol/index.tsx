@@ -41,7 +41,7 @@ const Lol: NextPage = () => {
         <>
             <div className={"flex flex-col justify-center items-center mt-20 space-y-10"}>
                 <div>
-                    <Image src={logo} width={300} height={200}/>
+                    <Image src={"/lol/logo2.svg"} width={500} height={200}/>
                 </div>
                 <div className={"flex flex-row bg-summoner-light w-2/5 h-14 rounded-3xl items-center"}>
                     <div>
@@ -63,7 +63,7 @@ const Lol: NextPage = () => {
                     </div>
                     <div className={"ml-4 text-sm text-white"}>
                         <p>Search</p>
-                        <input onChange={handleChange} className={"w-80 h-7 bg-summoner-light text-summoner-gray"} type="text" placeholder={"Summoner Name"}/>
+                        <input onChange={handleChange} className={"w-10/12 h-7 bg-summoner-light text-summoner-gray"} type="text" placeholder={"Summoner Name"}/>
                     </div>
                 </div>
                 <Link href={"/lol/" + summonerName}>
