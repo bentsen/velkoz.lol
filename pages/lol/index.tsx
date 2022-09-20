@@ -1,12 +1,10 @@
 import type { NextPage } from 'next'
 import Image from 'next/image'
-import logo from '/public/lol/logo.webp'
 import Modal from "../../components/Modal";
 import {useState} from "react";
 import {motion} from "framer-motion";
 import Link from "next/link";
-import axios from "axios";
-import {ISummoner} from "reksai/src/@types/summoner";
+
 
 /*
 * Name: Mikkel Bentsen
@@ -43,7 +41,7 @@ const Lol: NextPage = () => {
                 <div>
                     <Image src={"/lol/logo2.svg"} width={500} height={200}/>
                 </div>
-                <div className={"flex flex-row bg-summoner-light w-2/5 h-14 rounded-3xl items-center"}>
+                <div className={"flex flex-row bg-summoner-light lg:w-2/5 h-14 rounded-3xl items-center"}>
                     <div>
                         <div onClick={() => setIsOpen(true)} className={"text-sm ml-4 w-44 text-white cursor-pointer"}>
                             <p>Region</p>
@@ -66,7 +64,7 @@ const Lol: NextPage = () => {
                         <input onChange={handleChange} className={"w-10/12 h-7 bg-summoner-light text-summoner-gray"} type="text" placeholder={"Summoner Name"}/>
                     </div>
                 </div>
-                <Link href={"/lol/" + summonerName}>
+                <Link href={"/lol/" + summonerName + "?region="+regions.get(region)}>
                     <motion.button onClick={handleClick} whileHover={{scale: 1.1}} className={"bg-leagueoflegends-color text-white w-32 h-10 rounded"}>Search</motion.button>
                 </Link>
             </div>

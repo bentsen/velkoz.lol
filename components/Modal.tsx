@@ -77,15 +77,6 @@ const Modal = ({isOpen, setIsOpen, region, setRegion} : any) => {
                                                 <p className={"ml-1"}>Turkiye</p>
                                             </div>
                                         </div>
-                                        <div className={"mt-3"}>
-                                            <h1>Garena Regions</h1>
-                                            <div>
-                                            </div>
-                                        </div>
-                                        <h1>Language</h1>
-                                        <div>
-
-                                        </div>
                                         <div className={"flex justify-center"}>
                                             <button className={"bg-leagueoflegends-color text-white w-20 h-10 rounded mt-8"} onClick={() => setIsOpen(false)}>save</button>
                                         </div>

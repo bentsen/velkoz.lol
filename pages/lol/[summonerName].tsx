@@ -7,7 +7,7 @@ import {ISummoner} from "reksai/src/@types/summoner";
 import {IMatch, Participant} from "reksai/src/@types/match";
 import useSWR from 'swr'
 import DoughnutChart from "../../components/DoughnutChart";
-import Reksai, {ddragon} from "reksai";
+import { useRouter } from "next/router";
 
 /*
 * Name: Mikkel Bentsen
@@ -15,6 +15,8 @@ import Reksai, {ddragon} from "reksai";
 */
 
 const Account = () => {
+    /*router instance*/
+    const router = useRouter()
     /*useState for region*/
     const [region, setRegion] = useState<string>("")
     /*useState for summonerName*/
@@ -22,19 +24,11 @@ const Account = () => {
     /*fetcher engine*/
     const fetcher = async (url: any) => await axios.get(url).then((res) => res.data)
     /*Summoner fetcher using SWR and axios*/
-    const { data: summoner, error: summonerError, mutate: mutateSummoner} = useSWR<ISummoner>("/api/summoner?summonerName="+summonerName+"&region="+region, fetcher)
+    const { data: summoner, error: summonerError, mutate: mutateSummoner} = useSWR<ISummoner>("/api/summoner?summonerName="+router.query.summonerName+"&region="+router.query.region, fetcher)
     /*Match fetcher using SWR and axios*/
-    const { data: matches, error: matchError, mutate: mutateMatch} = useSWR<IMatch[]>("/api/summoner/matches?summonerName="+summonerName+"&region="+region, fetcher)
+    const { data: matches, error: matchError, mutate: mutateMatch} = useSWR<IMatch[]>("/api/summoner/matches?summonerName="+router.query.summonerName+"&region="+router.query.region, fetcher)
     /*Icon url*/
     const icon = `https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/${summoner?.profileIconId}.png`
-
-    /*useEffect that get localstorage when window is ready*/
-    useEffect(() => {
-        if(typeof window !== 'undefined') {
-            setRegion(localStorage.getItem("region") as string)
-            setSummonerName(localStorage.getItem("summonerName") as string)
-        }
-    }, [])
 
     /*Sorting match array by TimeStamp*/
     const sortMatches = () => {
@@ -45,14 +39,14 @@ const Account = () => {
 
     /*Update summoner in database*/
     const updateSummoner = async () => {
-        const response = await axios.put<ISummoner>("/api/summoner?summonerName="+summonerName+"&region="+region);
+        const response = await axios.put<ISummoner>("/api/summoner?summonerName="+router.query.summonerName+"&region="+router.query.region);
         if(response.status !== 200){
             console.log("something went wrong")
         } else{
             await mutateSummoner();
         }
 
-        const response2 = await axios.delete<IMatch>("/api/summoner/matches?summonerName="+summonerName+"&region="+region);
+        const response2 = await axios.delete<IMatch>("/api/summoner/matches?summonerName="+router.query.summonerName+"&region="+router.query.region);
         if(response2.status !== 200){
             console.log("something went wrong")
         } else{
@@ -284,7 +278,7 @@ const Account = () => {
 
     return(
         <>
-            <div>
+            <div className={"block w-full my-0 mx-auto"}>
                 {summonerError ? (
                     <div className={"flex justify-center items-center mt-10"}>
                         <h1 className={"text-white text-xl"}>This summoner does not exist. Please check spelling</h1>
@@ -317,7 +311,7 @@ const Account = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className={"flex flex-row"}>
+                        <div className={"flex flex-row block w-full my-0 mx-auto"}>
                             <div className={""}>
                                 <div className={"divide-y divide-black bg-summoner-light mt-2 ml-40 w-80 h-auto text-white rounded"}>
                                     <div className={"h-7 flex items-center"}>
@@ -376,7 +370,7 @@ const Account = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className={"flex flex-col w-1/2 ml-2 mt-2 h-auto"}>
+                            <div className={"flex flex-col w-1/2 ml-2 mt-2 h-auto my-0 mx-auto"}>
                                 <div className={"divide-y divide-black bg-summoner-light w-full h-48 text-white rounded"}>
                                     <div className={"h-7 flex items-center"}>
                                         <p className={"text-sm ml-2"}>Match History Stats</p>
