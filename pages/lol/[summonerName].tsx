@@ -26,7 +26,8 @@ const Account = () => {
     /*Summoner fetcher using SWR and axios*/
     const { data: summoner, error: summonerError, mutate: mutateSummoner} = useSWR<ISummoner>("/api/summoner?summonerName="+router.query.summonerName+"&region="+router.query.region, fetcher)
     /*Match fetcher using SWR and axios*/
-    const { data: matches, error: matchError, mutate: mutateMatch} = useSWR<IMatch[]>("/api/summoner/matches?summonerName="+router.query.summonerName+"&region="+router.query.region, fetcher)
+    const { data: matches, mutate: mutateMatch} = useSWR<IMatch[]>("/api/summoner/matches?summonerName="+router.query.summonerName+"&region="+router.query.region, fetcher)
+
     /*Icon url*/
     const icon = `https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/${summoner?.profileIconId}.png`
 
@@ -457,7 +458,7 @@ const Account = () => {
                                         matches.map((match) => (
                                             <Match key={match.info.gameId} match={match} summoner={summoner}/>
                                         ))
-                                    ) : matchError ? (<div className={"w-full flex items-center justify-center h-14 text-white font-bold text-xl"}>Something went wrong</div>) : (
+                                    ) : (
                                         <div className={"w-full flex items-center justify-center h-14"}>
                                             <div role="status">
                                                 <svg aria-hidden="true"
