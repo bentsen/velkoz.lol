@@ -125,16 +125,6 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         return match.info.participants.slice(half_length)
     }
 
-    /*Check length of name and cut to fit*/
-    const checkLength = (name: string) => {
-        if(name.length > 5) {
-            return name.substring(0, 5) + ".."
-        }
-        else {
-            return name
-        }
-    }
-
     /*Calculate kda of summoner*/
     const calculateKDA = (kills:number | undefined, deaths:number | undefined, assists:number | undefined) => {
        if(kills != undefined && deaths != undefined && assists != undefined) {
@@ -359,24 +349,24 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                         <div className={"flex ml-3"}>
                             <ul className={"mr-2 list-none"}>
                                 {getFirstHalf().map((player, index) => (
-                                <li key={index} className={"flex items-center w-20 h-4 text-left whitespace-nowrap"}>
-                                    <div className={"inline-block align-middle mr-1"}>
+                                <li key={index} className={"flex items-center w-[88px] h-4 text-center whitespace-nowrap list-none mt-px"}>
+                                    <div className={"relative inline-block align-middle mr-1"}>
                                         <img className={"block w-4 h-4 rounded"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${player.championName}.png`} alt=""/>
                                     </div>
-                                    <div className={"inline-block align-middle text-summoner-gray"}>
-                                        <p className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden " + (player.puuid == summonerParticipant.puuid ? "text-white" : "")}>{checkLength(player.summonerName)}</p>
+                                    <div className={"inline-block max-w-[60px] align-middle text-summoner-gray"}>
+                                        <p className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden " + (player.puuid == summonerParticipant.puuid ? "text-white" : "")}>{player.summonerName}</p>
                                     </div>
                                 </li>
                                 ))}
                             </ul>
                             <ul className={"list-none"}>
                                 {getLastHalf().map((player, index) => (
-                                <li key={index + 10} className={"flex items-center w-20 h-4 text-left whitespace-nowrap"}>
-                                    <div className={"inline-block align-middle mr-1"}>
+                                <li key={index + 10} className={"flex items-center w-[88px] h-4 text-left whitespace-nowrap mt-px"}>
+                                    <div className={"relative inline-block align-middle mr-1"}>
                                         <img className={"block w-4 h-4 rounded"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${player.championName}.png`} alt=""/>
                                     </div>
-                                    <div className={"inline-block align-middle text-summoner-gray"}>
-                                        <p className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden " + (player.puuid == summonerParticipant.puuid ? "text-white" : "")}>{checkLength(player.summonerName)}</p>
+                                    <div className={"inline-block max-w-[60px] align-middle text-summoner-gray"}>
+                                        <p className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden " + (player.puuid == summonerParticipant.puuid ? "text-white" : "")}>{player.summonerName}</p>
                                     </div>
                                 </li>
                                 ))}
@@ -527,24 +517,24 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                             <div className={"flex ml-3"}>
                                 <ul className={"mr-2 list-none"}>
                                     {getFirstHalf().map((player, index) => (
-                                        <li key={index} className={"flex items-center w-20 h-4 text-left whitespace-nowrap"}>
-                                            <div className={"inline-block align-middle mr-1"}>
+                                        <li key={index} className={"flex items-center w-[88px] h-4 text-center whitespace-nowrap list-none mt-px"}>
+                                            <div className={"relative inline-block align-middle mr-1"}>
                                                 <img className={"block w-4 h-4 rounded"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${player.championName}.png`} alt=""/>
                                             </div>
-                                            <div className={"inline-block align-middle text-summoner-gray"}>
-                                                <p className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden " + (player.puuid == summonerParticipant.puuid ? "text-white" : "")}>{checkLength(player.summonerName)}</p>
+                                            <div className={"inline-block max-w-[60px] align-middle text-summoner-gray"}>
+                                                <p className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden " + (player.puuid == summonerParticipant.puuid ? "text-white" : "")}>{player.summonerName}</p>
                                             </div>
                                         </li>
                                     ))}
                                 </ul>
                                 <ul className={"list-none"}>
-                                    {getLastHalf().map((player,index) => (
-                                        <li key={index} className={"flex items-center w-20 h-4 text-left whitespace-nowrap"}>
-                                            <div key={index + 10} className={"inline-block align-middle mr-1"}>
+                                    {getLastHalf().map((player, index) => (
+                                        <li key={index + 10} className={"flex items-center w-[88px] h-4 text-left whitespace-nowrap mt-px"}>
+                                            <div className={"relative inline-block align-middle mr-1"}>
                                                 <img className={"block w-4 h-4 rounded"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${player.championName}.png`} alt=""/>
                                             </div>
-                                            <div key={index} className={"inline-block align-middle text-summoner-gray"}>
-                                                <p className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden " + (player.puuid  == summonerParticipant.puuid ? "text-white" : "")}>{checkLength(player.summonerName)}</p>
+                                            <div className={"inline-block max-w-[60px] align-middle text-summoner-gray"}>
+                                                <p className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden " + (player.puuid == summonerParticipant.puuid ? "text-white" : "")}>{player.summonerName}</p>
                                             </div>
                                         </li>
                                     ))}

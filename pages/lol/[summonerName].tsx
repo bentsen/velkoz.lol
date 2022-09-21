@@ -8,6 +8,7 @@ import {IMatch, Participant} from "reksai/src/@types/match";
 import useSWR from 'swr'
 import DoughnutChart from "../../components/DoughnutChart";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 /*
 * Name: Mikkel Bentsen
@@ -27,7 +28,6 @@ const Account = () => {
     const { data: summoner, error: summonerError, mutate: mutateSummoner} = useSWR<ISummoner>("/api/summoner?summonerName="+router.query.summonerName+"&region="+router.query.region, fetcher)
     /*Match fetcher using SWR and axios*/
     const { data: matches, mutate: mutateMatch} = useSWR<IMatch[]>("/api/summoner/matches?summonerName="+router.query.summonerName+"&region="+router.query.region, fetcher)
-
     /*Icon url*/
     const icon = `https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/${summoner?.profileIconId}.png`
 
@@ -40,13 +40,14 @@ const Account = () => {
 
     /*Update summoner in database*/
     const updateSummoner = async () => {
+        console.log("jeg opdatere summoner")
         const response = await axios.put<ISummoner>("/api/summoner?summonerName="+router.query.summonerName+"&region="+router.query.region);
         if(response.status !== 200){
             console.log("something went wrong")
         } else{
             await mutateSummoner();
         }
-
+        console.log("jeg opdatere matches")
         const response2 = await axios.delete<IMatch>("/api/summoner/matches?summonerName="+router.query.summonerName+"&region="+router.query.region);
         if(response2.status !== 200){
             console.log("something went wrong")
@@ -64,23 +65,6 @@ const Account = () => {
         return Math.round(winrate)
     }
 
-    /*Gets the most frequent role played by a summoner (needs fix)*/
-    const getMostFrequent = (arr: string[]) => {
-
-    }
-
-    /*Gets the most played champion played by a summoner (not done)*/
-    const getMostPlayeChamps = () => {
-        let champArray: string[] = []
-        if(matches != undefined) {
-            for (let i = 0; i < matches.length; i++) {
-                champArray.push(getSummerParticipantFromMatch(matches[i])?.championName as string)
-            }
-        }
-
-        return champArray
-    }
-
     /*Calculates a summoners favorite position by reason matches*/
     const calculateFavoritePosition = () => {
         let positionArray: string[] = []
@@ -90,11 +74,11 @@ const Account = () => {
             }
         }
 
-        const hashmap = positionArray.reduce( (acc: any, val : any) => {
-            acc[val] = (acc[val] || 0 ) + 1
-            return acc
-        },{})
-        return Object.keys(hashmap).reduce((a, b) => hashmap[a] > hashmap[b] ? a : b)
+        const occurrences = positionArray.reduce(function (acc: any, curr: any) {
+            return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+        }, {})
+
+       return Object.keys(occurrences).reduce((a, b) => occurrences[a] > occurrences[b] ? a : b)
     }
 
     /*Identifies the summoner in all matches*/
@@ -205,6 +189,110 @@ const Account = () => {
 
         const kp = (number2 / teamKill) * 100
         return Math.round(kp)
+    }
+
+    /*calculate frequency of champs played by summoner (should be refactored)*/
+    const calculateChampFrequency = () => {
+        let champions = []
+        let topThreeChampions = []
+
+        /*gets all champion names and save in array*/
+        if(matches == undefined) return
+        for(let i = 0; i < matches?.length; i++){
+           champions.push(getSummerParticipantFromMatch(matches[i])?.championName)
+        }
+
+        /*creates object with the name of champions with value of how many times it occurs*/
+        const occurrences = champions.reduce(function (acc: any, curr: any) {
+            if(!curr)return
+            return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+        }, {})
+
+        /*deletes the champions with the smallest value until it has the three highest*/
+        for(let i = 0; Object.keys(occurrences).length > 3; i++){
+            let key = Object.keys(occurrences).reduce((key, v) => occurrences[v] < occurrences[key] ? v : key);
+            delete occurrences[key]
+            console.log("i deleted " + key)
+        }
+
+        for(const key in occurrences){
+            let wins: number = 0
+            if(matches == undefined) return
+            for (let i = 0; i < matches.length; i++) {
+                for (let j = 0; j < matches[i].info.participants.length; j++) {
+                    if (matches[i].info.participants[j]?.puuid != undefined) {
+                        if (matches[i].info.participants[j].puuid == summoner?.puuid) {
+                            if (matches[i].info.participants[j].championName == key) {
+                                if(matches[i].info.participants[j].win)
+                                {
+                                    wins = wins + 1
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            const champion = {
+                name: key,
+                games: occurrences[key],
+                wins: wins
+            }
+            topThreeChampions.push(champion)
+        }
+        return topThreeChampions.sort((a, b) => b.games - a.games)
+    }
+
+    const getRecentlyPlayedWith = () => {
+        const participants = []
+        let favoriteParticipants = []
+
+        if(matches != undefined) {
+            for (let i = 0; i < matches.length; i++) {
+                for (let j = 0; j < matches[i].info.participants.length; j++) {
+                    if (matches[i].info.participants[j]?.puuid != undefined) {
+                        if (matches[i].info.participants[j].teamId == getSummerParticipantFromMatch(matches[i])?.teamId) {
+                            if(matches[i].info.participants[j].puuid != getSummerParticipantFromMatch(matches[i])?.puuid){
+                                participants.push(matches[i].info.participants[j].summonerName)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        const occurrences = participants.reduce(function (acc: any, curr: any) {
+            if(!curr)return
+            return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+        }, {})
+        //jeg skal have personens icon
+        for(const key in occurrences){
+            let summonerIcon: number = 0
+            let wins: number = 0
+            if(matches != undefined) {
+                for (let i = 0; i < matches.length; i++) {
+                    for (let j = 0; j < matches[i].info.participants.length; j++) {
+                        if (matches[i].info.participants[j]?.puuid != undefined) {
+                            if (matches[i].info.participants[j].summonerName == key) {
+                                summonerIcon = matches[i].info.participants[j].profileIcon
+                                if(matches[i].info.participants[j].win){
+                                    wins += 1
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(occurrences[key] >= 2) {
+                const newObj = {
+                    name: key,
+                    games: occurrences[key],
+                    wins: wins,
+                    icon: summonerIcon
+                }
+                favoriteParticipants.push(newObj)
+            }
+        }
+        return favoriteParticipants.sort((a, b) => b.games - a.games)
     }
 
     /*Calculates summoners kda in all recent games*/
@@ -362,13 +450,54 @@ const Account = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className={"divide-y divide-black bg-summoner-light mt-2 ml-40 w-80 h-96 text-white rounded"}>
-                                    <div>
-                                        <p className={"text-sm ml-2"}>pik</p>
+                                <div className={"divide-y divide-black bg-summoner-light mt-2 ml-40 w-80 h-auto text-white rounded"}>
+                                    <div className={"pt-2 pb-2"}>
+                                        <p className={"text-sm ml-2"}>Recently played with</p>
                                     </div>
-                                    <div>
+                                    <table className={"w-full table-fixed border-collapse border-spacing-0 table mt-1"}>
+                                        <colgroup className={"table-column-group border-collapse border-spacing-0"}>
 
-                                    </div>
+                                        </colgroup>
+                                        <thead className={"table-header-group align-middle border-collapse"}>
+                                            <tr className={"table-row align-middle border-collapse border-spacing-0"}>
+                                                <th className={"pl-3 pt-3 pb-3 text-left bg-summoner-dark text-summoner-gray text-xs font-normal"}>
+                                                    Summoner
+                                                </th>
+                                                <th className={"pt-3 pb-3 bg-summoner-dark text-summoner-gray text-xs font-normal"}>
+                                                    Played
+                                                </th>
+                                                <th className={"pt-3 pb-3 bg-summoner-dark text-summoner-gray text-xs font-normal"}>
+                                                    W-L
+                                                </th>
+                                                <th className={"pt-3 pb-3 pr-3 text-right bg-summoner-dark text-summoner-gray text-xs font-normal"}>Win
+                                                    Ratio
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className={"table-row-group align-middle border-collapse border-spacing-0"}>
+                                            {getRecentlyPlayedWith().map((participant) => (
+                                                <tr key={participant.name} className={"border-t border-solid align-middle border-black"}>
+                                                    <td className={"pt-1 pb-1 pl-2"}>
+                                                        <Link href={"/"}>
+                                                            <div className={"text-xs text-summoner-gray text-left text-ellipsis whitespace-nowrap overflow-hidden cursor-pointer"}>
+                                                                <Image className={"rounded-full block"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/${participant.icon}.png`} alt={"image of champ"} height={20} width={20}/>
+                                                                {participant.name}
+                                                            </div>
+                                                        </Link>
+                                                    </td>
+                                                    <td className={"pt-1 pb-1 text-summoner-gray text-xs text-center"}>
+                                                        {participant.games}
+                                                    </td>
+                                                    <td className={"pt-1 pb-1 text-summoner-gray text-xs text-center"}>
+                                                        {participant.wins}-{(participant.games - participant.wins)}
+                                                    </td>
+                                                    <td className={"pt-1 pb-1 text-summoner-gray text-xs text-center"}>
+                                                        {calculateWinRate(participant.wins, (participant.games - participant.wins))}%
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                             <div className={"flex flex-col w-1/2 ml-2 mt-2 h-auto my-0 mx-auto"}>
@@ -411,41 +540,22 @@ const Account = () => {
                                                     Recent 20 Games Played Champion
                                                 </div>
                                                 <ul className={"flex flex-col justify-center h-20 mt-5 h-20"}>
-                                                    <li className={"flex items-center"}>
-                                                        <img className={"w-6 h-6 rounded-full mr-2"} src="http://ddragon.leagueoflegends.com/cdn/12.16.1/img/champion/Aatrox.png" alt=""/>
-                                                        <div className={"text-summoner-gray text-xs"}>
-                                                            58% (7W 7L)
-                                                        </div>
-                                                        <div className={"inline-block text-xs m-2"}>
-                                                            3.07 KDA
-                                                        </div>
-                                                    </li>
-                                                    <li className={"flex items-center"}>
-                                                        <img className={"w-6 h-6 rounded-full mr-2"} src="http://ddragon.leagueoflegends.com/cdn/12.16.1/img/champion/Aatrox.png" alt=""/>
-                                                        <div className={"text-summoner-gray text-xs"}>
-                                                            58% (7W 7L)
-                                                        </div>
-                                                        <div className={"inline-block text-xs m-2"}>
-                                                            3.07 KDA
-                                                        </div>
-                                                    </li>
-                                                    <li className={"flex items-center"}>
-                                                        <img className={"w-6 h-6 rounded-full mr-2"} src="http://ddragon.leagueoflegends.com/cdn/12.16.1/img/champion/Aatrox.png" alt=""/>
-                                                        <div className={"text-summoner-gray text-xs"}>
-                                                            58% (7W 7L)
-                                                        </div>
-                                                        <div className={"inline-block text-xs m-2"}>
-                                                            3.07 KDA
-                                                        </div>
-                                                    </li>
+                                                    {calculateChampFrequency()?.map((champ) => (
+                                                        <li key={champ.name} className={"flex items-center"}>
+                                                            <img className={"w-6 h-6 rounded-full mr-2"} src={`http://ddragon.leagueoflegends.com/cdn/12.16.1/img/champion/${champ.name}.png`} alt=""/>
+                                                            <div className={"text-summoner-gray text-xs"}>
+                                                                {calculateWinRate(champ.wins,champ.games - champ.wins)}% ({champ.wins}W {champ.games  - champ.wins}L)
+                                                            </div>
+                                                        </li>
+                                                    ))}
                                                 </ul>
                                             </div>
                                             <div className={"mt-3 ml-10"}>
                                                 <div className={"text-summoner-gray text-xs leading-4 block"}>
                                                     Preferred Position
                                                 </div>
-                                                <div>
-                                                    hej
+                                                <div className={"h-20 mt-5 h-20"}>
+                                                    {calculateFavoritePosition()}
                                                 </div>
                                             </div>
                                         </div>
