@@ -400,9 +400,9 @@ const Account = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className={"flex flex-row block w-full my-0 mx-auto"}>
-                            <div className={""}>
-                                <div className={"divide-y divide-black bg-summoner-light mt-2 ml-40 w-80 h-auto text-white rounded"}>
+                        <div className={"block w-[1080px] my-0 mx-auto"}>
+                            <div className={"inline-block w-[332] align-top min-h-[870px]"}>
+                                <div className={"divide-y divide-black bg-summoner-light mt-2 w-80 h-auto text-white rounded"}>
                                     <div className={"h-7 flex items-center"}>
                                         <p className={"text-sm ml-2"}>Ranked Solo-Matches</p>
                                     </div>
@@ -426,7 +426,7 @@ const Account = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className={"divide-y divide-black bg-summoner-light mt-2 ml-40 w-80 h-auto text-white rounded"}>
+                                <div className={"divide-y divide-black bg-summoner-light mt-2 w-80 h-auto text-white rounded"}>
                                     <div className={"h-7 flex items-center"}>
                                         <p className={"text-sm ml-2"}>Ranked Flex-Matches</p>
                                     </div>
@@ -450,7 +450,7 @@ const Account = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className={"divide-y divide-black bg-summoner-light mt-2 ml-40 w-80 h-auto text-white rounded"}>
+                                <div className={"divide-y divide-black bg-summoner-light mt-2 w-80 h-auto text-white rounded"}>
                                     <div className={"pt-2 pb-2"}>
                                         <p className={"text-sm ml-2"}>Recently played with</p>
                                     </div>
@@ -500,7 +500,7 @@ const Account = () => {
                                     </table>
                                 </div>
                             </div>
-                            <div className={"flex flex-col w-1/2 ml-2 mt-2 h-auto my-0 mx-auto"}>
+                            <div className={"inline-block w-[740px] mt-2 ml-2 align-top"}>
                                 <div className={"divide-y divide-black bg-summoner-light w-full h-48 text-white rounded"}>
                                     <div className={"h-7 flex items-center"}>
                                         <p className={"text-sm ml-2"}>Match History Stats</p>

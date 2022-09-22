@@ -5,7 +5,7 @@ import {ISummoner} from "reksai/src/@types/summoner";
 import axios from "axios";
 import {Runes} from "../utils/types/runes.t";
 import {Spell} from "../utils/types/spell.t"
-import {ddragon} from "reksai";
+import Image from "next/image";
 
 /*
 * Name: Mikkel Bentsen
@@ -21,6 +21,8 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
     const [runes, setRunes] = useState<Runes[]>([])
     /*useState for Spell array*/
     const [spells, setSpells] = useState<Spell[]>([])
+    /*useState that indicates if match is expanded*/
+    const [expanded, setExpanded] = useState(false)
 
     /*useEffect to fetch all spells*/
     useEffect(() => {
@@ -111,6 +113,24 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
+    const getSummonerTeam = () => {
+        for(let i = 0; i < getFirstHalf().length; i++){
+            if(getFirstHalf()[i].puuid == summonerParticipant.puuid){
+                return getFirstHalf()
+            }
+        }
+        return getLastHalf()
+    }
+
+    const getEnemyTeam = () => {
+        for(let i = 0; i < getFirstHalf().length; i++){
+            if(getFirstHalf()[i].puuid == summonerParticipant.puuid){
+                return getLastHalf()
+            }
+        }
+        return getFirstHalf()
+    }
+
     /*Get first team in match*/
     const getFirstHalf = () => {
         const half_length = Math.ceil(match.info.participants.length / 2)
@@ -139,7 +159,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
     }
 
     /*Calculate total cs of summoner*/
-    const calculateTotalCs = () => {
+    const calculateSummonerCs = () => {
         const totalMinions = getSummerParticipant()?.totalMinionsKilled
         const totalJungleMonsters = getSummerParticipant()?.neutralMinionsKilled
         if(totalMinions != undefined && totalJungleMonsters != undefined) {
@@ -179,33 +199,48 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
     }
 
     /*Calculate summoner cs per minute*/
-    const calculateCsPerMin = () => {
+    const calculateCsPerMin = (totalCs: number | undefined) => {
         const matchDuration = match.info.gameDuration
-        const totalMinions = calculateTotalCs()
+        const totalMinions = totalCs
        if(matchDuration != undefined && totalMinions != undefined) {
            const lort: number = totalMinions / (matchDuration / 60)
-           const lort2: number = Math.round(lort * 10) / 10
-           return lort2
+           return Math.round(lort * 10) / 10
        }
        else{
            console.log("undefined")
        }
     }
 
+    /*Calculate summoner cs per minute*/
+    const calculateCsPerMinSummoner = (totalCs: number | undefined) => {
+        const matchDuration = match.info.gameDuration
+        const totalMinions = totalCs
+        if(matchDuration != undefined && totalMinions != undefined) {
+            const lort: number = totalMinions / (matchDuration / 60)
+            return Math.round(lort * 10) / 10
+        }
+        else{
+            console.log("undefined")
+        }
+    }
+
     /*Get summoners team total kills*/
-    const getTeamKills = () => {
+    const getTeamKills = (teamId: number | undefined) => {
         for(let i = 0; i < match.info.teams.length; i++){
-            if(match.info.teams[i].teamId == getSummerParticipant()?.teamId){
+            if(match.info.teams[i].teamId == teamId){
                return match.info.teams[i].objectives.champion.kills
             }
         }
     }
 
     /*Calculate summoner kill participation*/
-    const calculateKillPerticipation = () => {
-        const teamKill = getTeamKills()
-        const personalAssists = getSummerParticipant()?.assists
-        const personalKills = getSummerParticipant()?.kills
+    const calculateKillPerticipation = (teamId: number | undefined, kills: number | undefined, assists: number | undefined) => {
+        if(teamId == undefined) return
+        const teamKill = getTeamKills(teamId)
+        if(assists == undefined) return
+        const personalAssists = assists
+        if(kills == undefined) return
+        const personalKills = kills
 
         if(teamKill != undefined && personalKills != undefined && personalAssists != undefined){
             const sum = personalKills + personalAssists
@@ -216,17 +251,16 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
 
     return(
         <>
-            {!matchWon ? (
             <div className={"w-full my-0 mx-auto"}>
-                <li className={"relative list-none mt-2 bg-loss"}>
-                    <div className={"flex items-center h-24 rounded border-l-4 border-solid border-loss-border"}>
+                <li className={"relative list-none mt-2 " + (matchWon ? "bg-win" : "bg-loss")}>
+                    <div className={"flex items-center h-24 rounded border-l-4 border-solid " + (matchWon ? "border-win-border" : "border-loss-border")}>
                         <div className={"ml-3 w-28 leading-4 text-xs"}>
-                            <div className={"text-loss-border"}>Ranked Solo</div>
+                            <div className={" " + (matchWon ? "text-win-border" : "text-loss-border")}>Ranked Solo</div>
                             <div>
                                 <div className={"relative text-summoner-gray"}>{timeSince()}</div>
                             </div>
                             <div className={"w-12 h-px"}></div>
-                            <div className={"text-summoner-gray"}>Loss</div>
+                            <div className={"text-summoner-gray"}>{matchWon ? ("Won") : ("Loss")}</div>
                             <div className={"text-summoner-gray"}>{match.info.teams[0].objectives.champion.kills} {match.info.teams[1].objectives.champion.kills}</div>
                         </div>
                         <div className={"ml-2"}>
@@ -257,7 +291,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                         </div>
                                         <div className={"w-6 h-6 mb-0.5 block"}>
                                             <div className={"relative block"}>
-                                                <img className={"block rounded border-0"} src={"https://ddragon.canisback.com/img/"+getRuneStyle(getSummerParticipant()?.perks.styles[0].style)} alt=""/>
+                                                <img className={"block rounded border-0"} src={"https://ddragon.canisback.com/img/"+getRuneStyle(getSummerParticipant()?.perks.styles[1].style)} alt=""/>
                                             </div>
                                         </div>
                                     </div>
@@ -276,13 +310,13 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                                         </span>
                                         KDA
                                     </div>
-                                    <div className={"absolute top-0 right-0 w-px h-full bg-loss-button"}></div>
+                                    <div className={"absolute top-0 right-0 w-px h-full " + (matchWon ? "bg-win-button" : "bg-loss-button")}></div>
                                 </div>
                                 <div className={"flex flex-col items-start w-36 text-summoner-gray text-xs"}>
                                     <div className={"text-loss-border block"}>
                                         <div className={"relative block"}>
                                             P/Kill
-                                            {calculateKillPerticipation()}
+                                            {calculateKillPerticipation(getSummerParticipant()?.teamId, getSummerParticipant()?.kills, getSummerParticipant()?.assists)}
                                             %
                                         </div>
                                     </div>
@@ -290,9 +324,9 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                     <div className={"block"}>
                                         <div className={"relative"}>
                                             <span>CS </span>
-                                            {calculateTotalCs()}
+                                            {calculateSummonerCs()}
                                             (
-                                            {calculateCsPerMin()}
+                                            {calculateCsPerMin(calculateSummonerCs())}
                                             )
                                         </div>
                                     </div>
@@ -307,38 +341,38 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                             <div className={"flex items-center"}>
                                 <div className={"flex"}>
                                     <ul className={"flex list-none"}>
-                                        <li className={"w-6 h-6 bg-loss-button rounded"}>
+                                        <li className={"w-6 h-6 rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
                                             <div className={"relative block"}>
                                                 <img className={"rounded"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item0}.png`} alt=""/>
                                             </div>
                                         </li>
-                                        <li className={"w-6 h-6 bg-loss-button ml-0.5 rounded"}>
+                                        <li className={"w-6 h-6 ml-0.5 rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
                                             <div className={"relative block"}>
                                                 <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item1}.png`} alt=""/>
                                             </div>
                                         </li>
-                                        <li className={"w-6 h-6 bg-loss-button ml-0.5 rounded"}>
+                                        <li className={"w-6 h-6 ml-0.5 rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
                                             <div className={"relative block"}>
                                                 <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item2}.png`} alt=""/>
                                             </div>
                                         </li>
-                                        <li className={"w-6 h-6 bg-loss-button ml-0.5 rounded"}>
+                                        <li className={"w-6 h-6 ml-0.5 rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
                                             <div className={"relative block"}>
                                                 <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item3}.png`} alt=""/>
                                             </div>
                                         </li>
-                                        <li className={"w-6 h-6 bg-loss-button ml-0.5 rounded"}>
+                                        <li className={"w-6 h-6 ml-0.5 rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
                                             <div className={"relative block"}>
                                                 <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item4}.png`} alt=""/>
                                             </div>
                                         </li>
-                                        <li className={"w-6 h-6 bg-loss-button ml-0.5 rounded"}>
+                                        <li className={"w-6 h-6 ml-0.5 rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
                                             <div className={"relative block"}>
                                                 <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item5}.png`} alt=""/>
                                             </div>
                                         </li>
                                     </ul>
-                                    <div className={"w-6 h-6 ml-0.5 mr-1 bg-loss-button rounded-full"}>
+                                    <div className={"w-6 h-6 ml-0.5 mr-1 rounded-full " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
                                         <div className={"relative block"}>
                                             <img className={"rounded-full"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item6}.png`} alt=""/>
                                         </div>
@@ -373,186 +407,210 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                             </ul>
                         </div>
                         <div className={"relative w-10 h-24 rounded-tr rounded-br overflow-hidden"}>
-                            <button className={"w-10 h-24 bg-loss-button flex justify-center items-end hover:bg-loss"}>
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-loss-border mb-2" fill="none"
+                            <button onClick={() => setExpanded(!expanded)} className={"w-10 h-24 flex justify-center items-end " + (matchWon ? "bg-win-button hover:bg-win" : "bg-loss-button hover:bg-loss")}>
+                                {!expanded ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" className={"h-6 w-6 mb-2 " + (matchWon ? "text-win-border" : "text-loss-border")} fill="none"
                                      viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                     <path strokeLinecap="round" strokeLinejoin="round"
                                           d="M19 9l-7 7-7-7"/>
                                 </svg>
+                                    ):(
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                         strokeWidth="2" stroke="currentColor" className={"w-6 h-6 mb-2 " + (matchWon ? "text-win-border" : "text-loss-border")}>
+                                        <path strokeLinecap="round" strokeLinejoin="round"
+                                              d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+                                    </svg>
+                                )}
                             </button>
                         </div>
                     </div>
                 </li>
             </div>
-            ) : (
-                <div className={"w-full h-auto"}>
-                    <li className={"relative list-none mt-2 bg-win"}>
-                        <div className={"flex items-center h-24 rounded border-l-4 border-solid border-win-border"}>
-                            <div className={"ml-3 w-28 leading-4 text-xs"}>
-                                <div className={"text-win-border"}>Ranked Solo</div>
-                                <div>
-                                    <div className={"relative text-summoner-gray"}>{timeSince()}</div>
-                                </div>
-                                <div className={"w-12 h-px"}></div>
-                                <div className={"text-summoner-gray"}>Won</div>
-                                <div className={"text-summoner-gray"}>{match.info.teams[0].objectives.champion.kills} {match.info.teams[1].objectives.champion.kills}</div>
-                            </div>
-                            <div className={"ml-2"}>
-                                <div className={"flex"}>
-                                    <div className={"flex items-center"}>
-                                        <div>
-                                            <Link className={"relative block w-12 h-12"} href={"habib"}>
-                                                <img className={"rounded-full block w-13 h-12 object-cover"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${getSummerParticipant()?.championName}.png`}/>
-                                            </Link>
-                                        </div>
-                                        <div className={"block ml-1"}>
-                                            <div className={"w-6 h-6 mb-0.5 block"}>
-                                                <div className={"relative block"}>
-                                                    <img className={"block rounded border-0"} src={getSummonerSpell(getSummerParticipant()?.summoner1Id)} alt="summonerSpell"/>
+            {expanded ?
+                <div className={"mt-1 block"}>
+                    <div className={"block"}>
+                        <table className={"rounded-t w-full table-fixed bg-summoner-dark border-collapse border-spacing-0"}>
+                            <colgroup>
+                                <col width={"44"}/>
+                                <col width={"18"}/>
+                                <col width={"18"}/>
+                                <col/>
+                                <col width={"68"}/>
+                                <col width={"98"}/>
+                                <col width={"120"}/>
+                                <col width={"48"}/>
+                                <col width={"56"}/>
+                                <col width={"175"}/>
+                            </colgroup>
+                            <thead className={"table-header-group align-middle border-inherit"}>
+                                <tr className={"table-row align-middle border-inherit"}>
+                                    <th colSpan={4} className={"pl-[15px] text-left text-summoner-gray font-normal border-b-[1px] border-solid " + (matchWon ? "border-win" : "border-loss")}>
+                                        <span className={"text-xs " + (matchWon ? "text-win-border" : "text-loss-border")}>{matchWon ? ("Won") : ("Loss")}</span>
+                                    </th>
+                                    <th className={"h-8 text-summoner-gray text-xs font-normal text-center border-b-[1px] border-solid " + (matchWon ? "border-win" : "border-loss")}>
+                                       OP Score
+                                    </th>
+                                    <th className={"h-8 text-summoner-gray text-xs font-normal text-center border-b-[1px] border-solid " + (matchWon ? "border-win" : "border-loss")}>
+                                        KDA
+                                    </th>
+                                    <th className={"h-8 text-summoner-gray text-xs font-normal text-center border-b-[1px] border-solid " + (matchWon ? "border-win" : "border-loss")}>
+                                        Damage
+                                    </th>
+                                    <th className={"h-8 text-summoner-gray text-xs font-normal text-center border-b-[1px] border-solid " + (matchWon ? "border-win" : "border-loss")}>
+                                        Wards
+                                    </th>
+                                    <th className={"h-8 text-summoner-gray text-xs font-normal text-center border-b-[1px] border-solid " + (matchWon ? "border-win" : "border-loss")}>
+                                        CS
+                                    </th>
+                                    <th className={"h-8 text-summoner-gray text-xs font-normal text-center border-b-[1px] border-solid " + (matchWon ? "border-win" : "border-loss")}>
+                                        Items
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className={"table-row-group align-middle " + (matchWon ? "bg-win" : "bg-loss")}>
+                                {getSummonerTeam().map((player) => (
+                                    <tr key={player.puuid} className={"table-row align-middle border-inherit"}>
+                                        <td className={"pl-2.5 pr-1 pt-1"}>
+                                            <div className={"relative block cursor-pointer"}>
+                                                <div className={"relative w-[32px] block"}>
+                                                    <Image className={"block rounded-full"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${player.championName}.png`} width={"35"} height={"35"} alt={"Champion image"}/>
+                                                    <div className={"absolute left-[-3px] bottom-[1px] w-[15px] h-[15px] bg-gray-800 rounded-full text-white text-xs text-center leading-[15px]"}>
+                                                        {player.champLevel}
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className={"w-6 h-6 mb-0.5 block"}>
-                                                <div className={"relative block"}>
-                                                    <img className={"block rounded border-0"} src={getSummonerSpell(getSummerParticipant()?.summoner2Id)} alt=""/>
+                                        </td>
+                                        <td className={"pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
+                                            <div className={"relative mb-0.5 w-4 h-4 block"}>
+                                                <img className={"w-4 h-4 rounded"} src={getSummonerSpell(player.summoner1Id)} alt={"summonerSpell"}/>
+                                            </div>
+                                            <div className={"relative w-4 h-4 block"}>
+                                                <img className={"w-4 h-4 rounded"} src={getSummonerSpell(player.summoner2Id)} alt={"summonerSpell"}/>
+                                            </div>
+                                        </td>
+                                        <td className={"pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
+                                            <div className={"relative mb-0.5 bg-black rounded-full w-4 h-4"}>
+                                                <img className={"w-4 h-4 rounded"} src={"https://ddragon.canisback.com/img/"+getRuneIcon(player.perks.styles[0].selections[0].perk)} alt={"RuneIcon"}/>
+                                            </div>
+                                            <div className={"relative mb-0.5 bg-black rounded-full w-4 h-4"}>
+                                                <img className={"w-4 h-4 rounded"} src={"https://ddragon.canisback.com/img/"+getRuneStyle(player.perks.styles[1].style)} alt={"RuneStyleIcon"}/>
+                                            </div>
+                                        </td>
+                                        <td className={"pl-[5px] whitespace-nowrap text-ellipsis overflow-hidden pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
+                                            <div className={"leading-4 text-white text-xs decoration-0 cursor-pointer"}>
+                                                {player.summonerName}
+                                                <div className={"text-gray-400 text-[11px] leading-[14px] block"}>
+                                                    <div className={"relative capitalize block"}>
+                                                        gold 3
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div className={"block ml-1"}>
-                                            <div className={"w-6 h-6 mb-0.5 block bg-black rounded-full"}>
-                                                <div className={"relative block"}>
-                                                    <img className={"block rounded border-0"} src={"https://ddragon.canisback.com/img/"+ getRuneIcon(getSummerParticipant()?.perks.styles[0].selections[0].perk)} alt=""/>
+                                        </td>
+                                        <td className={"text-xs"}>
+                                            her er jeg
+                                        </td>
+                                        <td className={"text-center whitespace-nowrap pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
+                                            <div className={"text-gray-500 leading-[14px] text-xs block"}>
+                                                {player.kills}/{player.deaths}/{player.assists}
+                                                <div className={"relative inline"}>
+                                                    ({calculateKillPerticipation(player.teamId,player.kills,player.assists)}%)
                                                 </div>
                                             </div>
-                                            <div className={"w-6 h-6 mb-0.5 block"}>
+                                            <div className={"text-[11px] font-bold text-gray-500 block"}>
+                                                {calculateKDA(player.kills,player.deaths,player.assists)}:1
+                                            </div>
+                                        </td>
+                                        <td className={"pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
+                                            <div className={"flex justify-center"}>
                                                 <div className={"relative block"}>
-                                                    <img className={"block rounded border-0"} src={"https://ddragon.canisback.com/img/"+getRuneStyle(getSummerParticipant()?.perks.styles[0].style)} alt=""/>
+                                                    <div className={"text-center text-gray-500 text-[11px] leading-[14px] block"}>
+                                                        {player.totalDamageDealtToChampions}
+                                                        <div></div>
+                                                    </div>
+                                                </div>
+                                                <div className={"relative block"}>
+                                                    <div className={"text-center text-gray-500 text-[11px] leading-[14px] ml-2 block"}>
+                                                        {player.totalDamageTaken.toLocaleString()}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div className={"flex flex-col justify-center relative w-28 pr-3 mr-2 ml-3"}>
-                                        <div className={"text-sm text-summoner-gray font-bold"}>
-                                            <span className={"text-white"}>{getSummerParticipant()?.kills}</span>
-                                            /
-                                            <span className={"text-loss-border"}>{getSummerParticipant()?.deaths}</span>
-                                            /
-                                            <span className={"text-white"}>{getSummerParticipant()?.assists}</span>
-                                        </div>
-                                        <div className={"block text-xs text-summoner-gray"}>
-                                                        <span>
-                                                            {calculateKDA(getSummerParticipant()?.kills, getSummerParticipant()?.deaths, getSummerParticipant()?.assists)}:1
-                                                        </span>
-                                            KDA
-                                        </div>
-                                        <div className={"absolute top-0 right-0 w-px h-full bg-win-button"}></div>
-                                    </div>
-                                    <div className={"flex flex-col items-start w-36 text-summoner-gray text-xs"}>
-                                        <div className={"text-win-border block"}>
+                                        </td>
+                                        <td className={"text-center text-gray-500 text-[11px] pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
                                             <div className={"relative block"}>
-                                                P/Kill
-                                                {calculateKillPerticipation()}
-                                                %
-                                            </div>
-                                        </div>
-                                        <div>Control Ward {getSummerParticipant()?.detectorWardsPlaced}</div>
-                                        <div className={"block"}>
-                                            <div className={"relative"}>
-                                                <span>CS </span>
-                                                {calculateTotalCs()}
-                                                (
-                                                {calculateCsPerMin()}
-                                                )
-                                            </div>
-                                        </div>
-                                        <div className={"font-bold capitalize"}>
-                                            <div className={"relative"}>
-                                                gold
-                                                3
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className={"flex items-center"}>
-                                    <div className={"flex"}>
-                                        <ul className={"flex list-none"}>
-                                            <li className={"w-6 h-6 bg-win-button rounded"}>
-                                                <div className={"relative block"}>
-                                                    <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item0}.png`} alt=""/>
+                                                <div className={"block"}>
+                                                    {player.visionWardsBoughtInGame}
                                                 </div>
-                                            </li>
-                                            <li className={"w-6 h-6 bg-win-button ml-0.5 rounded"}>
-                                                <div className={"relative block"}>
-                                                    <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item1}.png`} alt=""/>
+                                                <div className={"block"}>
+                                                    {player.wardsPlaced} / {player.wardsKilled}
                                                 </div>
-                                            </li>
-                                            <li className={"w-6 h-6 bg-win-button ml-0.5 rounded"}>
+                                            </div>
+                                        </td>
+                                        <td className={"text-center text-gray-500 text-[11px] pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
+                                            <div className={"block"}>
+                                                {player.totalMinionsKilled + player.neutralMinionsKilled}
+                                            </div>
+                                            <div className={"block"}>
+                                                {calculateCsPerMin(player.totalMinionsKilled + player.neutralMinionsKilled)}/m
+                                            </div>
+                                        </td>
+                                        <td className={"text-center pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
+                                            <div className={"ml-0 inline-block w-[22px] h-[22px] align-middle"}>
+                                                {player.item0 != 0 ? (
+                                                    <div className={"relative block"}>
+                                                        <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item0}.png`} alt=""/>
+                                                    </div>
+                                                ) : (<div className={"w-full h-full rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
+                                            </div>
+                                            <div className={"inline-block w-[22px] h-[22px] ml-px align-middle"}>
+                                                {player.item1 != 0 ? (
+                                                    <div className={"relative block"}>
+                                                        <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item1}.png`} alt=""/>
+                                                    </div>
+                                                ) : (<div className={"w-full h-full rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
+                                            </div>
+                                            <div className={"inline-block w-[22px] h-[22px] ml-px align-middle"}>
+                                                {player.item2 != 0 ? (
+                                                    <div className={"relative block"}>
+                                                        <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item2}.png`} alt=""/>
+                                                    </div>
+                                                ) : (<div className={"w-full h-full rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
+                                            </div>
+                                            <div className={"inline-block w-[22px] h-[22px] ml-px align-middle"}>
+                                                {player.item3 != 0 ? (
+                                                    <div className={"relative block"}>
+                                                        <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item3}.png`} alt=""/>
+                                                    </div>
+                                                ) : (<div className={"w-full h-full rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
+                                            </div>
+                                            <div className={"inline-block w-[22px] h-[22px] ml-px align-middle"}>
+                                                {player.item4 != 0 ? (
+                                                    <div className={"relative block"}>
+                                                        <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item4}.png`} alt=""/>
+                                                    </div>
+                                                ) : (<div className={"w-full h-full rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
+                                            </div>
+                                            <div className={"inline-block w-[22px] h-[22px] ml-px align-middle"}>
+                                                {player.item5 != 0 ? (
                                                 <div className={"relative block"}>
-                                                    <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item2}.png`} alt=""/>
+                                                    <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item5}.png`} alt=""/>
                                                 </div>
-                                            </li>
-                                            <li className={"w-6 h-6 bg-win-button ml-0.5 rounded"}>
-                                                <div className={"relative block"}>
-                                                    <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item3}.png`} alt=""/>
-                                                </div>
-                                            </li>
-                                            <li className={"w-6 h-6 bg-win-button ml-0.5 rounded"}>
-                                                <div className={"relative block"}>
-                                                    <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item4}.png`} alt=""/>
-                                                </div>
-                                            </li>
-                                            <li className={"w-6 h-6 bg-win-button ml-0.5 rounded"}>
-                                                <div className={"relative block"}>
-                                                    <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item5}.png`} alt=""/>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                        <div className={"w-6 h-6 ml-0.5 mr-1 bg-win-button rounded-full"}>
-                                            <div className={"relative block"}>
-                                                <img className={"rounded-full"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item6}.png`} alt=""/>
+                                                ) : (<div className={"w-full h-full rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className={"flex ml-3"}>
-                                <ul className={"mr-2 list-none"}>
-                                    {getFirstHalf().map((player, index) => (
-                                        <li key={index} className={"flex items-center w-[88px] h-4 text-center whitespace-nowrap list-none mt-px"}>
-                                            <div className={"relative inline-block align-middle mr-1"}>
-                                                <img className={"block w-4 h-4 rounded"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${player.championName}.png`} alt=""/>
+                                            <div className={"inline-block w-[22px] h-[22px] ml-px align-middle"}>
+                                                {player.item6 != 0 ? (
+                                                    <div className={"relative block"}>
+                                                        <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item6}.png`} alt=""/>
+                                                    </div>
+                                                ) : (<div className={"w-full h-full rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
                                             </div>
-                                            <div className={"inline-block max-w-[60px] align-middle text-summoner-gray"}>
-                                                <p className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden " + (player.puuid == summonerParticipant.puuid ? "text-white" : "")}>{player.summonerName}</p>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                                <ul className={"list-none"}>
-                                    {getLastHalf().map((player, index) => (
-                                        <li key={index + 10} className={"flex items-center w-[88px] h-4 text-left whitespace-nowrap mt-px"}>
-                                            <div className={"relative inline-block align-middle mr-1"}>
-                                                <img className={"block w-4 h-4 rounded"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${player.championName}.png`} alt=""/>
-                                            </div>
-                                            <div className={"inline-block max-w-[60px] align-middle text-summoner-gray"}>
-                                                <p className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden " + (player.puuid == summonerParticipant.puuid ? "text-white" : "")}>{player.summonerName}</p>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                            <div className={"relative w-10 h-24 rounded-tr rounded-br overflow-hidden"}>
-                                <button className={"w-10 h-24 bg-win-button flex justify-center items-end hover:bg-win"}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-win-border mb-2" fill="none"
-                                         viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                        <path strokeLinecap="round" strokeLinejoin="round"
-                                              d="M19 9l-7 7-7-7"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </li>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            )}
+            : ("")}
         </>
     )
 }
