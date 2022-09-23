@@ -1,32 +1,32 @@
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faSearch} from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
 import {useContext, useEffect, useState} from "react";
 import {motion} from "framer-motion";
-import {VersionContext} from "../../store/VersionContext/VersionList";
-import Reksai, {ddragon} from "reksai";
-import {IChampion} from "reksai/src/@types/champion";
-import apiFacade from "../../store/apiFacade";
-
+import {VersionContext} from "../../../store/VersionContext/VersionList";
+import axios from "axios";
+import {Champion} from "../../../utils/types/champion.t";
+import {useRouter} from "next/router";
 
 const Champions = () => {
-    const [champions, setChampions] = useState<IChampion[]>([])
+    const router = useRouter()
+    const [champions, setChampions] = useState<Champion[]>([])
     const Version = useContext(VersionContext);
     const [role, setRole] = useState("all")
     const [inputValue, setInputValue] = useState<string>("")
-    const [filteredList, setFilteredList] = useState<IChampion[] | undefined>([])
+    const [filteredList, setFilteredList] = useState<Champion[] | undefined>()
 
     useEffect(() => {
         async function getChampions(){
-            await ddragon.champion.getAll()
-                .then((data) => setChampions(data))
+            axios.get<any>("http://ddragon.leagueoflegends.com/cdn/6.24.1/data/en_US/champion.json")
+                .then(response => {
+                    let championData = []
+                    for(let key in response.data['data']){
+                        championData.push(response.data['data'][key])
+                    }
+                    setChampions(championData)
+                })
         }
         getChampions()
     }, [])
-
-    useEffect(() => {
-        setFilteredList(champions)
-    }, []);
 
 
     const filterChampion = (e: any) => {
@@ -34,7 +34,7 @@ const Champions = () => {
 
         if(keyword !== ''){
             if(champions) {
-                const results: IChampion[] | undefined = champions?.filter((items) => {
+                const results: Champion[] | undefined = champions?.filter((items) => {
                     return items.name.toLowerCase().startsWith(keyword.toLowerCase())
                 })
                 //if text fields has an input
@@ -47,6 +47,10 @@ const Champions = () => {
             setFilteredList(champions)
         }
         setInputValue(keyword)
+    }
+
+    const goToChampion = (e: any, championName: string) => {
+        router.push(`/lol/champions/${championName}`)
     }
 
 
@@ -104,12 +108,10 @@ const Champions = () => {
                 <div className={"bg-summoner-light rounded-b overflow-hidden flex justify-center"}>
                     <div className="mt-3 mb-2 grid grid-cols-12 gap-x-5 gap-y-5 text-summoner-gray text-xs text-center">
                         {filteredList?.map((item) => (
-                            <motion.div key={item.id} initial={"hidden"} animate={"show"}>
-                                <motion.div key={item.id}>
-                                    <Image className={"cursor-pointer"} key={item.id} src={`https://ddragon.leagueoflegends.com/cdn/${Version}/img/champion/${item.image.full}`} unoptimized={true} width={60} height={60} alt={`picture of ${item.name}`}/>
-                                    <span>{item.name}</span>
-                                </motion.div>
-                            </motion.div>
+                            <div onClick={() => goToChampion(event, item.name)} key={item.id}>
+                                <Image className={"cursor-pointer"} key={item.id} src={`https://ddragon.leagueoflegends.com/cdn/${Version}/img/champion/${item.image.full}`} unoptimized={true} width={60} height={60} alt={`picture of ${item.name}`}/>
+                                <span>{item.name}</span>
+                            </div>
                         ))}
                     </div>
                 </div>
