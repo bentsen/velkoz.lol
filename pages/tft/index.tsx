@@ -29,16 +29,16 @@ const Tft: NextPage = () => {
 
     return (
         <>
-            <div className={"bg-[url('/tft/poster.jpeg')] h-screen w-full bg-cover overflow-hidden"}>
+            <div className={"bg-[url('/tft/poster.jpeg')] h-[550px] w-full bg-cover overflow-hidden rounded-bl-[100px]"}>
                 <div className={"flex flex-col justify-center items-center mt-20 space-y-10"}>
                     <div>
                         <Image src={"/tft/logo.svg"} width={400} height={200}/>
                     </div>
-                    <div className={"flex flex-row bg-white w-2/5 h-14 rounded-3xl items-center"}>
+                    <div className={"flex flex-row bg-summoner-light w-2/5 h-14 rounded-3xl items-center"}>
                         <div>
-                            <div onClick={() => setIsOpen(true)} className={"text-sm ml-4 w-44 text-black cursor-pointer"}>
+                            <div onClick={() => setIsOpen(true)} className={"text-sm ml-4 w-44 text-white cursor-pointer"}>
                                 <p>Region</p>
-                                <div className={"flex flex-row text-black"}>
+                                <div className={"flex flex-row text-summoner-gray"}>
                                     <span>{region}</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20"
                                          fill="currentColor">
@@ -52,9 +52,9 @@ const Tft: NextPage = () => {
                         <div className={"ml-2"}>
                             |
                         </div>
-                        <div className={"ml-4 text-sm text-black"}>
+                        <div className={"ml-4 text-sm text-white"}>
                             <p>Search</p>
-                            <input onChange={handleChange} className={"w-72 h-7 bg-white text-black"} type="text" placeholder={"Summoner Name"}/>
+                            <input onChange={handleChange} className={"w-72 h-7 bg-summoner-light text-summoner-gray"} type="text" placeholder={"Summoner Name"}/>
                         </div>
                     </div>
                     <Link href={"/tft/account"}>

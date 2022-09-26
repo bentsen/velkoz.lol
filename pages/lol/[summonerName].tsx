@@ -436,11 +436,11 @@ const Account = () => {
                                     </div>
                                 </div>
                                 <div className={"ml-3"}>
-                                    <p className={"text-white text-2xl font-bold"}>{summoner.name}</p>
+                                    <p className={"text-white text-2xl font-bold font-heading"}>{summoner.name}</p>
                                     <p className={"text-summoner-gray text-xs mt-2"}>Ladder Rank</p>
                                     <div className={"mt-3"}>
-                                        <motion.button onClick={updateSummoner} whileHover={{scale: 1.1}} className={"bg-leagueoflegends-color text-white w-16 h-10 rounded text-sm"}>Update</motion.button>
-                                        <motion.button whileHover={{scale: 1.1}} className={"bg-transparent border-leagueoflegends-color border ml-2 text-leagueoflegends-color w-20 h-10 rounded text-sm"}>Tier-Graph</motion.button>
+                                        <motion.button onClick={updateSummoner} whileHover={{scale: 1.1}} className={"bg-leagueoflegends-color text-white w-16 h-10 rounded text-sm font-heading"}>Update</motion.button>
+                                        <motion.button whileHover={{scale: 1.1}} className={"bg-transparent border-leagueoflegends-color border ml-2 text-leagueoflegends-color w-20 h-10 rounded text-sm font-heading"}>Tier-Graph</motion.button>
                                     </div>
                                     <p className={"text-summoner-gray text-xs mt-2"}>Last updated:</p>
                                 </div>
@@ -500,7 +500,7 @@ const Account = () => {
                                 )}
                                 <div className={"divide-y divide-black bg-summoner-light mt-2 w-80 h-auto text-white rounded"}>
                                     <div className={"pt-2 pb-2"}>
-                                        <p className={"text-sm ml-2"}>Recently played with</p>
+                                        <p className={"text-md ml-2 font-medium"}>Recently played with</p>
                                     </div>
                                     <table className={"w-full table-fixed border-collapse border-spacing-0 table mt-1"}>
                                         <colgroup className={"table-column-group border-collapse border-spacing-0"}>
@@ -552,7 +552,7 @@ const Account = () => {
                             <div className={"inline-block w-[740px] mt-2 ml-2 align-top"}>
                                 <div className={"divide-y divide-black bg-summoner-light w-full h-48 text-white rounded"}>
                                     <div className={"h-7 flex items-center"}>
-                                        <p className={"text-sm ml-2"}>Match History Stats</p>
+                                        <p className={"text-md ml-2 font-medium"}>Match History Stats</p>
                                     </div>
                                     <div>
                                         {matches ? (
@@ -564,7 +564,7 @@ const Account = () => {
                                                 <div className={"mt-2"}>
                                                     <div className={"relative text-center"}>
                                                         <DoughnutChart wins={getWinsRecentGames()} losses={getLossesRecentGames()}/>
-                                                        <div className={"absolute top-10 left-9 text-sm text-win-border"}>
+                                                        <div className={"absolute top-10 left-9 text-sm " + (calculateWinRate(getWinsRecentGames(),getLossesRecentGames()) > 50 ? "text-win" : "text-loss")}>
                                                             {calculateWinRate(getWinsRecentGames(),getLossesRecentGames())}%
                                                         </div>
                                                     </div>
@@ -593,7 +593,7 @@ const Account = () => {
                                                         <li key={champ.name} className={"flex items-center"}>
                                                             <img className={"w-6 h-6 rounded-full mr-2"} src={`http://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${champ.name}.png`} alt=""/>
                                                             <div className={"text-xs text-summoner-gray"}>
-                                                                <span className={" " + (calculateWinRate(champ.wins, champ.games- champ.wins) >= 60 ? "text-win-border" : calculateWinRate(champ.wins, champ.games- champ.wins) <= 40 ? "text-loss-border" : "text-summoner-gray")}>{calculateWinRate(champ.wins,champ.games - champ.wins)}% </span>
+                                                                <span className={" " + (calculateWinRate(champ.wins, champ.games- champ.wins) >= 60 ? "text-win" : calculateWinRate(champ.wins, champ.games- champ.wins) <= 40 ? "text-loss" : "text-summoner-gray")}>{calculateWinRate(champ.wins,champ.games - champ.wins)}% </span>
                                                                 ({champ.wins}W {champ.games  - champ.wins}L)
                                                             </div>
                                                         </li>

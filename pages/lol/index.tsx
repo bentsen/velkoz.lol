@@ -74,7 +74,7 @@ const Lol: NextPage = () => {
                     </div>
                 </div>
                 <Link href={"/lol/" + summonerName + "?region="+regions.get(region)}>
-                    <motion.button onClick={handleClick} whileHover={{scale: 1.1}} className={"bg-leagueoflegends-color text-white w-32 h-10 rounded"}>Search</motion.button>
+                    <motion.button onClick={handleClick} whileHover={{scale: 1.1}} className={"bg-leagueoflegends-color text-white w-32 h-10 rounded font-heading"}>Search</motion.button>
                 </Link>
             </div>
             <Modal isOpen={isOpen} setIsOpen={setIsOpen} region={region} setRegion={setRegion}/>
