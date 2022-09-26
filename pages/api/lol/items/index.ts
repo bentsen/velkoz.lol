@@ -1,11 +1,9 @@
 import {NextApiRequest, NextApiResponse} from "next";
 import {ddragon} from "reksai";
-import {IChampion} from "reksai/src/@types/champion";
+import {IItem} from "reksai/src/@types/items";
 
 
 export default async (req: NextApiRequest, res: NextApiResponse) =>  {
-    const champions: IChampion = await ddragon.champion.getAll()
-
-
-    res.status(200).json(champions)
+    const item: IItem = await ddragon.item.all()
+    res.status(200).json(item)
 }

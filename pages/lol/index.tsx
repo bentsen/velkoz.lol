@@ -21,7 +21,16 @@ const Lol: NextPage = () => {
     /*Map to translate region string to usable region string*/
     const regions: Map<string, string> = new Map([
         ["Europa West", "euw1"],
-        ["Europe Nordic & East", "eun1"]
+        ["Europe Nordic & East", "eun1"],
+        ["North America", "NA1"],
+        ["Oceania", "OC1"],
+        ["Japan", "JP1"],
+        ["Russia", "RU"],
+        ["LAS", "LA1"],
+        ["LAN", "LA2"],
+        ["Brazil", "BR1"],
+        ["Korea", "KR"],
+        ["Türkiye", "TR1"],
     ])
 
     /*Saves region and summonerName in localStorage*/

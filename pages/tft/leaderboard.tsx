@@ -105,15 +105,15 @@ const Leaderboard = () => {
     return(
         <>
             <div className={"flex flex-col divide-black divide-y"}>
-                <div className={"bg-summoner-light w-full h-16 flex items-center"}>
+                <div className={"bg-summoners-light w-full h-16 flex items-center"}>
                     <h1 className={"text-white text-2xl font-bold ml-40"}>Leaderboards</h1>
                 </div>
-                <div className={"bg-summoner-light w-full h-12"}>
+                <div className={"bg-summoners-light w-full h-12"}>
 
                 </div>
             </div>
             <div className={"container mx-auto px-20 mt-10"}>
-                <div className={"flex justify-between text-xs text-summoner-gray"}>
+                <div className={"flex justify-between text-xs text-summoners-gray"}>
                     <div>
                         There are currently {ladder.length} challengers on the Tft Arena
                     </div>
@@ -122,8 +122,8 @@ const Leaderboard = () => {
                     </div>
                 </div>
                 <div className={"w-full h-auto mt-4"}>
-                    <div className={"w-full h-12 rounded bg-summoner-light flex justify-between items-center"}>
-                        <button onClick={() => setIsOpen(true)} className={"flex flex-row text-summoner-gray ml-2 border rounded text-sm w-auto justify-center h-10 items-center border-summoner-dark"}>
+                    <div className={"w-full h-12 rounded bg-summoners-light flex justify-between items-center"}>
+                        <button onClick={() => setIsOpen(true)} className={"flex flex-row text-summoners-gray ml-2 border rounded text-sm w-auto justify-center h-10 items-center border-summoners-dark"}>
                             <span>{region}</span>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20"
                                  fill="currentColor">
@@ -132,8 +132,8 @@ const Leaderboard = () => {
                                       clipRule="evenodd"/>
                             </svg>
                         </button>
-                        <div className={"bg-summoner-dark rounded w-60 mr-2 h-9 flex justify-between items-center"}>
-                            <input className={"bg-summoner-dark indent-3 ml-1 text-xs text-white w-48 h-9 rounded"} type="text" placeholder={"Summoner Name"}/>
+                        <div className={"bg-summoners-dark rounded w-60 mr-2 h-9 flex justify-between items-center"}>
+                            <input className={"bg-summoners-dark indent-3 ml-1 text-xs text-white w-48 h-9 rounded"} type="text" placeholder={"Summoner Name"}/>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
                                  stroke="currentColor" className="w-6 h-6 text-summoner-gray">
                                 <path strokeLinecap="round" strokeLinejoin="round"
@@ -154,22 +154,22 @@ const Leaderboard = () => {
                             </colgroup>
                             <thead className={"table-header-group align-middle border-inherit"}>
                             <tr className={"table-row border-inherit"}>
-                                <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border pl-3 rounded-t"} align="left" scope="col">#</th>
-                                <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">Summoners</th>
-                                <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">Tier</th>
-                                <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">LP</th>
-                                <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">Most champions</th>
-                                <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border"} align="left" scope="col">Level</th>
-                                <th className={"relative h-8 select-none bg-summoner-dark text-summoner-gray text-xs leading-4 border-b-2 border-solid border-summoner-dark box-border rounded-t"} align="left" scope="col">Win Ratio</th>
+                                <th className={"relative h-8 select-none bg-summoners-dark text-summoners-gray text-xs leading-4 border-b-2 border-solid border-summoners-dark box-border pl-3 rounded-t"} align="left" scope="col">#</th>
+                                <th className={"relative h-8 select-none bg-summoners-dark text-summoners-gray text-xs leading-4 border-b-2 border-solid border-summoners-dark box-border"} align="left" scope="col">Summoners</th>
+                                <th className={"relative h-8 select-none bg-summoners-dark text-summoners-gray text-xs leading-4 border-b-2 border-solid border-summoners-dark box-border"} align="left" scope="col">Tier</th>
+                                <th className={"relative h-8 select-none bg-summoners-dark text-summoners-gray text-xs leading-4 border-b-2 border-solid border-summoners-dark box-border"} align="left" scope="col">LP</th>
+                                <th className={"relative h-8 select-none bg-summoners-dark text-summoners-gray text-xs leading-4 border-b-2 border-solid border-summoners-dark box-border"} align="left" scope="col">Most champions</th>
+                                <th className={"relative h-8 select-none bg-summoners-dark text-summoners-gray text-xs leading-4 border-b-2 border-solid border-summoners-dark box-border"} align="left" scope="col">Level</th>
+                                <th className={"relative h-8 select-none bg-summoners-dark text-summoners-gray text-xs leading-4 border-b-2 border-solid border-summoners-dark box-border rounded-t"} align="left" scope="col">Win Ratio</th>
                             </tr>
                             </thead>
                             <tbody className={"table-row-group align-middle border-inherit"}>
                             {slice.map((el, index) => (
-                                <tr className={"table-row border-inherit text-xs text-summoner-gray"} key={el.summonerId}>
-                                    <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light pl-3"}>
+                                <tr className={"table-row border-inherit text-xs text-summoners-gray"} key={el.summonerId}>
+                                    <td className={"border-b-2 border-solid border-summoners-dark bg-summoners-light pl-3"}>
                                         {page === 1 ? index+1 : page === 2 ? index + 1 + 100 : page === 3 ? index+1 + 200 : ""}
                                     </td>
-                                    <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light box-border font-normal align-middle p-1"}>
+                                    <td className={"border-b-2 border-solid border-summoners-dark bg-summoners-light box-border font-normal align-middle p-1"}>
                                         <a className={"flex items-center"} href={""}>
                                             <Image className={"rounded-full"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/1665.png`} height={30} width={30}/>
                                             <strong className={"pl-2 flex-1 box-border text-white text-xs"}>
@@ -177,14 +177,14 @@ const Leaderboard = () => {
                                             </strong>
                                         </a>
                                     </td>
-                                    <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
+                                    <td className={"border-b-2 border-solid border-summoners-dark bg-summoners-light"}>
                                         Challenger
                                     </td>
-                                    <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
+                                    <td className={"border-b-2 border-solid border-summoners-dark bg-summoners-light"}>
                                         {el.leaguePoints}
                                         LP
                                     </td>
-                                    <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
+                                    <td className={"border-b-2 border-solid border-summoners-dark bg-summoners-light"}>
                                         <a className={"align-middle inline-block cursor-pointer p-1"} href="">
                                             <div className={"relative block"}>
                                                 <Image className={"rounded-full"} src={icon} loader={() => icon} height={30} width={30}/>
@@ -201,10 +201,10 @@ const Leaderboard = () => {
                                             </div>
                                         </a>
                                     </td>
-                                    <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
+                                    <td className={"border-b-2 border-solid border-summoners-dark bg-summoners-light"}>
                                         100
                                     </td>
-                                    <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
+                                    <td className={"border-b-2 border-solid border-summoners-dark bg-summoners-light"}>
                                         <div className={""}>
                                             <div>
                                                 {calculateWinRate(el.wins,el.losses)}%
@@ -215,26 +215,26 @@ const Leaderboard = () => {
                             ))}
                             </tbody>
                         </table>
-                        <div className={"bg-summoner-light w-full h-24 rounded-b text-center text-summoner-gray text-xs overflow-hidden"}>
+                        <div className={"bg-summoners-light w-full h-24 rounded-b text-center text-summoners-gray text-xs overflow-hidden"}>
                             <p className={"mb-6 mt-5"}>
                                 #{page === 1 ? 1: page === 2 ? 101: page === 3 ? 201: "x"} ~#{page === 1 ? 100 : page === 2 ? 200 : page === 3 ? 300: "x"}/Total {ladder.length} Summoners
                             </p>
                             <div className={"flex justify-between"}>
-                                <motion.div whileHover={{scale: 1.1}} onClick={previousPage} className={"box-border block w-7 h-7 bg-summoner-dark leading-7 rounded ml-3 cursor-pointer"}>
+                                <motion.div whileHover={{scale: 1.1}} onClick={previousPage} className={"box-border block w-7 h-7 bg-summoners-dark leading-7 rounded ml-3 cursor-pointer"}>
                                     <Image src={"/lol/icon-arrow-left.svg"} width={20} height={28}/>
                                 </motion.div>
                                 <div className={"flex justify-between space-x-1"}>
-                                    <div onClick={() => specificPage(1)} className={"box-border block w-7 h-7 leading-7 rounded border border-solid font-bold text-center cursor-pointer " + (page === 1 ? "bg-summoner-light text-white border-black" : "bg-summoner-dark border-summoner-light text-summoner-gray")}>
+                                    <div onClick={() => specificPage(1)} className={"box-border block w-7 h-7 leading-7 rounded border border-solid font-bold text-center cursor-pointer " + (page === 1 ? "bg-summoners-light text-white border-black" : "bg-summoners-dark border-summoners-light text-summoners-gray")}>
                                         1
                                     </div>
-                                    <div onClick={() => specificPage(2)} className={"box-border block w-7 h-7 leading-7 rounded border border-solid font-bold text-center cursor-pointer " + (page === 2 ? "bg-summoner-light text-white border-black" : "bg-summoner-dark border-summoner-light text-summoner-gray")}>
+                                    <div onClick={() => specificPage(2)} className={"box-border block w-7 h-7 leading-7 rounded border border-solid font-bold text-center cursor-pointer " + (page === 2 ? "bg-summoners-light text-white border-black" : "bg-summoners-dark border-summoners-light text-summoners-gray")}>
                                         2
                                     </div>
-                                    <div onClick={() => specificPage(3)} className={"box-border block w-7 h-7 leading-7 rounded border border-solid font-bold text-center cursor-pointer " + (page === 3 ? "bg-summoner-light text-white border-black" : "bg-summoner-dark border-summoner-light text-summoner-gray")}>
+                                    <div onClick={() => specificPage(3)} className={"box-border block w-7 h-7 leading-7 rounded border border-solid font-bold text-center cursor-pointer " + (page === 3 ? "bg-summoners-light text-white border-black" : "bg-summoners-dark border-summoners-light text-summoners-gray")}>
                                         3
                                     </div>
                                 </div>
-                                <motion.div whileHover={{scale: 1.1}} onClick={nextPage} className={"box-border block w-7 h-7 bg-summoner-dark leading-7 rounded mr-3 cursor-pointer"}>
+                                <motion.div whileHover={{scale: 1.1}} onClick={nextPage} className={"box-border block w-7 h-7 bg-summoners-dark leading-7 rounded mr-3 cursor-pointer"}>
                                     <Image src={"/lol/icon-arrow-right.svg"} width={20} height={28}/>
                                 </motion.div>
                             </div>

@@ -7,6 +7,9 @@ import {Runes} from "../utils/types/runes.t";
 import {Spell} from "../utils/types/spell.t"
 import Image from "next/image";
 import {useRouter} from "next/router";
+import { Tooltip } from '@nextui-org/react';
+import {IItem, ItemsResponse} from "reksai/src/@types/items";
+import useSWR from "swr";
 
 /*
 * Name: Mikkel Bentsen
@@ -17,7 +20,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
     const router = useRouter()
     /*useStake for match state*/
     const [matchWon, setMatchWon] = useState<boolean>()
-    /*useStake for summoner*/
+    /*useStake for summoners*/
     const [summonerParticipant, setSummonerParticipant] = useState<ISummoner>(summoner)
     /*useState for Runes array*/
     const [runes, setRunes] = useState<Runes[]>([])
@@ -25,15 +28,30 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
     const [spells, setSpells] = useState<Spell[]>([])
     /*useState that indicates if match is expanded*/
     const [expanded, setExpanded] = useState(false)
+    /*useState for items object*/
+    const [items, setItems] = useState<ItemsResponse>()
+    /*fetcher engine*/
+    const fetcher = async (url: any) => await axios.get(url).then((res) => res.data)
+    /*ddragon vesion*/
+    const { data: version } = useSWR("/api/lol/versions", fetcher)
 
     /*useEffect to fetch all spells*/
     useEffect(() => {
         async function getSpells(){
-            const response = await axios.get<Spell[]>("/api/spells/")
+            const response = await axios.get<Spell[]>("/api/lol/spells/")
             const data:Spell[] = await response.data
             setSpells(data)
         }
         getSpells()
+    },[])
+
+    useEffect(() => {
+        async function getItems(){
+            const response = await axios.get<ItemsResponse>("/api/lol/items")
+            const data:ItemsResponse = await response.data
+            setItems(data)
+        }
+        getItems()
     },[])
 
     /*useEffect to check if match is won or lost*/
@@ -53,32 +71,32 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
     /*useEffect to fetch all runes*/
     useEffect(() => {
         async function getRunes(){
-            const response = await axios.get<Runes[]>("/api/runes/")
+            const response = await axios.get<Runes[]>("/api/lol/runes/")
             const data:Runes[] = await response.data
             setRunes(data)
         }
         getRunes()
     }, [])
 
-    /*Get summoner spell by id*/
+    /*Get summoners spell by id*/
     const getSummonerSpell = (id: number | undefined) => {
         if(id != undefined){
             for(let i = 0; i < spells.length; i++){
                 if(spells[i].id == id){
-                    return spells[i].icon
+                    return spells[i]
                 }
             }
         }
     }
 
     /*Get runeIcon by id*/
-    const getRuneIcon = (id: number | undefined) => {
+    const getRune = (id: number | undefined) => {
         if(id != undefined) {
             for(let i = 0; i < runes.length; i++) {
                 for(let j = 0; j < runes[i].slots.length; j++){
                     for(let l = 0; l < runes[i].slots[j].runes.length; l++) {
                         if(runes[i].slots[j].runes[l].id == id){
-                            return runes[i].slots[j].runes[l].icon
+                            return runes[i].slots[j].runes[l]
                         }
                     }
                 }
@@ -91,14 +109,14 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         if(id != undefined){
             for(let i = 0; i < runes.length; i++) {
                 if(runes[i].id == id){
-                    return runes[i].icon
+                    return runes[i]
                 }
             }
         }
 
     }
 
-    /*Get summoner from match*/
+    /*Get summoners from match*/
     const getSummerParticipant = () => {
         let participant: Participant
 
@@ -115,12 +133,14 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
+    /*get team percentage gold earned in match*/
     const getProcentGoldEarned = (totalGold: number | undefined, teamGold: number | undefined) => {
         if(totalGold != undefined && teamGold != undefined){
             return Math.round((teamGold / totalGold) * 100)
         }
     }
 
+    /*get total earned gold from enemy team*/
     const getTotalGoldEnemyTeam = () => {
         let gold: number = 0
         for(let i = 0; i < getEnemyPlayers().length; i++){
@@ -130,6 +150,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         return gold
     }
 
+    /*get total earned gold from summoners team*/
     const getTotalGoldSummonerTeam = () => {
         let gold: number = 0
         for(let i = 0; i < getSummonerPlayers().length; i++){
@@ -139,6 +160,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         return gold
     }
 
+    /*get enemy team*/
     const getEnemyTeam = () => {
         for(let i = 0; i < match.info.teams.length; i++){
             if(match.info.teams[i].teamId != getSummerParticipant()?.teamId){
@@ -147,6 +169,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
+    /*get summoners team*/
     const getSummonerTeam = () => {
         for(let i = 0; i < match.info.teams.length; i++ ){
             if(match.info.teams[i].teamId == getSummerParticipant()?.teamId){
@@ -155,6 +178,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
+    /*get players on summoners team*/
     const getSummonerPlayers = () => {
         for(let i = 0; i < getFirstHalf().length; i++){
             if(getFirstHalf()[i].puuid == summonerParticipant.puuid){
@@ -164,6 +188,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         return getLastHalf()
     }
 
+    /*get players on enemy team*/
     const getEnemyPlayers = () => {
         for(let i = 0; i < getFirstHalf().length; i++){
             if(getFirstHalf()[i].puuid == summonerParticipant.puuid){
@@ -187,7 +212,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         return match.info.participants.slice(half_length)
     }
 
-    /*Calculate kda of summoner*/
+    /*Calculate kda of summoners*/
     const calculateKDA = (kills:number | undefined, deaths:number | undefined, assists:number | undefined) => {
        if(kills != undefined && deaths != undefined && assists != undefined) {
             const KDA: number = (kills + assists) / deaths
@@ -200,7 +225,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
        }
     }
 
-    /*Calculate total cs of summoner*/
+    /*Calculate total cs of summoners*/
     const calculateSummonerCs = () => {
         const totalMinions = getSummerParticipant()?.totalMinionsKilled
         const totalJungleMonsters = getSummerParticipant()?.neutralMinionsKilled
@@ -240,7 +265,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         return Math.floor(seconds) + " seconds";
     }
 
-    /*Calculate summoner cs per minute*/
+    /*Calculate summoners cs per minute*/
     const calculateCsPerMin = (totalCs: number | undefined) => {
         const matchDuration = match.info.gameDuration
         const totalMinions = totalCs
@@ -262,7 +287,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
-    /*Calculate summoner kill participation*/
+    /*Calculate summoners kill participation*/
     const calculateKillPerticipation = (teamId: number | undefined, kills: number | undefined, assists: number | undefined) => {
         if(teamId == undefined) return
         const teamKill = getTeamKills(teamId)
@@ -278,6 +303,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
+    /*determine the game mode from match*/
     const determineGameMode = (queueId: number) => {
         const queueMap = new Map([
             [400, "Normal"],
@@ -295,14 +321,26 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
+    /*OnClick go to another summoners profile*/
     const goToProfile = (e: any, summonerName: string) => {
         e.preventDefault()
         router.push(`/lol/${summonerName}?region=${router.query.region}`)
     }
 
+    /*OnClick go to the champ profile*/
     const goToChamp = (e: any, champName: string | undefined) => {
         e.preventDefault()
         router.push(`/lol/champions/${champName}`)
+    }
+
+    /*get item from itemId*/
+    const getItem = (itemId: number | undefined) => {
+        if(itemId != undefined){
+            const item: IItem | undefined = items?.data[itemId]
+            if(item != undefined){
+                return item
+            }
+        }
     }
 
     return(
@@ -324,32 +362,40 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                 <div className={"flex items-center"}>
                                     <div>
                                         <div onClick={() => goToChamp(event, getSummerParticipant()?.championName)} className={"block w-12 h-12 bg-black rounded-full cursor-pointer"}>
-                                            <img className={"rounded-full w-12 h-12 object-contain"} src={`https://ddragon.canisback.com/img/champion/tiles/${getSummerParticipant()?.championName}_0.jpg`} alt={"champion image"}/>
+                                            <img className={"rounded-full w-12 h-12 object-contain"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${getSummerParticipant()?.championName == "FiddleSticks" ? "Fiddlesticks" : getSummerParticipant()?.championName}.png`} alt={"items image"}/>
                                         </div>
                                     </div>
                                     <div className={"block ml-1"}>
-                                        <div className={"w-6 h-6 mb-0.5 block"}>
-                                            <div className={"relative block"}>
-                                                <img className={"block rounded border-0"} src={getSummonerSpell(getSummerParticipant()?.summoner1Id)} alt="summonerSpell"/>
+                                        <Tooltip content={getSummonerSpell(getSummerParticipant()?.summoner1Id)?.description} color={"invert"}>
+                                            <div className={"w-6 h-6 mb-0.5 block"}>
+                                                <div className={"relative block"}>
+                                                    <img className={"block rounded border-0"} src={getSummonerSpell(getSummerParticipant()?.summoner1Id)?.icon} alt="summonerSpell"/>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className={"w-6 h-6 mb-0.5 block"}>
-                                            <div className={"relative block"}>
-                                                <img className={"block rounded border-0"} src={getSummonerSpell(getSummerParticipant()?.summoner2Id)} alt="summonerSpell"/>
+                                        </Tooltip>
+                                        <Tooltip content={getSummonerSpell(getSummerParticipant()?.summoner2Id)?.description} color={"invert"}>
+                                            <div className={"w-6 h-6 mb-0.5 block"}>
+                                                <div className={"relative block"}>
+                                                    <img className={"block rounded border-0"} src={getSummonerSpell(getSummerParticipant()?.summoner2Id)?.icon} alt="summonerSpell"/>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </Tooltip>
                                     </div>
                                     <div className={"block ml-1"}>
-                                        <div className={"w-6 h-6 mb-0.5 block bg-black rounded-full"}>
-                                            <div className={"relative block"}>
-                                                <img className={"block rounded border-0"} src={"https://ddragon.canisback.com/img/"+getRuneIcon(getSummerParticipant()?.perks.styles[0].selections[0].perk)} alt=""/>
+                                        <Tooltip content={getRune(getSummerParticipant()?.perks.styles[0].selections[0].perk)?.shortDesc} color={"invert"}>
+                                            <div className={"w-6 h-6 mb-0.5 block bg-black rounded-full"}>
+                                                <div className={"relative block"}>
+                                                    <img className={"block rounded border-0"} src={"https://ddragon.canisback.com/img/"+getRune(getSummerParticipant()?.perks.styles[0].selections[0].perk)?.icon} alt=""/>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className={"w-6 h-6 mb-0.5 block"}>
-                                            <div className={"relative block"}>
-                                                <img className={"block rounded border-0"} src={"https://ddragon.canisback.com/img/"+getRuneStyle(getSummerParticipant()?.perks.styles[1].style)} alt=""/>
+                                        </Tooltip>
+                                        <Tooltip content={getRuneStyle(getSummerParticipant()?.perks.styles[1].style)?.name} color={"invert"}>
+                                            <div className={"w-6 h-6 mb-0.5 block"}>
+                                                <div className={"relative block"}>
+                                                    <img className={"block rounded border-0"} src={"https://ddragon.canisback.com/img/"+getRuneStyle(getSummerParticipant()?.perks.styles[1].style)?.icon} alt=""/>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </Tooltip>
                                     </div>
                                 </div>
                                 <div className={"flex flex-col justify-center relative w-28 pr-3 mr-2 ml-3"}>
@@ -361,9 +407,9 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                         <span className={"text-white"}>{getSummerParticipant()?.assists}</span>
                                     </div>
                                     <div className={"block text-xs text-summoner-gray"}>
-                                                        <span>
-                                                            {calculateKDA(getSummerParticipant()?.kills, getSummerParticipant()?.deaths, getSummerParticipant()?.assists)}:1
-                                                        </span>
+                                        <span>
+                                            {calculateKDA(getSummerParticipant()?.kills, getSummerParticipant()?.deaths, getSummerParticipant()?.assists)}:1
+                                        </span>
                                         KDA
                                     </div>
                                     <div className={"absolute top-0 right-0 w-px h-full " + (matchWon ? "bg-win-button" : "bg-loss-button")}></div>
@@ -397,42 +443,56 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                             <div className={"flex items-center"}>
                                 <div className={"flex"}>
                                     <ul className={"flex list-none"}>
-                                        <li className={"w-6 h-6 rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
-                                            <div className={"relative block"}>
-                                                <img className={"rounded"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item0}.png`} alt=""/>
-                                            </div>
-                                        </li>
-                                        <li className={"w-6 h-6 ml-0.5 rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
-                                            <div className={"relative block"}>
-                                                <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item1}.png`} alt=""/>
-                                            </div>
-                                        </li>
-                                        <li className={"w-6 h-6 ml-0.5 rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
-                                            <div className={"relative block"}>
-                                                <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item2}.png`} alt=""/>
-                                            </div>
-                                        </li>
-                                        <li className={"w-6 h-6 ml-0.5 rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
-                                            <div className={"relative block"}>
-                                                <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item3}.png`} alt=""/>
-                                            </div>
-                                        </li>
-                                        <li className={"w-6 h-6 ml-0.5 rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
-                                            <div className={"relative block"}>
-                                                <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item4}.png`} alt=""/>
-                                            </div>
-                                        </li>
-                                        <li className={"w-6 h-6 ml-0.5 rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
-                                            <div className={"relative block"}>
-                                                <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item5}.png`} alt=""/>
-                                            </div>
-                                        </li>
+                                        <Tooltip content={getItem(getSummerParticipant()?.item0)?.name + ": " + getItem(getSummerParticipant()?.item0)?.plaintext} color={"invert"}>
+                                            <li className={"w-6 h-6 rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
+                                                <div className={"relative block"}>
+                                                    <img className={"rounded"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item0}.png`} alt=""/>
+                                                </div>
+                                            </li>
+                                        </Tooltip>
+                                        <Tooltip content={getItem(getSummerParticipant()?.item1)?.name + ": " + getItem(getSummerParticipant()?.item1)?.plaintext} color={"invert"}>
+                                            <li className={"w-6 h-6 ml-0.5 rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
+                                                <div className={"relative block"}>
+                                                    <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item1}.png`} alt=""/>
+                                                </div>
+                                            </li>
+                                        </Tooltip>
+                                        <Tooltip content={getItem(getSummerParticipant()?.item2)?.name + ": " + getItem(getSummerParticipant()?.item2)?.plaintext} color={"invert"}>
+                                            <li className={"w-6 h-6 ml-0.5 rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
+                                                <div className={"relative block"}>
+                                                    <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item2}.png`} alt=""/>
+                                                </div>
+                                            </li>
+                                        </Tooltip>
+                                        <Tooltip content={getItem(getSummerParticipant()?.item3)?.name + ": " + getItem(getSummerParticipant()?.item3)?.plaintext} color={"invert"}>
+                                            <li className={"w-6 h-6 ml-0.5 rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
+                                                <div className={"relative block"}>
+                                                    <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item3}.png`} alt=""/>
+                                                </div>
+                                            </li>
+                                        </Tooltip>
+                                        <Tooltip content={getItem(getSummerParticipant()?.item4)?.name + ": " + getItem(getSummerParticipant()?.item4)?.plaintext} color={"invert"}>
+                                            <li className={"w-6 h-6 ml-0.5 rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
+                                                <div className={"relative block"}>
+                                                    <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item4}.png`} alt=""/>
+                                                </div>
+                                            </li>
+                                        </Tooltip>
+                                        <Tooltip content={getItem(getSummerParticipant()?.item5)?.name + ": " + getItem(getSummerParticipant()?.item5)?.plaintext} color={"invert"}>
+                                            <li className={"w-6 h-6 ml-0.5 rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
+                                                <div className={"relative block"}>
+                                                    <img className={"rounded"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item5}.png`} alt=""/>
+                                                </div>
+                                            </li>
+                                        </Tooltip>
                                     </ul>
-                                    <div className={"w-6 h-6 ml-0.5 mr-1 rounded-full " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
-                                        <div className={"relative block"}>
-                                            <img className={"rounded-full"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item6}.png`} alt=""/>
+                                    <Tooltip content={getItem(getSummerParticipant()?.item6)?.name + ": " + getItem(getSummerParticipant()?.item6)?.plaintext} color={"invert"}>
+                                        <div className={"w-6 h-6 ml-0.5 mr-1 rounded-full " + (matchWon ? "bg-win-button" : "bg-loss-button")}>
+                                            <div className={"relative block"}>
+                                                <img className={"rounded-full"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${getSummerParticipant()?.item6}.png`} alt=""/>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </Tooltip>
                                 </div>
                             </div>
                         </div>
@@ -440,9 +500,11 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                             <ul className={"mr-2 list-none"}>
                                 {getFirstHalf().map((player, index) => (
                                 <li key={index} className={"flex items-center w-[88px] h-4 text-center whitespace-nowrap list-none mt-px"}>
-                                    <div className={"relative inline-block align-middle mr-1"}>
-                                        <img className={"block w-4 h-4 " + (player.puuid == summonerParticipant.puuid ? "rounded-full" : "rounded")} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${player.championName}.png`} alt=""/>
-                                    </div>
+                                    <Tooltip content={player.championName} color={"invert"}>
+                                        <div className={"relative inline-block align-middle mr-1"}>
+                                            <img className={"block w-4 h-4 " + (player.puuid == summonerParticipant.puuid ? "rounded-full" : "rounded")} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${player.championName == "FiddleSticks" ? "Fiddlesticks" : player.championName}.png`} alt=""/>
+                                        </div>
+                                    </Tooltip>
                                     <div className={"inline-block max-w-[60px] align-middle text-summoner-gray"}>
                                         <p onClick={() => goToProfile(event, player.summonerName)} className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden hover:underline cursor-pointer " + (player.puuid == summonerParticipant.puuid ? "text-white" : "")}>{player.summonerName}</p>
                                     </div>
@@ -452,9 +514,11 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                             <ul className={"list-none"}>
                                 {getLastHalf().map((player, index) => (
                                 <li key={index + 10} className={"flex items-center w-[88px] h-4 text-left whitespace-nowrap mt-px"}>
-                                    <div className={"relative inline-block align-middle mr-1"}>
-                                        <img className={"block w-4 h-4 " + (player.puuid == summonerParticipant.puuid ? "rounded-full" : "rounded")} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${player.championName}.png`} alt=""/>
-                                    </div>
+                                    <Tooltip content={player.championName} color={"invert"}>
+                                        <div className={"relative inline-block align-middle mr-1"}>
+                                            <img className={"block w-4 h-4 " + (player.puuid == summonerParticipant.puuid ? "rounded-full" : "rounded")} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${player.championName == "FiddleSticks" ? "Fiddlesticks" : player.championName}.png`} alt=""/>
+                                        </div>
+                                    </Tooltip>
                                     <div className={"inline-block max-w-[60px] align-middle text-summoner-gray"}>
                                         <p onClick={() => goToProfile(event, player.summonerName)} className={"text-xs block text-ellipsis whitespace-nowrap overflow-hidden hover:underline cursor-pointer " + (player.puuid == summonerParticipant.puuid ? "text-white" : "")}>{player.summonerName}</p>
                                     </div>
@@ -527,29 +591,31 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                 {getSummonerPlayers().map((player) => (
                                     <tr key={player.puuid} className={"table-row align-middle border-inherit"}>
                                         <td className={"pl-2.5 pr-1 pt-1"}>
-                                            <div className={"relative block cursor-pointer"}>
-                                                <div className={"relative w-[32px] block"}>
-                                                    <Image className={"block rounded-full"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${player.championName}.png`} width={"35"} height={"35"} alt={"Champion image"}/>
-                                                    <div className={"absolute left-[-3px] bottom-[1px] w-[15px] h-[15px] bg-gray-800 rounded-full text-white text-xs text-center leading-[15px]"}>
-                                                        {player.champLevel}
+                                            <Tooltip content={player.championName} color={"invert"}>
+                                                <div className={"relative block cursor-pointer"}>
+                                                    <div className={"relative w-[32px] block"}>
+                                                        <Image className={"block rounded-full"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${player.championName}.png`} width={"35"} height={"35"} alt={"Champion image"}/>
+                                                        <div className={"absolute left-[-3px] bottom-[1px] w-[15px] h-[15px] bg-gray-800 rounded-full text-white text-xs text-center leading-[15px]"}>
+                                                            {player.champLevel}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </Tooltip>
                                         </td>
                                         <td className={"pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
                                             <div className={"relative mb-0.5 w-4 h-4 block"}>
-                                                <img className={"w-4 h-4 rounded"} src={getSummonerSpell(player.summoner1Id)} alt={"summonerSpell"}/>
+                                                <img className={"w-4 h-4 rounded"} src={getSummonerSpell(player.summoner1Id)?.icon} alt={"summonerSpell"}/>
                                             </div>
                                             <div className={"relative w-4 h-4 block"}>
-                                                <img className={"w-4 h-4 rounded"} src={getSummonerSpell(player.summoner2Id)} alt={"summonerSpell"}/>
+                                                <img className={"w-4 h-4 rounded"} src={getSummonerSpell(player.summoner2Id)?.icon} alt={"summonerSpell"}/>
                                             </div>
                                         </td>
                                         <td className={"pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
                                             <div className={"relative mb-0.5 bg-black rounded-full w-4 h-4"}>
-                                                <img className={"w-4 h-4 rounded"} src={"https://ddragon.canisback.com/img/"+getRuneIcon(player.perks.styles[0].selections[0].perk)} alt={"RuneIcon"}/>
+                                                <img className={"w-4 h-4 rounded"} src={"https://ddragon.canisback.com/img/"+getRune(player.perks.styles[0].selections[0].perk)?.icon} alt={"RuneIcon"}/>
                                             </div>
                                             <div className={"relative mb-0.5 bg-black rounded-full w-4 h-4"}>
-                                                <img className={"w-4 h-4 rounded"} src={"https://ddragon.canisback.com/img/"+getRuneStyle(player.perks.styles[1].style)} alt={"RuneStyleIcon"}/>
+                                                <img className={"w-4 h-4 rounded"} src={"https://ddragon.canisback.com/img/"+getRuneStyle(player.perks.styles[1].style)?.icon} alt={"RuneStyleIcon"}/>
                                             </div>
                                         </td>
                                         <td className={"pl-[5px] whitespace-nowrap text-ellipsis overflow-hidden pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
@@ -578,17 +644,21 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                         </td>
                                         <td className={"pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
                                             <div className={"flex justify-center"}>
-                                                <div className={"relative block"}>
-                                                    <div className={"text-center text-gray-500 text-[11px] leading-[14px] block"}>
-                                                        {player.totalDamageDealtToChampions}
-                                                        <div></div>
+                                                <Tooltip content={"Total damage inflicted to champions: " + player.totalDamageDealtToChampions} color={"invert"}>
+                                                    <div className={"relative block"}>
+                                                        <div className={"text-center text-gray-500 text-[11px] leading-[14px] block"}>
+                                                            {player.totalDamageDealtToChampions}
+                                                            <div></div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div className={"relative block"}>
-                                                    <div className={"text-center text-gray-500 text-[11px] leading-[14px] ml-2 block"}>
-                                                        {player.totalDamageTaken.toLocaleString()}
+                                                </Tooltip>
+                                                <Tooltip content={"Total taken damage " + player.totalDamageTaken.toLocaleString()} color={"invert"}>
+                                                    <div className={"relative block"}>
+                                                        <div className={"text-center text-gray-500 text-[11px] leading-[14px] ml-2 block"}>
+                                                            {player.totalDamageTaken.toLocaleString()}
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                </Tooltip>
                                             </div>
                                         </td>
                                         <td className={"text-center text-gray-500 text-[11px] pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
@@ -613,49 +683,49 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                             <div className={"ml-0 inline-block w-[22px] h-[22px] align-middle"}>
                                                 {player.item0 != 0 ? (
                                                     <div className={"relative block"}>
-                                                        <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item0}.png`} alt=""/>
+                                                        <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${player.item0}.png`} alt=""/>
                                                     </div>
                                                 ) : (<div className={"w-full h-full rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
                                             </div>
                                             <div className={"inline-block w-[22px] h-[22px] ml-px align-middle"}>
                                                 {player.item1 != 0 ? (
                                                     <div className={"relative block"}>
-                                                        <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item1}.png`} alt=""/>
+                                                        <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${player.item1}.png`} alt=""/>
                                                     </div>
                                                 ) : (<div className={"w-full h-full rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
                                             </div>
                                             <div className={"inline-block w-[22px] h-[22px] ml-px align-middle"}>
                                                 {player.item2 != 0 ? (
                                                     <div className={"relative block"}>
-                                                        <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item2}.png`} alt=""/>
+                                                        <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${player.item2}.png`} alt=""/>
                                                     </div>
                                                 ) : (<div className={"w-full h-full rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
                                             </div>
                                             <div className={"inline-block w-[22px] h-[22px] ml-px align-middle"}>
                                                 {player.item3 != 0 ? (
                                                     <div className={"relative block"}>
-                                                        <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item3}.png`} alt=""/>
+                                                        <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${player.item3}.png`} alt=""/>
                                                     </div>
                                                 ) : (<div className={"w-full h-full rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
                                             </div>
                                             <div className={"inline-block w-[22px] h-[22px] ml-px align-middle"}>
                                                 {player.item4 != 0 ? (
                                                     <div className={"relative block"}>
-                                                        <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item4}.png`} alt=""/>
+                                                        <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${player.item4}.png`} alt=""/>
                                                     </div>
                                                 ) : (<div className={"w-full h-full rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
                                             </div>
                                             <div className={"inline-block w-[22px] h-[22px] ml-px align-middle"}>
                                                 {player.item5 != 0 ? (
                                                 <div className={"relative block"}>
-                                                    <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item5}.png`} alt=""/>
+                                                    <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${player.item5}.png`} alt=""/>
                                                 </div>
                                                 ) : (<div className={"w-full h-full rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
                                             </div>
                                             <div className={"inline-block w-[22px] h-[22px] ml-px align-middle"}>
                                                 {player.item6 != 0 ? (
                                                     <div className={"relative block"}>
-                                                        <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item6}.png`} alt=""/>
+                                                        <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${player.item6}.png`} alt=""/>
                                                     </div>
                                                 ) : (<div className={"w-full h-full rounded " + (matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
                                             </div>
@@ -666,23 +736,29 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                         </table>
                         <div className={"flex justify-between align-middle bg-summoner-dark"}>
                             <div className={"pr-[0px] pl-[16px] text-left table-cell h-[30px] items-center leading-[50px]"}>
-                                <div className={"ml-0 inline-block text-xs text-summoner-gray"}>
-                                    <div className={"relative block"}>
-                                        <img className={"inline-block mr-[4px] align-middle w-[16px] h-[16px]"} src={`/lol/icon-baron${matchWon ? "" : "-r"}.svg`} alt=""/>
-                                        <span className={"inline-block align-middle text-xs text-summoner-gray"}>{getSummonerTeam()?.objectives.baron.kills}</span>
+                                    <div className={"ml-0 inline-block text-xs text-summoner-gray"}>
+                                        <Tooltip content={"Baron"} color={"invert"}>
+                                            <div className={"relative block"}>
+                                                <img className={"inline-block mr-[4px] align-middle w-[16px] h-[16px]"} src={`/lol/icon-baron${matchWon ? "" : "-r"}.svg`} alt=""/>
+                                                <span className={"inline-block align-middle text-xs text-summoner-gray"}>{getSummonerTeam()?.objectives.baron.kills}</span>
+                                            </div>
+                                        </Tooltip>
                                     </div>
+                                <div className={"inline-block text-xs text-summoner-gray ml-[16px]"}>
+                                    <Tooltip content={"Dragon"} color={"invert"}>
+                                        <div className={"relative block"}>
+                                            <img className={"inline-block mr-[4px] align-middle w-[16px] h-[16px]"} src={`/lol/icon-dragon${matchWon ? "" : "-r"}.svg`} alt=""/>
+                                            <span className={"inline-block align-middle"}>{getSummonerTeam()?.objectives.dragon.kills}</span>
+                                        </div>
+                                    </Tooltip>
                                 </div>
                                 <div className={"inline-block text-xs text-summoner-gray ml-[16px]"}>
-                                    <div className={"relative block"}>
-                                        <img className={"inline-block mr-[4px] align-middle w-[16px] h-[16px]"} src={`/lol/icon-dragon${matchWon ? "" : "-r"}.svg`} alt=""/>
-                                        <span className={"inline-block align-middle"}>{getSummonerTeam()?.objectives.dragon.kills}</span>
-                                    </div>
-                                </div>
-                                <div className={"inline-block text-xs text-summoner-gray ml-[16px]"}>
-                                    <div className={"relative block"}>
-                                        <img className={"inline-block mr-[4px] align-middle w-[16px] h-[16px]"} src={`/lol/icon-tower${matchWon ? "" : "-r"}.svg`} alt=""/>
-                                        <span className={"inline-block align-middle"}>{getSummonerTeam()?.objectives.tower.kills}</span>
-                                    </div>
+                                    <Tooltip content={"Tower"} color={"invert"}>
+                                        <div className={"relative block"}>
+                                            <img className={"inline-block mr-[4px] align-middle w-[16px] h-[16px]"} src={`/lol/icon-tower${matchWon ? "" : "-r"}.svg`} alt=""/>
+                                            <span className={"inline-block align-middle"}>{getSummonerTeam()?.objectives.tower.kills}</span>
+                                        </div>
+                                    </Tooltip>
                                 </div>
                             </div>
                             <div className={"flex-[0_1_405px] block"}>
@@ -719,22 +795,28 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                             </div>
                             <div className={"pr-[16px] table-cell h-[30px] items-center text-right leading-[50px]"}>
                                 <div className={"ml-0 inline-block text-xs text-summoner-gray"}>
-                                    <div className={"relative block"}>
-                                        <img className={"inline-block mr-[4px] align-middle w-[16px] h-[16px]"} src={`/lol/icon-baron${matchWon ? "-r" : ""}.svg`} alt=""/>
-                                        <span className={"inline-block align-middle"}>{getEnemyTeam()?.objectives.baron.kills}</span>
-                                    </div>
+                                    <Tooltip content={"Baron"} color={"invert"}>
+                                        <div className={"relative block"}>
+                                            <img className={"inline-block mr-[4px] align-middle w-[16px] h-[16px]"} src={`/lol/icon-baron${matchWon ? "-r" : ""}.svg`} alt=""/>
+                                            <span className={"inline-block align-middle"}>{getEnemyTeam()?.objectives.baron.kills}</span>
+                                        </div>
+                                    </Tooltip>
                                 </div>
                                 <div className={"inline-block text-xs text-summoner-gray ml-[16px]"}>
-                                    <div className={"relative block"}>
-                                        <img className={"inline-block mr-[4px] align-middle w-[16px] h-[16px]"} src={`/lol/icon-dragon${matchWon ? "-r" : ""}.svg`} alt=""/>
-                                        <span className={"inline-block align-middle"}>{getEnemyTeam()?.objectives.dragon.kills}</span>
-                                    </div>
+                                    <Tooltip content={"Dragon"} color={"invert"}>
+                                        <div className={"relative block"}>
+                                            <img className={"inline-block mr-[4px] align-middle w-[16px] h-[16px]"} src={`/lol/icon-dragon${matchWon ? "-r" : ""}.svg`} alt=""/>
+                                            <span className={"inline-block align-middle"}>{getEnemyTeam()?.objectives.dragon.kills}</span>
+                                        </div>
+                                    </Tooltip>
                                 </div>
                                 <div className={"inline-block text-xs text-summoner-gray ml-[16px]"}>
-                                    <div className={"relative block"}>
-                                        <img className={"inline-block mr-[4px] align-middle w-[16px] h-[16px]"} src={`/lol/icon-tower${matchWon ? "-r" : ""}.svg`} alt=""/>
-                                        <span className={"inline-block align-middle"}>{getEnemyTeam()?.objectives.tower.kills}</span>
-                                    </div>
+                                    <Tooltip content={"Tower"} color={"invert"}>
+                                        <div className={"relative block"}>
+                                            <img className={"inline-block mr-[4px] align-middle w-[16px] h-[16px]"} src={`/lol/icon-tower${matchWon ? "-r" : ""}.svg`} alt=""/>
+                                            <span className={"inline-block align-middle"}>{getEnemyTeam()?.objectives.tower.kills}</span>
+                                        </div>
+                                    </Tooltip>
                                 </div>
                             </div>
                         </div>
@@ -780,29 +862,31 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                             {getEnemyPlayers().map((player) => (
                                 <tr key={player.puuid} className={"table-row align-middle border-inherit"}>
                                     <td className={"pl-2.5 pr-1 pt-1"}>
-                                        <div className={"relative block cursor-pointer"}>
-                                            <div className={"relative w-[32px] block"}>
-                                                <Image className={"block rounded-full"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${player.championName}.png`} width={"35"} height={"35"} alt={"Champion image"}/>
-                                                <div className={"absolute left-[-3px] bottom-[1px] w-[15px] h-[15px] bg-gray-800 rounded-full text-white text-xs text-center leading-[15px]"}>
-                                                    {player.champLevel}
+                                        <Tooltip content={player.championName} color={"invert"}>
+                                            <div className={"relative block cursor-pointer"}>
+                                                <div className={"relative w-[32px] block"}>
+                                                    <Image className={"block rounded-full"} src={`http://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${player.championName}.png`} width={"35"} height={"35"} alt={"Champion image"}/>
+                                                    <div className={"absolute left-[-3px] bottom-[1px] w-[15px] h-[15px] bg-gray-800 rounded-full text-white text-xs text-center leading-[15px]"}>
+                                                        {player.champLevel}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </Tooltip>
                                     </td>
                                     <td className={"pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
                                         <div className={"relative mb-0.5 w-4 h-4 block"}>
-                                            <img className={"w-4 h-4 rounded"} src={getSummonerSpell(player.summoner1Id)} alt={"summonerSpell"}/>
+                                            <img className={"w-4 h-4 rounded"} src={getSummonerSpell(player.summoner1Id)?.icon} alt={"summonerSpell"}/>
                                         </div>
                                         <div className={"relative w-4 h-4 block"}>
-                                            <img className={"w-4 h-4 rounded"} src={getSummonerSpell(player.summoner2Id)} alt={"summonerSpell"}/>
+                                            <img className={"w-4 h-4 rounded"} src={getSummonerSpell(player.summoner2Id)?.icon} alt={"summonerSpell"}/>
                                         </div>
                                     </td>
                                     <td className={"pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
                                         <div className={"relative mb-0.5 bg-black rounded-full w-4 h-4"}>
-                                            <img className={"w-4 h-4 rounded"} src={"https://ddragon.canisback.com/img/"+getRuneIcon(player.perks.styles[0].selections[0].perk)} alt={"RuneIcon"}/>
+                                            <img className={"w-4 h-4 rounded"} src={"https://ddragon.canisback.com/img/"+getRune(player.perks.styles[0].selections[0].perk)?.icon} alt={"RuneIcon"}/>
                                         </div>
                                         <div className={"relative mb-0.5 bg-black rounded-full w-4 h-4"}>
-                                            <img className={"w-4 h-4 rounded"} src={"https://ddragon.canisback.com/img/"+getRuneStyle(player.perks.styles[1].style)} alt={"RuneStyleIcon"}/>
+                                            <img className={"w-4 h-4 rounded"} src={"https://ddragon.canisback.com/img/"+getRuneStyle(player.perks.styles[1].style)?.icon} alt={"RuneStyleIcon"}/>
                                         </div>
                                     </td>
                                     <td className={"pl-[5px] whitespace-nowrap text-ellipsis overflow-hidden pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
@@ -831,17 +915,21 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                     </td>
                                     <td className={"pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
                                         <div className={"flex justify-center"}>
-                                            <div className={"relative block"}>
-                                                <div className={"text-center text-gray-500 text-[11px] leading-[14px] block"}>
-                                                    {player.totalDamageDealtToChampions}
-                                                    <div></div>
+                                            <Tooltip content={"Total damage inflicted to champions: " + player.totalDamageDealtToChampions} color={"invert"}>
+                                                <div className={"relative block"}>
+                                                    <div className={"text-center text-gray-500 text-[11px] leading-[14px] block"}>
+                                                        {player.totalDamageDealtToChampions}
+                                                        <div></div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className={"relative block"}>
-                                                <div className={"text-center text-gray-500 text-[11px] leading-[14px] ml-2 block"}>
-                                                    {player.totalDamageTaken.toLocaleString()}
+                                            </Tooltip>
+                                            <Tooltip content={"Total taken damage: " + player.totalDamageTaken.toLocaleString()} color={"invert"}>
+                                                <div className={"relative block"}>
+                                                    <div className={"text-center text-gray-500 text-[11px] leading-[14px] ml-2 block"}>
+                                                        {player.totalDamageTaken.toLocaleString()}
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            </Tooltip>
                                         </div>
                                     </td>
                                     <td className={"text-center text-gray-500 text-[11px] pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
@@ -866,49 +954,49 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                         <div className={"ml-0 inline-block w-[22px] h-[22px] align-middle"}>
                                             {player.item0 != 0 ? (
                                                 <div className={"relative block"}>
-                                                    <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item0}.png`} alt=""/>
+                                                    <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${player.item0}.png`} alt=""/>
                                                 </div>
                                             ) : (<div className={"w-full h-full rounded " + (!matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
                                         </div>
                                         <div className={"inline-block w-[22px] h-[22px] ml-px align-middle"}>
                                             {player.item1 != 0 ? (
                                                 <div className={"relative block"}>
-                                                    <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item1}.png`} alt=""/>
+                                                    <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${player.item1}.png`} alt=""/>
                                                 </div>
                                             ) : (<div className={"w-full h-full rounded " + (!matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
                                         </div>
                                         <div className={"inline-block w-[22px] h-[22px] ml-px align-middle"}>
                                             {player.item2 != 0 ? (
                                                 <div className={"relative block"}>
-                                                    <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item2}.png`} alt=""/>
+                                                    <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${player.item2}.png`} alt=""/>
                                                 </div>
                                             ) : (<div className={"w-full h-full rounded " + (!matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
                                         </div>
                                         <div className={"inline-block w-[22px] h-[22px] ml-px align-middle"}>
                                             {player.item3 != 0 ? (
                                                 <div className={"relative block"}>
-                                                    <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item3}.png`} alt=""/>
+                                                    <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${player.item3}.png`} alt=""/>
                                                 </div>
                                             ) : (<div className={"w-full h-full rounded " + (!matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
                                         </div>
                                         <div className={"inline-block w-[22px] h-[22px] ml-px align-middle"}>
                                             {player.item4 != 0 ? (
                                                 <div className={"relative block"}>
-                                                    <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item4}.png`} alt=""/>
+                                                    <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${player.item4}.png`} alt=""/>
                                                 </div>
                                             ) : (<div className={"w-full h-full rounded " + (!matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
                                         </div>
                                         <div className={"inline-block w-[22px] h-[22px] ml-px align-middle"}>
                                             {player.item5 != 0 ? (
                                                 <div className={"relative block"}>
-                                                    <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item5}.png`} alt=""/>
+                                                    <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${player.item5}.png`} alt=""/>
                                                 </div>
                                             ) : (<div className={"w-full h-full rounded " + (!matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
                                         </div>
                                         <div className={"inline-block w-[22px] h-[22px] ml-px align-middle"}>
                                             {player.item6 != 0 ? (
                                                 <div className={"relative block"}>
-                                                    <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/item/${player.item6}.png`} alt=""/>
+                                                    <img className={"rounded-sm align-middle"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${player.item6}.png`} alt=""/>
                                                 </div>
                                             ) : (<div className={"w-full h-full rounded " + (!matchWon ? "bg-win-button" : "bg-loss-button")}></div>)}
                                         </div>

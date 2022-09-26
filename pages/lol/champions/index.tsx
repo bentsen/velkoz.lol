@@ -1,55 +1,47 @@
 import Image from "next/image";
 import {useContext, useEffect, useState} from "react";
-import {motion} from "framer-motion";
 import {VersionContext} from "../../../store/VersionContext/VersionList";
-import axios from "axios";
-import {Champion} from "../../../utils/types/champion.t";
 import {useRouter} from "next/router";
+import {ddragon} from "reksai";
+import {IChampion} from "reksai/src/@types/champion";
 
 const Champions = () => {
     const router = useRouter()
-    const [champions, setChampions] = useState<Champion[]>([])
+    const [champions, setChampions] = useState<IChampion[]>([])
     const Version = useContext(VersionContext);
     const [role, setRole] = useState("all")
     const [inputValue, setInputValue] = useState<string>("")
-    const [filteredList, setFilteredList] = useState<Champion[] | undefined>()
 
     useEffect(() => {
         async function getChampions(){
-            axios.get<any>("http://ddragon.leagueoflegends.com/cdn/6.24.1/data/en_US/champion.json")
-                .then(response => {
-                    let championData = []
-                    for(let key in response.data['data']){
-                        championData.push(response.data['data'][key])
-                    }
-                    setChampions(championData)
-                })
+            const response = await ddragon.champion.getAll()
+            let championData = []
+            for(let key in response.data){
+                championData.push(response.data[key])
+            }
+            setChampions(championData)
+            console.log(response)
         }
         getChampions()
     }, [])
 
+    const handleChange = (e:any) => {
+        e.preventDefault()
+        setInputValue(e.target.value)
+    }
 
-    const filterChampion = (e: any) => {
-        const keyword = e.target.value
 
-        if(keyword !== ''){
-            if(champions) {
-                const results: Champion[] | undefined = champions?.filter((items) => {
-                    return items.name.toLowerCase().startsWith(keyword.toLowerCase())
-                })
-                //if text fields has an input
-                setFilteredList(results)
-            }
-            else
-                console.log('no champions exits')
-        } else {
-            //if text fields is empty
-            setFilteredList(champions)
+    const filterChampion = () => {
+        if(!champions) return
+        if(inputValue) {
+            return  champions?.filter((champion) => champion.name.toLowerCase().includes(inputValue.toLowerCase()))
+        } else{
+            return  champions
         }
-        setInputValue(keyword)
     }
 
     const goToChampion = (e: any, championName: string) => {
+        e.preventDefault()
         router.push(`/lol/champions/${championName}`)
     }
 
@@ -67,7 +59,7 @@ const Champions = () => {
             <div className={"container mx-auto px-20 mt-10"}>
                 <div className={"flex justify-between text-xs text-summoner-gray"}>
                     <div>
-                        There are currently x Champions available on Summoner&apos;s Rift
+                        There are currently {champions.length} Champions available on Summoner&apos;s Rift
                     </div>
                     <div>
                         Displaying Champions active in the game. Champions are updated periodically.
@@ -96,7 +88,7 @@ const Champions = () => {
                             </div>
                         </div>
                         <div className={"bg-summoner-light rounded w-60 mr-2 h-9 flex justify-between items-center"}>
-                            <input className={"bg-summoner-light indent-3 ml-1 text-xs text-white w-48 h-9 rounded"} value={inputValue} onChange={filterChampion} type="text" placeholder={"Champion Name"}/>
+                            <input className={"bg-summoner-light indent-3 ml-1 text-xs text-white w-48 h-9 rounded"} value={inputValue} onChange={handleChange} type="text" placeholder={"Champion Name"}/>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
                                  stroke="currentColor" className="w-6 h-6 text-summoner-gray">
                                 <path strokeLinecap="round" strokeLinejoin="round"
@@ -107,7 +99,7 @@ const Champions = () => {
                 </div>
                 <div className={"bg-summoner-light rounded-b overflow-hidden flex justify-center"}>
                     <div className="mt-3 mb-2 grid grid-cols-12 gap-x-5 gap-y-5 text-summoner-gray text-xs text-center">
-                        {filteredList?.map((item) => (
+                        {filterChampion()?.map((item) => (
                             <div onClick={() => goToChampion(event, item.name)} key={item.id}>
                                 <Image className={"cursor-pointer"} key={item.id} src={`https://ddragon.leagueoflegends.com/cdn/${Version}/img/champion/${item.image.full}`} unoptimized={true} width={60} height={60} alt={`picture of ${item.name}`}/>
                                 <span>{item.name}</span>

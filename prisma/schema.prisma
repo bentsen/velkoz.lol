@@ -14,8 +14,7 @@ datasource db {
 
 //Summoner table
 model Summoner {
-  id            Int      @id @unique @default(autoincrement())
-  summonerid    String   @unique
+  id            String      @id @unique
   accountId     String   @unique
   puuid         String   @unique
   name          String
@@ -33,7 +32,7 @@ model Match {
   metaData   Metadata?
   info       Info?
   summoner   Summoner  @relation(fields: [summonerId], references: [id], onDelete: Cascade)
-  summonerId Int
+  summonerId String
 }
 
 //Meta table

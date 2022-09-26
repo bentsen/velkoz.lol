@@ -2,7 +2,7 @@ import Reksai from "reksai";
 import {ISummoner} from "reksai/src/@types/summoner";
 import type {NextApiRequest, NextApiResponse} from "next";
 import {IMatch} from "reksai/src/@types/match";
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "../../../../lib/prisma";
 
 
 export default async (req: NextApiRequest, res: NextApiResponse) =>  {
@@ -23,14 +23,27 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
 
         const reksai = new Reksai(process.env.RIOT_API_KEY)
         const summoner: ISummoner = await reksai.summoner.bySummonerName(String(summonerName), String(region))
-        const matchIds = await reksai.match.idsByPuuid(summoner.puuid)
+        const regions: Map<string, string> = new Map([
+            ["euw1", "EUROPE"],
+            ["eun1", "EUROPE"],
+            ["NA1", "AMERICAS"],
+            ["BR1", "AMERICAS"],
+            ["JP1", "ASIA"],
+            ["KR" , "ASIA"],
+            ["LA1", "AMERICAS"],
+            ["LA2", "AMERICAS"],
+            ["OC1", "AMERICAS"],
+            ["RU", "ASIA"],
+            ["TR1" , "EUROPE"],
+        ])
+        const matchIds = await reksai.match.idsByPuuid(summoner.puuid,regions.get(String(region)))
         let matches: IMatch[] = []
         for (let i = 0; i < matchIds.length; i++) {
-            const temp = await reksai.match.byMatchId(matchIds[i], "europe")
+            const temp = await reksai.match.byMatchId(matchIds[i], regions.get(String(region)))
             matches.push(temp)
         }
 
-        /*Find the summoner in database by SummonerName and Region*/
+        /*Find the summoners in database by SummonerName and Region*/
         let summonerData = await prisma.summoner.findFirst(
             {
                 where: {
@@ -292,8 +305,21 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
         /*Name and region typed in url*/
         const query = req.query
         const {summonerName, region} = query
+        const regions: Map<string, string> = new Map([
+            ["euw1", "EUROPE"],
+            ["eun1", "EUROPE"],
+            ["NA1", "AMERICAS"],
+            ["BR1", "AMERICAS"],
+            ["JP1", "ASIA"],
+            ["KR" , "ASIA"],
+            ["LA1", "AMERICAS"],
+            ["LA2", "AMERICAS"],
+            ["OC1", "AMERICAS"],
+            ["RU", "ASIA"],
+            ["TR1" , "EUROPE"],
+        ])
 
-        /*Find the summoner in database by SummonerName and Region*/
+        /*Find the summoners in database by SummonerName and Region*/
         let summonerData = await prisma.summoner.findFirst(
             {
                 where: {
@@ -302,7 +328,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
                 }
             }
         )
-        /*Find matches in the database that belongs to summoner */
+        /*Find matches in the database that belongs to summoners */
         if (summonerData != null) {
 
             let matchData = await prisma.match.findMany(
@@ -313,15 +339,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
                 }
             )
 
-            /*if no matches exits in the databse for the summoner*/
+            /*if no matches exits in the databse for the summoners*/
             if (matchData.length == 0) {
-                /*Fetch all recent matches by summoner*/
+                console.log("jeg fandt ikke ")
+                /*Fetch all recent matches by summoners*/
                 const reksai = new Reksai(process.env.RIOT_API_KEY)
                 const summoner: ISummoner = await reksai.summoner.bySummonerName(String(summonerName), String(region))
-                const matchIds = await reksai.match.idsByPuuid(summoner.puuid)
+                const matchIds = await reksai.match.idsByPuuid(summoner.puuid, regions.get(String(region)))
                 let matches: IMatch[] = []
                 for (let i = 0; i < matchIds.length; i++) {
-                    const temp = await reksai.match.byMatchId(matchIds[i], "europe")
+                    const temp = await reksai.match.byMatchId(matchIds[i], regions.get(String(region)))
                     matches.push(temp)
                 }
 
@@ -559,7 +586,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
                     res.status(500).json({error: "Error creating Summoner"})
                 }
             }
-            /*If summoner has matches in database pull out and return*/
+            /*If summoners has matches in database pull out and return*/
             else {
                 let matchFromDatabase = await prisma.match.findMany(
                     {

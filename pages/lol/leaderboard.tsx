@@ -1,36 +1,65 @@
 import Image from "next/image";
 import {useEffect, useState} from "react";
-import apiFacade from "../../store/apiFacade";
-import {Ladder} from "../../utils/types/ladder.t";
+import {League, Entry} from "../../utils/types/league.t";
 import {motion} from "framer-motion";
 import Modal from "../../components/Modal";
+import axios from "axios";
+import useSWR from "swr";
+import {ISummoner} from "reksai/src/@types/summoner";
+import summonerName from "./[summonerName]";
+import Link from "next/link";
 
 const Leaderboard = () => {
-    const icon = "https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/1665.png"
+    const regions: Map<string, string> = new Map([
+        ["Europa West", "euw1"],
+        ["Europe Nordic & East", "eun1"],
+        ["North America", "NA1"],
+        ["Oceania", "OC1"],
+        ["Japan", "JP1"],
+        ["Russia", "RU"],
+        ["LAS", "LA1"],
+        ["LAN", "LA2"],
+        ["Brazil", "BR1"],
+        ["Korea", "KR"],
+        ["Türkiye", "TR1"],
+    ])
     const [isOpen, setIsOpen] = useState(false)
-    const [ladder, setLadder] = useState<Ladder[]>([])
     const [region, setRegion] = useState("Europa West")
     const [gameMode, setGameMode] = useState("RANKED_SOLO_5x5")
     const [page, setPage] = useState(1)
-
-    const getRegion = (regionData: any) => {
-        setRegion(regionData)
-    }
-
-    useEffect(()  => {
-        async function getLadder(){
-            apiFacade.getLadder(region, gameMode)
-                .then((data) => setLadder(data))
-
-        }
-        getLadder()
-
-    }, [])
+    const [summoners, setSummoners] = useState<ISummoner[]>([])
+    const fetcher = async (url: any) => await axios.get(url).then((res) => res.data)
+    const { data: ladder } = useSWR<League>("/api/lol/leaderboard?gameMode="+gameMode+"&region="+regions.get(region), fetcher)
+    const { data: version } = useSWR("/api/lol/versions", fetcher)
+    const icon = `https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/1665.png`
 
     useEffect(() => {
-        const temp: Ladder[] = ladder.sort((a,b)=> b.leaguePoints - a.leaguePoints)
-        setLadder(temp)
+        if(ladder == undefined)return
+        ladder.entries.sort((a,b)=> b.leaguePoints - a.leaguePoints)
     })
+
+    useEffect(() => {
+        async function getSummoners() {
+            if (ladder == undefined) return
+            let summoners: ISummoner[] = []
+            for (let i = 0; i < ladder?.entries.length; i++) {
+                const response = await axios.get<ISummoner>("/api/lol/summoners?summonerId=" + ladder.entries[i].summonerId + "&region=" + regions.get(region))
+                summoners.push(response.data)
+            }
+            setSummoners(summoners)
+        }
+        getSummoners()
+    },[region])
+
+
+    const getIcon = (summonerId: string) => {
+        for(let i = 0; i < summoners.length; i++){
+            if(summoners[i].id == summonerId){
+                return summoners[i].profileIconId
+            }
+        }
+    }
+
 
     const calculateWinRate = (wins: any, loss: any) => {
         const sum = wins + loss
@@ -40,36 +69,40 @@ const Leaderboard = () => {
         return Math.round(winrate)
     }
 
-    const calculateRange = (data: any, rowsPerPage: any) => {
-        const range: any[] = []
-        const num = Math.ceil(data.length / rowsPerPage);
-        let i = 1;
+    const calculateRange = (data: League | undefined, rowsPerPage: any) => {
+        if(data == undefined) return
+        const range: number[] = []
+        const num = Math.ceil(data.entries.length / rowsPerPage);
         for (let i = 1; i <= num; i++) {
             range.push(i);
         }
+
         return range;
     }
 
-    const sliceData = (data: any, page: any, rowsPerPage: any) => {
-        return data.slice((page - 1) * rowsPerPage, page * rowsPerPage)
+    const sliceData = (data: League | undefined, page: any, rowsPerPage: any) => {
+        if(data == undefined) return
+        return data.entries.slice((page - 1) * rowsPerPage, page * rowsPerPage)
     }
 
-    const useTable = (data: any, page: any, rowsPerPage: any) => {
+    const useTable = (data: League | undefined, page: any, rowsPerPage: any) => {
         const [tableRange, setTableRange] = useState<any>([]);
-        const [slice, setSlice] = useState<any[]>([]);
+        const [slice, setSlice] = useState<Entry[]>([]);
 
         useEffect(() => {
-            const range: any[] = calculateRange(data, rowsPerPage);
+            const range: number[] | undefined = calculateRange(data, rowsPerPage);
+            if(range == undefined) return
             setTableRange([...range]);
 
-            const slice: any[] = sliceData(data, page, rowsPerPage);
+            const slice: Entry[] | undefined = sliceData(data, page, rowsPerPage);
+            if(slice == undefined) return;
             setSlice([...slice]);
         }, [data, setTableRange, page, setSlice]);
 
         return { slice, range: tableRange };
     };
 
-    const {slice, range} = useTable(ladder, page, 100)
+    const {slice, range} : {slice: Entry[], range:any} = useTable(ladder, page, 100)
 
 
 
@@ -113,7 +146,7 @@ const Leaderboard = () => {
             <div className={"container mx-auto px-20 mt-10"}>
                 <div className={"flex justify-between text-xs text-summoner-gray"}>
                     <div>
-                        There are currently {ladder.length} challengers summoners on Summoner&apos;s Rift
+                        There are currently {ladder?.entries.length} challengers summoners on Summoner&apos;s Rift
                     </div>
                     <div>
                         Displaying summoners that are in the challenger. Rankings are updated periodically.
@@ -121,7 +154,7 @@ const Leaderboard = () => {
                 </div>
                 <div className={"w-full h-auto mt-4"}>
                     <div className={"w-full h-12 rounded bg-summoner-light flex justify-between items-center"}>
-                        <button onClick={() => setIsOpen(true)} className={"flex flex-row text-summoner-gray ml-2 border rounded text-sm w-auto justify-center h-10 items-center border-summoner-dark"}>
+                        <button onClick={() => setIsOpen(true)} className={"flex flex-row text-summoner-gray ml-2 border rounded text-sm w-auto justify-center h-10 items-center border-summoners-dark"}>
                             <span>{region}</span>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20"
                                  fill="currentColor">
@@ -168,12 +201,14 @@ const Leaderboard = () => {
                                                 {page === 1 ? index+1 : page === 2 ? index + 1 + 100 : page === 3 ? index+1 + 200 : ""}
                                         </td>
                                         <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light box-border font-normal align-middle p-1"}>
-                                            <a className={"flex items-center"} href={""}>
-                                                <Image className={"rounded-full"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/1665.png`} height={30} width={30}/>
-                                                <strong className={"pl-2 flex-1 box-border text-white text-xs"}>
-                                                    {el.summonerName}
-                                                </strong>
-                                            </a>
+                                            <Link href={"/lol/"+el.summonerName+"?region="+regions.get(region)}>
+                                                <div className={"flex items-center cursor-pointer"}>
+                                                    <Image className={"rounded-full"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${getIcon(el.summonerId)}.png`} height={30} width={30}/>
+                                                    <strong className={"pl-2 flex-1 box-border text-white text-xs"}>
+                                                        {el.summonerName}
+                                                    </strong>
+                                                </div>
+                                            </Link>
                                         </td>
                                         <td className={"border-b-2 border-solid border-summoner-dark bg-summoner-light"}>
                                             Challenger
@@ -215,7 +250,7 @@ const Leaderboard = () => {
                         </table>
                         <div className={"bg-summoner-light w-full h-24 rounded-b text-center text-summoner-gray text-xs overflow-hidden"}>
                             <p className={"mb-6 mt-5"}>
-                                #{page === 1 ? 1: page === 2 ? 101: page === 3 ? 201: "x"} ~#{page === 1 ? 100 : page === 2 ? 200 : page === 3 ? 300: "x"}/Total {ladder.length} Summoners
+                                #{page === 1 ? 1: page === 2 ? 101: page === 3 ? 201: "x"} ~#{page === 1 ? 100 : page === 2 ? 200 : page === 3 ? 300: "x"}/Total {ladder?.entries.length} Summoners
                             </p>
                             <div className={"flex justify-between"}>
                                 <motion.div whileHover={{scale: 1.1}} onClick={previousPage} className={"box-border block w-7 h-7 bg-summoner-dark leading-7 rounded ml-3 cursor-pointer"}>

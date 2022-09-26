@@ -1,7 +1,7 @@
 import Reksai from "reksai";
 import {ISummoner} from "reksai/src/@types/summoner";
 import type {NextApiRequest, NextApiResponse} from "next";
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "../../../../../lib/prisma";
 
 /*
 * Name: Mikkel Bentsen
@@ -31,7 +31,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
                 puuid: newSummoner.puuid
             },
             data: {
-                summonerid: newSummoner.id,
+                id: newSummoner.id,
                 accountId: newSummoner.accountId,
                 puuid: newSummoner.puuid,
                 name: newSummoner.name,
@@ -50,7 +50,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
         const query = req.query
         const {summonerName, region} = query
 
-        /*Checks if a summoner exists in database by name and region*/
+        /*Checks if a summoners exists in database by name and region*/
         let placeCount = await prisma.summoner.count(
             {
                 where: {
@@ -60,7 +60,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
             }
         )
 
-        /*If no summoner exists in database fetch and push summoner to database and return json*/
+        /*If no summoners exists in database fetch and push summoners to database and return json*/
         if(placeCount == 0){
             const reksai = new Reksai(process.env.RIOT_API_KEY)
             const summoner: ISummoner = await reksai.summoner.bySummonerName(String(summonerName), String(region))
@@ -68,7 +68,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
             try{
                 await prisma.summoner.create({
                     data: {
-                        summonerid: summoner.id,
+                        id: summoner.id,
                         accountId: summoner.accountId,
                         puuid: summoner.puuid,
                         name: summoner.name,
@@ -84,7 +84,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
                 res.status(500).json({error: "Error creating Summoner"})
             }
         }
-        /*If summoner exists in database pull summoner from database and return json*/
+        /*If summoners exists in database pull summoners from database and return json*/
         else{
             try{
                 const summoner = await prisma.summoner.findFirst({

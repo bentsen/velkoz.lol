@@ -4,46 +4,47 @@ import {IChampion} from "reksai/src/@types/champion";
 import {useRouter} from "next/router";
 import axios from "axios";
 import useSWR from "swr";
+import {Agents, Agent} from "../../../utils/types/agents.t";
 
-const Champion = () => {
-    const [champion, setChampion] = useState<IChampion>()
+const Agent = () => {
+    const [agent, setAgent] = useState<Agent>()
     const router = useRouter()
-    /*fetcher engine*/
     const fetcher = async (url: any) => await axios.get(url).then((res) => res.data)
-    /*ddragon vesion*/
-    const { data: version } = useSWR("/api/lol/versions", fetcher)
-
+    const { data: agents} = useSWR<Agents>("/api/valorant/agents", fetcher)
 
     useEffect(() => {
-        async function getChampions(){
-            if(typeof router.query.championName != "string") return
-            const response = await ddragon.champion.get(router.query.championName)
-            setChampion(response)
+        async function getAgent(){
+            if(agents == undefined) return
+            for(let i = 0; i < agents?.data.length; i++){
+                if(agents.data[i].displayName == router.query.agentName){
+                    setAgent(agents.data[i])
+                }
+            }
         }
-        getChampions()
-    }, [])
+        getAgent()
+    })
 
-    const getSpellKey = (index: number) => {
+    const getAbilityKey = (slot: string) => {
         const spell = new Map([
-            ["0", {
-                spellKey:"Q",
+            ["Ability1", {
+                spellKey:"C",
                 color:"text-win-border"
             }],
-            ["1", {
-                spellKey: "W",
+            ["Ability2", {
+                spellKey: "Q",
                 color: "text-teal-400"
             }],
-            ["2", {
+            ["Grenade", {
                 spellKey: "E",
                 color: "text-orange-400"
             }],
-            ["3", {
-                spellKey: "R",
+            ["Ultimate", {
+                spellKey: "X",
                 color: "text-white"
             }]
         ])
 
-        return spell.get(String(index))
+        return spell.get(String(slot))
     }
 
     return(
@@ -57,31 +58,39 @@ const Champion = () => {
                                     <div className={"absolute bottom-[-6px] right-[-2px] w-[22px] h-[24px] block"}>
 
                                     </div>
-                                    <img className={"w-full h-full rounded-2xl overflow-hidden border-0 items-center"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${champion?.name == "FiddleSticks" ? "Fiddlesticks" : champion?.name}.png`} alt=""/>
+                                    <img className={"w-full h-full rounded-2xl overflow-hidden border-0 items-center"} src={agent?.displayIcon} alt=""/>
                                 </div>
                                 <div className={"flex flex-col justify-end"}>
                                     <h1 className={"font-normal leading-[0] text-[0] m-0 p-0 block"}>
                                         <span className={"inline-block text-[24px] font-bold text-gray-300 leading-[32px]"}>
-                                            {champion?.name}
+                                            {agent?.displayName}
                                         </span>
                                         <span className={"text-[24px] ml-[6px] text-summoner-gray tracking-tighter capitalize"}>
-                                            {champion?.title}
+
                                         </span>
                                     </h1>
                                     <div className={"leading-[18px] text-xs text-summoner-gray font-[400] block"}>
                                         <span>4 Tier</span>
                                     </div>
                                     <div className={"flex mt-[8px]"}>
-                                        {champion?.spells.map((spell,index) => (
-                                            <div key={spell.id} className={"cursor-pointer rounded w-[24px] h-[24px] overflow-hidden ml-[4px] block"}>
-                                                <div className={"relative block"}>
-                                                    <div className={"absolute right-0 bottom-0 w-[14px] h-[14px] block"}>
-                                                        <div className={`flex items-center justify-center w-[14px] h-[16px] rounded-tl bg-win text-[11px] font-bold leading-[1] ${getSpellKey(index)?.color}`}>
-                                                            {getSpellKey(index)?.spellKey}
+                                        {agent?.abilities.map((ability,index) => (
+                                            <div key={index} className={"cursor-pointer rounded w-[24px] h-[24px] overflow-hidden block " + (index > 0 ? "ml-[4px]" : "")}>
+                                                {ability.slot == "Passive" ? (
+                                                    <div className={"ml-0 cursor-pointer rounded w-[24px] h-[24px] overflow-hidden block"}>
+                                                        <div className={"relative block"}>
+                                                            <img src={ability.displayIcon}/>
                                                         </div>
                                                     </div>
-                                                    <img className={"block border-0 align-middle w-[24px] h-[24px]"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${spell.image.full}`} alt=""/>
+                                                ) : (
+                                                <div className={"relative block"}>
+                                                    <div className={"absolute right-0 bottom-0 w-[14px] h-[14px] block"}>
+                                                        <div className={`flex items-center justify-center w-[14px] h-[16px] rounded-tl bg-win text-[11px] font-bold leading-[1] ${getAbilityKey(ability.slot)?.color}`}>
+                                                            {getAbilityKey(ability.slot)?.spellKey}
+                                                        </div>
+                                                    </div>
+                                                    <img className={"block border-0 align-middle w-[24px] h-[24px]"} src={ability.displayIcon} alt=""/>
                                                 </div>
+                                                    )}
                                             </div>
                                         ))}
                                     </div>
@@ -105,4 +114,4 @@ const Champion = () => {
     )
 }
 
-export default Champion
+export default Agent

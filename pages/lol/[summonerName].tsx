@@ -1,4 +1,3 @@
-import {useEffect, useState} from "react";
 import Image from "next/image";
 import Match from "../../components/Match";
 import {motion} from "framer-motion";
@@ -8,6 +7,7 @@ import {IMatch, Participant} from "reksai/src/@types/match";
 import useSWR from 'swr'
 import DoughnutChart from "../../components/DoughnutChart";
 import { useRouter } from "next/router";
+import {ILeagueEntry} from "reksai/src/@types/league";
 
 /*
 * Name: Mikkel Bentsen
@@ -19,12 +19,16 @@ const Account = () => {
     const router = useRouter()
     /*fetcher engine*/
     const fetcher = async (url: any) => await axios.get(url).then((res) => res.data)
+    /*ddragon vesion*/
+    const { data: version } = useSWR("/api/lol/versions", fetcher)
     /*Summoner fetcher using SWR and axios*/
-    const { data: summoner, error: summonerError, mutate: mutateSummoner} = useSWR<ISummoner>("/api/summoner?summonerName="+router.query.summonerName+"&region="+router.query.region, fetcher)
+    const { data: summoner, error: summonerError, mutate: mutateSummoner } = useSWR<ISummoner>("/api/lol/summoners/by-name/"+router.query.summonerName+"?region="+router.query.region, fetcher)
     /*Match fetcher using SWR and axios*/
-    const { data: matches, mutate: mutateMatch} = useSWR<IMatch[]>("/api/summoner/matches?summonerName="+router.query.summonerName+"&region="+router.query.region, fetcher)
+    const { data: matches, mutate: mutateMatch } = useSWR<IMatch[]>("/api/lol/summoners/matches?summonerName="+router.query.summonerName+"&region="+router.query.region, fetcher)
+    /*Rank fetcher using SWR and axios*/
+    const { data: ranks, mutate: mutateRank } = useSWR<ILeagueEntry[]>("/api/lol/league/"+summoner?.id+"?region="+router.query.region, fetcher)
     /*Icon url*/
-    const icon = `https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/${summoner?.profileIconId}.png`
+    const icon = `https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${summoner?.profileIconId}.png`
 
     /*Sorting match array by TimeStamp*/
     const sortMatches = () => {
@@ -33,10 +37,10 @@ const Account = () => {
         })
     }
 
-    /*Update summoner in database*/
+    /*Update summoners in database*/
     const updateSummoner = async () => {
-        console.log("jeg opdatere summoner")
-        const response = await axios.put<ISummoner>("/api/summoner?summonerName="+router.query.summonerName+"&region="+router.query.region);
+        console.log("jeg opdatere summoners")
+        const response = await axios.put<ISummoner>("/api/lol/summoner?summonerName="+router.query.summonerName+"&region="+router.query.region);
         if(response.status !== 200){
             console.log("something went wrong")
         } else{
@@ -45,7 +49,7 @@ const Account = () => {
 
     }
 
-    /*Calculates the win rate of a summoner*/
+    /*Calculates the win rate of a summoners*/
     const calculateWinRate = (wins: number, loss: number) => {
         const sum = wins + loss
         const deci = wins / sum
@@ -101,7 +105,7 @@ const Account = () => {
         return laneTypes.get(favoriteLane);
     }
 
-    /*Identifies the summoner in all matches*/
+    /*Identifies the summoners in all matches*/
     const getSummerParticipantFromMatch = (match: IMatch) => {
         let participant: Participant
 
@@ -211,12 +215,12 @@ const Account = () => {
         return Math.round(kp)
     }
 
-    /*calculate frequency of champs played by summoner (should be refactored)*/
+    /*calculate frequency of champs played by summoners (should be refactored)*/
     const calculateChampFrequency = () => {
         let champions = []
         let topThreeChampions = []
 
-        /*gets all champion names and save in array*/
+        /*gets all items names and save in array*/
         if(matches == undefined) return
         for(let i = 0; i < matches?.length; i++){
            champions.push(getSummerParticipantFromMatch(matches[i])?.championName)
@@ -389,6 +393,31 @@ const Account = () => {
         router.push(`/lol/${summonerName}?region=${router.query.region}`)
     }
 
+    const romanToInt = (roman: string) => {
+
+        const values = new Map([
+            ['I', 1],
+            ['V', 5],
+            ['X', 10]
+        ]);
+
+        let result = 0,
+            current, previous = 0;
+        for (const char of roman.split("").reverse()) {
+            current = values.get(char);
+            if(current != undefined) {
+                if (current >= previous) {
+                    result += current;
+                } else {
+                    result -= current;
+                }
+                previous = current;
+            }
+        }
+        return result;
+    }
+
+
     return(
         <>
             <div className={"block w-full my-0 mx-auto"}>
@@ -426,54 +455,49 @@ const Account = () => {
                         </div>
                         <div className={"block w-[1080px] my-0 mx-auto"}>
                             <div className={"inline-block w-[332] align-top min-h-[870px]"}>
-                                <div className={"divide-y divide-black bg-summoner-light mt-2 w-80 h-auto text-white rounded"}>
-                                    <div className={"h-7 flex items-center"}>
-                                        <p className={"text-sm ml-2"}>Ranked Solo-Matches</p>
-                                    </div>
-                                    <div className={"flex flex-row"}>
-                                        <div className={"flex items-center w-96 mb-2"}>
-                                            <div className={"bg-summoner-dark mt-2 rounded-full flex justify-center items-center w-20 h-20 ml-2"}>
-                                                <Image src={`/ranked-emblems/Emblem_gold.png`} width={60} height={60} alt={"flex-rank-emblem"}/>
+                                {ranks?.length != 0 ? (
+                                    ranks?.map((rank) => (
+                                        <div key={rank.leagueID} className={"divide-y divide-black bg-summoner-light mt-2 w-80 h-auto text-white rounded"}>
+                                            <div className={"h-7 flex items-center"}>
+                                                <p className={"text-sm ml-2"}>{rank.queueType == "Ranked_SOLO_5x5" ? "Ranked Solo" : "Ranked Flex"}</p>
                                             </div>
-                                            <div className={"flex flex-col ml-2"}>
-                                                <p className={"text-md font-bold"}>mangler</p>
-                                                <p className={"text-xs text-summoner-gray"}>mangler LP</p>
-                                            </div>
-                                        </div>
-                                        <div className={"flex w-full justify-end items-center mr-2"}>
-                                            <div className={"flex flex-col text-xs"}>
-                                                <div className={"flex justify-end"}>
-                                                    <p className={"text-md text-summoner-gray"}>mangler-W mangler-L</p>
+                                            <div className={"flex flex-row"}>
+                                                <div className={"flex items-center w-[600px] mb-2"}>
+                                                    <div className={"bg-summoner-dark mt-2 rounded-full flex justify-center items-center w-20 h-20 ml-2"}>
+                                                        <Image src={`/lol/medals/${rank.tier.toLowerCase()}.webp`} width={60} height={60} alt={"flex-rank-emblem"}/>
+                                                    </div>
+                                                    <div className={"flex flex-col ml-2 capitalize"}>
+                                                        <p className={"text-md font-bold"}>{rank.tier.toLowerCase()} {romanToInt(rank.rank)}</p>
+                                                        <p className={"text-xs text-summoner-gray"}>{rank.leaguePoints} LP</p>
+                                                    </div>
                                                 </div>
-                                                <p className={"text-xs text-summoner-gray"}>Win Rate mangler%</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className={"divide-y divide-black bg-summoner-light mt-2 w-80 h-auto text-white rounded"}>
-                                    <div className={"h-7 flex items-center"}>
-                                        <p className={"text-sm ml-2"}>Ranked Flex-Matches</p>
-                                    </div>
-                                    <div className={"flex flex-row"}>
-                                        <div className={"flex items-center w-96 mb-2"}>
-                                            <div className={"bg-summoner-dark mt-2 rounded-full flex justify-center items-center w-20 h-20 ml-2"}>
-                                                <Image src={`/ranked-emblems/Emblem_gold.png`} width={60} height={60} alt={"solo-rank-emblem"}/>
-                                            </div>
-                                            <div className={"flex flex-col ml-2"}>
-                                                <p className={"text-md font-bold "}>mangler</p>
-                                                <p className={"text-xs text-summoner-gray"}>mangler LP</p>
-                                            </div>
-                                        </div>
-                                        <div className={"flex w-full justify-end items-center mr-2"}>
-                                            <div className={"flex flex-col text-xs"}>
-                                                <div className={"flex justify-end"}>
-                                                    <p className={"text-md text-summoner-gray"}>manglerW manglerL</p>
+                                                <div className={"flex w-full justify-end items-center mr-2"}>
+                                                    <div className={"flex flex-col text-xs"}>
+                                                        <div className={"flex justify-end"}>
+                                                            <p className={"text-md text-summoner-gray"}>{rank.wins}W {rank.losses}L</p>
+                                                        </div>
+                                                        <p className={"text-xs text-summoner-gray"}>Win Rate {calculateWinRate(rank.wins, rank.losses)}%</p>
+                                                    </div>
                                                 </div>
-                                                <p className={"text-xs text-summoner-gray"}>Win Rate mangler%</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div>
+                                        <div className={"mt-[8px] rounded bg-summoner-dark block"}>
+                                            <div className={"flex justify-between leading-[35px] pt-0 pb-0 pl-[12px] pr-[12px] text-[14px] text-white"}>
+                                                Ranked Solo
+                                                <span className={"text-[14px] font-bold text-gray-600"}>Unranked</span>
+                                            </div>
+                                        </div>
+                                        <div className={"mt-[8px] rounded bg-summoner-dark block"}>
+                                            <div className={"flex justify-between leading-[35px] pt-0 pb-0 pl-[12px] pr-[12px] text-[14px] text-white"}>
+                                                Ranked Flex
+                                                <span className={"text-[14px] font-bold text-gray-600"}>Unranked</span>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                )}
                                 <div className={"divide-y divide-black bg-summoner-light mt-2 w-80 h-auto text-white rounded"}>
                                     <div className={"pt-2 pb-2"}>
                                         <p className={"text-sm ml-2"}>Recently played with</p>
@@ -506,7 +530,7 @@ const Account = () => {
                                                 <tr key={participant.name} className={"border-t border-solid align-middle border-black"}>
                                                     <td className={"text-left pl-[12px] whitespace-nowrap text-ellipsis overflow-hidden pt-[4px] pb-[4px] m-0 table-cell"}>
                                                         <div onClick={() => goToSummoner(event, participant.name)} className={"text-gray-300 text-[12px] decoration-0 cursor-pointer hover:underline"}>
-                                                            <img className={"w-[24px] h-[24px] rounded-full mr-[8px] align-middle inline-block"} src={`https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/${participant.icon}.png`} alt={"image of champ"}/>
+                                                            <img className={"w-[24px] h-[24px] rounded-full mr-[8px] align-middle inline-block"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${participant.icon}.png`} alt={"image of champ"}/>
                                                             {participant.name}
                                                         </div>
                                                     </td>
@@ -567,7 +591,7 @@ const Account = () => {
                                                 <ul className={"flex flex-col justify-center h-20 mt-5 h-20"}>
                                                     {calculateChampFrequency()?.map((champ) => (
                                                         <li key={champ.name} className={"flex items-center"}>
-                                                            <img className={"w-6 h-6 rounded-full mr-2"} src={`http://ddragon.leagueoflegends.com/cdn/12.16.1/img/champion/${champ.name}.png`} alt=""/>
+                                                            <img className={"w-6 h-6 rounded-full mr-2"} src={`http://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${champ.name}.png`} alt=""/>
                                                             <div className={"text-xs text-summoner-gray"}>
                                                                 <span className={" " + (calculateWinRate(champ.wins, champ.games- champ.wins) >= 60 ? "text-win-border" : calculateWinRate(champ.wins, champ.games- champ.wins) <= 40 ? "text-loss-border" : "text-summoner-gray")}>{calculateWinRate(champ.wins,champ.games - champ.wins)}% </span>
                                                                 ({champ.wins}W {champ.games  - champ.wins}L)
