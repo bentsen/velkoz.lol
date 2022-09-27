@@ -133,10 +133,29 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
+    const getSummonerProcentTeamKillsEarned = () => {
+        const totalKills = getSummonerTeam()?.objectives.champion.kills! + getEnemyTeam()?.objectives.champion.kills!
+        return Math.round((getSummonerTeam()?.objectives.champion.kills! / totalKills) * 100)
+    }
+
+    const getEnemyProcentTeamKillsEarned = () => {
+        const totalKills = getSummonerTeam()?.objectives.champion.kills! + getEnemyTeam()?.objectives.champion.kills!
+        return Math.round((getEnemyTeam()?.objectives.champion.kills! / totalKills) * 100)
+    }
+
     /*get team percentage gold earned in match*/
-    const getProcentGoldEarned = (totalGold: number | undefined, teamGold: number | undefined) => {
-        if(totalGold != undefined && teamGold != undefined){
-            return Math.round((teamGold / totalGold) * 100)
+    const getEnemyProcentTeamGoldEarned = () => {
+        if(getTotalGoldSummonerTeam() != undefined && getTotalGoldEnemyTeam() != undefined){
+            const totalGold = getTotalGoldEnemyTeam() + getTotalGoldSummonerTeam()
+            return Math.round((getTotalGoldEnemyTeam() / totalGold) * 100)
+        }
+    }
+
+    /*get team percentage gold earned in match*/
+    const getSummonerTeamProcentGoldEarned = () => {
+        if(getTotalGoldSummonerTeam() != undefined && getTotalGoldEnemyTeam() != undefined){
+            const totalGold = getTotalGoldEnemyTeam() + getTotalGoldSummonerTeam()
+            return Math.round((getTotalGoldSummonerTeam() / totalGold) * 100)
         }
     }
 
@@ -310,7 +329,8 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
             [420, "Ranked Solo"],
             [440, "Ranked Flex"],
             [450, "ARAM"],
-            [830, "Intro"]
+            [830, "Intro"],
+            [0, "Custom"]
         ])
         const gameMode = queueMap.get(queueId);
 
@@ -345,17 +365,18 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
 
     return(
         <>
-            <div className={"w-full my-0 mx-auto"}>
-                <li className={"relative list-none mt-2 bg-summoner-light"}>
-                    <div className={"flex items-center h-24 rounded border-l-4 border-solid " + (matchWon ? "border-win" : "border-loss")}>
+            <div className={"w-[740px] my-0 mx-auto"}>
+                <li className={"relative list-none mt-2 bg-summoner-dark"}>
+                    <div className={"flex items-center h-24 rounded border-l-4 border-solid " + (match.info.gameDuration / 60 < 4 ? "border-summoner-gray" : matchWon ? "border-win" : "border-loss")}>
                         <div className={"ml-3 w-28 leading-4 text-xs"}>
-                            <div className={" " + (matchWon ? "text-win" : "text-loss")}>{determineGameMode(match.info.queueId)}</div>
+                            <div className={"font-bold " + (match.info.gameDuration / 60 < 4 ? "text-summoner-gray": matchWon ? "text-win" : "text-loss")}>{determineGameMode(match.info.queueId)}</div>
                             <div>
-                                <div className={"relative text-summoner-gray"}>{timeSince()}</div>
+                                <div className={"relative text-summoner-gray pb-1"}>{timeSince()} ago</div>
                             </div>
-                            <div className={"w-12 h-px"}></div>
-                            <div className={"text-summoner-gray"}>{matchWon ? ("Won") : ("Loss")}</div>
-                            <div className={"text-summoner-gray"}>{match.info.teams[0].objectives.champion.kills} {match.info.teams[1].objectives.champion.kills}</div>
+                            <div className={"absolute top-13 left-4 h-px w-10 bg-match-text"}></div>
+                            <div className={"w-12 h-px pt-0.5"}></div>
+                            <div className={"text-summoner-gray font-semibold"}>{match.info.gameDuration / 60 < 4 ? ("Remake") : matchWon ? ("Victory") : ("Defeat")}</div>
+                            <div className={"text-summoner-gray"}>{(match.info.gameDuration / 60).toFixed()} minutes</div>
                         </div>
                         <div className={"ml-2"}>
                             <div className={"flex"}>
@@ -527,7 +548,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                             </ul>
                         </div>
                         <div className={"relative w-10 h-24 overflow-hidden"}>
-                            <button onClick={() => setExpanded(!expanded)} className={"w-10 h-24 flex justify-center items-end bg-summoner-dark hover:bg-summoner-light"}>
+                            <button onClick={() => setExpanded(!expanded)} className={"w-10 h-24 flex justify-center items-end bg-summoner-dark hover:bg-gray-400"}>
                                 {!expanded ? (
                                 <svg xmlns="http://www.w3.org/2000/svg" className={"h-6 w-6 mb-2 text-match-text"} fill="none"
                                      viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -587,7 +608,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className={"table-row-group align-middle bg-summoner-light"}>
+                            <tbody className={"table-row-group align-middle bg-match-border"}>
                                 {getSummonerPlayers().map((player) => (
                                     <tr key={player.puuid} className={"table-row align-middle border-inherit"}>
                                         <td className={"pl-2.5 pr-1 pt-1"}>
@@ -734,7 +755,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                 ))}
                             </tbody>
                         </table>
-                        <div className={"flex justify-between align-middle bg-summoner-dark"}>
+                        <div className={"flex justify-between align-middle bg-summoner-dark border-t border-b border-summoner-gray"}>
                             <div className={"pr-[0px] pl-[16px] text-left table-cell h-[30px] items-center leading-[50px]"}>
                                     <div className={"ml-0 inline-block text-xs text-summoner-gray"}>
                                         <Tooltip content={"Baron"} color={"invert"}>
@@ -773,8 +794,8 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                         <div className={"flex-[1_1_0%] h-[16px] absolute top-0 right-[8px] w-[40px] leading-[16px] text-right block"}>
                                             {getEnemyTeam()?.objectives.champion.kills}
                                         </div>
-                                        <div className={`flex-[1_1_${getProcentGoldEarned(getSummonerTeam()?.objectives.champion.kills + getEnemyTeam()?.objectives.champion.kills, getSummonerTeam()?.objectives.champion.kills)}%] h-[16px] block ` + (matchWon ? "bg-win-border": "bg-loss-border")}></div>
-                                        <div className={`flex-[1_1_${getProcentGoldEarned(getSummonerTeam()?.objectives.champion.kills + getEnemyTeam()?.objectives.champion.kills, getEnemyTeam()?.objectives.champion.kills)}%] h-[16px] block ` + (matchWon ? "bg-loss-border": "bg-win-border")}></div>
+                                        <div style={{flex: `1 1 ${getSummonerProcentTeamKillsEarned()}%`}} className={`h-[16px] block ` + (matchWon ? "bg-win": "bg-loss")}></div>
+                                        <div style={{flex: `1 1 ${getEnemyProcentTeamKillsEarned()}%`}} className={`h-[16px] block ` + (matchWon ? "bg-loss": "bg-win")}></div>
                                     </div>
                                 </div>
                                 <div className={"pb-[8px] flex justify-center text-[10px] text-white"}>
@@ -788,8 +809,8 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                         <div className={"flex-[1_1_0%] h-[16px] absolute top-0 right-[8px] w-[40px] leading-[16px] text-right block"}>
                                             {getTotalGoldEnemyTeam().toLocaleString()}
                                         </div>
-                                        <div className={`flex-[1_1_${getProcentGoldEarned(getTotalGoldEnemyTeam() + getTotalGoldSummonerTeam(), getTotalGoldSummonerTeam())}%] h-[16px] block ` + (matchWon ? "bg-win-border": "bg-loss-border")}></div>
-                                        <div className={`flex-[1_1_${getProcentGoldEarned(getTotalGoldEnemyTeam() + getTotalGoldSummonerTeam(), getTotalGoldEnemyTeam())}%] h-[16px] block ` + (matchWon ? "bg-loss-border": "bg-win-border")}></div>
+                                        <div style={{flex: `1 1 ${getSummonerTeamProcentGoldEarned()}%`}} className={`h-[16px] block ` + (matchWon ? "bg-win": "bg-loss")}></div>
+                                        <div style={{flex: `1 1 ${getEnemyProcentTeamGoldEarned()}%`}} className={`h-[16px] block ` + (matchWon ? "bg-loss": "bg-win")}></div>
                                     </div>
                                 </div>
                             </div>
@@ -836,7 +857,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                             <thead className={"table-header-group align-middle border-inherit"}>
                             <tr className={"table-row align-middle border-inherit"}>
                                 <th colSpan={4} className={"pl-[15px] text-left text-summoner-gray font-normal border-b-[1px] border-solid " + (!matchWon ? "border-win" : "border-loss")}>
-                                    <span className={"text-xs " + (!matchWon ? "text-win-border" : "text-loss-border")}>{!matchWon ? ("Won") : ("Loss")}</span>
+                                    <span className={"text-xs " + (!matchWon ? "text-win" : "text-loss")}>{!matchWon ? ("Won") : ("Loss")}</span>
                                 </th>
                                 <th className={"h-8 text-summoner-gray text-xs font-normal text-center border-b-[1px] border-solid " + (!matchWon ? "border-win" : "border-loss")}>
                                     SS Score
@@ -858,7 +879,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                 </th>
                             </tr>
                             </thead>
-                            <tbody className={"table-row-group align-middle bg-summoner-light"}>
+                            <tbody className={"table-row-group align-middle bg-match-border"}>
                             {getEnemyPlayers().map((player) => (
                                 <tr key={player.puuid} className={"table-row align-middle border-inherit"}>
                                     <td className={"pl-2.5 pr-1 pt-1"}>
