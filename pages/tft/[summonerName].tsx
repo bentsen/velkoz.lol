@@ -9,6 +9,7 @@ import {IMatch} from "reksai/src/@types/match";
 import {useState} from "react";
 import Tftmatch from "../../components/Tftmatch";
 import Match from "../../components/Match";
+import {TFTMatch} from "../../utils/types/tft/matches.t";
 
 const Account = () => {
     const router = useRouter()
@@ -16,7 +17,7 @@ const Account = () => {
     const fetcher = async (url: any) => await axios.get(url).then((res) => res.data)
     const { data: summoner, error: summonerError, mutate: mutateSummoner } = useSWR<ISummoner>("/api/tft/summoners/by-name/"+router.query.summonerName+"?region="+router.query.region, fetcher)
     const { data: ranks, mutate: mutateRank } = useSWR<ILeagueEntry[]>("/api/tft/league/"+summoner?.id+"?region="+router.query.region, fetcher)
-    const { data: matches, mutate: mutateMatch } = useSWR<IMatch[]>("/api/lol/summoners/matches?summonerName="+router.query.summonerName+"&region="+router.query.region, fetcher)
+    const { data: matches, mutate: mutateMatch } = useSWR<TFTMatch[]>("/api/tft/summoners/matches?puuid="+summoner?.puuid+"&region="+router.query.region, fetcher)
     const icon = `https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/${summoner?.profileIconId}.png`
 
 
@@ -157,7 +158,13 @@ const Account = () => {
                                     <div className={"flex flex-col w-full h-auto mb-3 items-center"}>
                                         <span className={"text-summoner-gray font-medium"}>Match History</span>
                                         <div className={"h-px w-96 bg-match-text"}></div>
-                                        <Tftmatch/>
+                                        {matches ? (
+                                            matches.map((match) => (
+                                                <div key={match.metadata.match_id}>
+                                                    <Tftmatch key={match.metadata.match_id} match={match} summoner={summoner}/>
+                                                </div>
+                                            ))
+                                        ): (
                                         <div className={"w-full flex items-center justify-center h-14"}>
                                             <div role="status">
                                                 <svg aria-hidden="true"
@@ -173,6 +180,7 @@ const Account = () => {
                                                 <span className="sr-only">Loading...</span>
                                             </div>
                                         </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

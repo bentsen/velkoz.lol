@@ -1,11 +1,44 @@
-import items from "../data/tft/items.json"
-import champions from "../data/tft/champions.json"
-import traits from "../data/tft/traits.json"
+import items from "../data/tft/set7/items.json"
+import champions from "../data/tft/set7.5/champions.json"
+import traits from "../data/tft/set7/traits.json"
+import {TFTChampion} from "../utils/types/tft/champion.t";
+import {ISummoner} from "reksai/src/@types/summoner";
+import {TFTMatch, Participant} from "../utils/types/tft/matches.t";
+import {Tooltip} from "@nextui-org/react";
 
-const Tftmatch = () => {
+const Tftmatch = ({match, summoner} : {match: TFTMatch, summoner: ISummoner}) => {
+
+
+    /*Get summoners from match*/
+    const getSummerParticipant = () => {
+        let participant: Participant
+
+        for (let i=0;i < match.info.participants.length; i++){
+            if(match.info.participants[i]?.puuid != undefined) {
+                if (match.info.participants[i]?.puuid == summoner?.puuid) {
+                    return participant = match.info.participants[i]
+                }
+            }
+            else {
+                console.log("undefined")
+                return null
+            }
+        }
+    }
+
+    const getChampion = (championId: string) => {
+        for(let i = 0; i < champions.length; i++){
+            if(champions[i].id == championId)
+            {
+                const champion: TFTChampion = champions[i]
+                return champion
+            }
+        }
+    }
 
     const getBorderColor = (championId: string) => {
-        const champ = champions.find(champ => champ.championId == championId)
+        const champ: TFTChampion | undefined = champions.find(champ => champ.id == championId)
+        if(champ == undefined) return
 
         const tierMap = new Map([
             [1, "border-tft-gray"],
@@ -15,7 +48,7 @@ const Tftmatch = () => {
             [5, "border-tft-yellow"],
         ])
 
-        return tierMap.get(champ!.cost)
+        return tierMap.get(champ.cost)
     }
 
     return(
@@ -35,11 +68,15 @@ const Tftmatch = () => {
                         </div>
                         <div className={"flex"}>
                             <ul className={"flex list-none"}>
-                                <li className={`w-10 h-10 rounded border-2 ${getBorderColor("TFT5_Aatrox")}`}>
-                                    <div className={"relative block"}>
-                                        <img className={"rounded"} src="/tft/champions/TFT5_Aatrox.png" alt=""/>
-                                    </div>
-                                </li>
+                                {getSummerParticipant()?.units.map((unit) => (
+                                    <Tooltip key={unit.character_id} content={unit.character_id.split("_")[1]} color={"invert"}>
+                                        <li key={unit.character_id} className={`w-12 h-10 rounded ml-2 border-2 ${getBorderColor(unit.character_id)}`}>
+                                            <div className={"relative block"}>
+                                                <img className={"rounded"} src={`/tft/set7.5/champions/${unit.character_id}.jpg`} alt={unit.character_id}/>
+                                            </div>
+                                        </li>
+                                    </Tooltip>
+                                ))}
                             </ul>
                         </div>
                     </div>
