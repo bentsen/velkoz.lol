@@ -7,7 +7,7 @@ import { prisma } from "../../../../lib/prisma";
 
 export default async (req: NextApiRequest, res: NextApiResponse) =>  {
 
-    if(req.method === 'DELETE') {
+    if(req.method === 'PUT') {
         return await updateMatches(req, res);
     } else if (req.method === 'GET'){
         return await readMatches(req, res);
@@ -20,9 +20,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
     async function updateMatches(req: NextApiRequest, res: NextApiResponse){
         const query = req.query
         const {summonerName, region} = query
-
-        const reksai = new Reksai(process.env.RIOT_API_KEY)
-        const summoner: ISummoner = await reksai.summoner.bySummonerName(String(summonerName), String(region))
         const regions: Map<string, string> = new Map([
             ["euw1", "EUROPE"],
             ["eun1", "EUROPE"],
@@ -32,15 +29,20 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
             ["KR" , "ASIA"],
             ["LA1", "AMERICAS"],
             ["LA2", "AMERICAS"],
-            ["OC1", "AMERICAS"],
-            ["RU", "ASIA"],
+            ["OC1", "SEA"],
+            ["RU", "EUROPE"],
             ["TR1" , "EUROPE"],
         ])
+
+        const reksai = new Reksai(process.env.RIOT_API_KEY)
+        const summoner: ISummoner = await reksai.summoner.bySummonerName(String(summonerName), String(region))
+
         const matchIds = await reksai.match.idsByPuuid(summoner.puuid,regions.get(String(region)))
-        let matches: IMatch[] = []
+        let newMatches: IMatch[] = []
+
         for (let i = 0; i < matchIds.length; i++) {
-            const temp = await reksai.match.byMatchId(matchIds[i], regions.get(String(region)))
-            matches.push(temp)
+            const temp: IMatch = await reksai.match.byMatchId(matchIds[i], regions.get(String(region)))
+            newMatches.push(temp)
         }
 
         /*Find the summoners in database by SummonerName and Region*/
@@ -53,26 +55,22 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
             }
         )
 
-        /*Delete all matches from table that user own*/
-        try{
-            if(summonerData != null){
-                await prisma.match.deleteMany({
-                    where: {
-                        summonerId: summonerData.id
-                    }
-                })
-            }
-        } catch (error) {
-        console.error("Request error", error);
-        res.status(500).json({error: "Error deleting Summoner"})
-        }
+       if(summonerData != null){
+           await prisma.match.deleteMany({
+               where: {
+                   summonerId: summonerData.id
+               }
+           })
+       }
+
 
         /*create all recent matches in database*/
         try {
-            await Promise.all([matches.map(async (match) => {
+            await Promise.all([newMatches.map(async (match) => {
                 if(summonerData != null){
                     await prisma.match.create({
                         data:{
+                            id: match.metadata.matchId,
                             metaData:{
                                 create: {
                                     matchId: match.metadata.matchId,
@@ -295,6 +293,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
                     })
                 }
             })])
+            res.status(200).json(newMatches)
         } catch (error) {
             console.error("Request error", error);
             res.status(500).json({error: "Error creating Summoner"})
@@ -314,8 +313,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
             ["KR" , "ASIA"],
             ["LA1", "AMERICAS"],
             ["LA2", "AMERICAS"],
-            ["OC1", "AMERICAS"],
-            ["RU", "ASIA"],
+            ["OC1", "SEA"],
+            ["RU", "EUROPE"],
             ["TR1" , "EUROPE"],
         ])
 
@@ -358,6 +357,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
                         if(summonerData != null){
                             await prisma.match.create({
                                 data:{
+                                    id: match.metadata.matchId,
                                     metaData:{
                                         create: {
                                             matchId: match.metadata.matchId,

@@ -13,15 +13,20 @@ const Tft: NextPage = () => {
     const [region, setRegion] = useState("Europa West")
     const [summonerName, setSummonerName] = useState("")
     const [summoner, setSummoner] = useState<Summoner[]>([])
+    const regions: Map<string, string> = new Map([
+        ["Europa West", "euw1"],
+        ["Europe Nordic & East", "eun1"],
+        ["North America", "NA1"],
+        ["Oceania", "OC1"],
+        ["Japan", "JP1"],
+        ["Russia", "RU"],
+        ["LAS", "LA1"],
+        ["LAN", "LA2"],
+        ["Brazil", "BR1"],
+        ["Korea", "KR"],
+        ["Türkiye", "TR1"],
+    ])
 
-    const getRegion = (regionData: string) => {
-        setRegion(regionData)
-    }
-
-    const handleClick = () => {
-        localStorage.setItem("region", region)
-        localStorage.setItem("summonerName", summonerName)
-    }
 
     const handleChange = (e: any) => {
         setSummonerName(e.target.value)
@@ -57,8 +62,8 @@ const Tft: NextPage = () => {
                             <input onChange={handleChange} className={"w-72 h-7 bg-summoner-light text-summoner-gray"} type="text" placeholder={"Summoner Name"}/>
                         </div>
                     </div>
-                    <Link href={"/tft/account"}>
-                        <motion.button onClick={handleClick} whileHover={{scale: 1.1}} className={"bg-tft-color text-white w-32 h-10 rounded"}>Search</motion.button>
+                    <Link href={"/tft/" + summonerName + "?region="+regions.get(region)}>
+                        <motion.button whileHover={{scale: 1.1}} className={"bg-tft-color text-white w-32 h-10 rounded"}>Search</motion.button>
                     </Link>
                 </div>
             </div>

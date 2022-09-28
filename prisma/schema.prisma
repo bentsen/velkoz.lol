@@ -28,7 +28,7 @@ model Summoner {
 
 //Match table
 model Match {
-  id         Int       @id @unique @default(autoincrement())
+  id         String       @id @unique
   metaData   Metadata?
   info       Info?
   summoner   Summoner  @relation(fields: [summonerId], references: [id], onDelete: Cascade)
@@ -39,7 +39,7 @@ model Match {
 model Metadata {
   id           Int               @id @unique @default(autoincrement())
   game         Match             @relation(fields: [gameId], references: [id], onDelete: Cascade)
-  gameId       Int               @unique
+  gameId       String               @unique
   matchId      String
   dataVersion  String
   participants MetaParticipant[]
@@ -70,7 +70,7 @@ model Info {
   teams              Team[]
   tournamentCode     String
   match              Match         @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  matchId            Int           @unique
+  matchId            String           @unique
 }
 
 model Participant {

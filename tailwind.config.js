@@ -27,6 +27,11 @@ module.exports = {
         'win' : 'rgb(86,134,229)',
         'loss' : 'rgb(230,67,90)',
         'game-hover' : 'rgb(25, 25, 25)',
+        'tft-blue' : 'rgb(27, 63, 133)',
+        'tft-pink' : 'rgb(128,25,126)',
+        'tft-gray' : 'rgb(83,84,97)',
+        'tft-green' : 'rgb(51,102,60)',
+        'tft-yellow' : 'rgb(230,179,58)'
       },
       fontFamily: {
         'sans': ['Rajdhani', 'sans-serif'],
