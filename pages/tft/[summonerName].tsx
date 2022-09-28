@@ -10,15 +10,17 @@ import {useState} from "react";
 import Tftmatch from "../../components/Tftmatch";
 import Match from "../../components/Match";
 import {TFTMatch} from "../../utils/types/tft/matches.t";
+import DoughnutChart from "../../components/DoughnutChart";
 
 const Account = () => {
     const router = useRouter()
     const [updateLoading, setUpdateLoading] = useState(false)
     const fetcher = async (url: any) => await axios.get(url).then((res) => res.data)
     const { data: summoner, error: summonerError, mutate: mutateSummoner } = useSWR<ISummoner>("/api/tft/summoners/by-name/"+router.query.summonerName+"?region="+router.query.region, fetcher)
+    const { data: version } = useSWR("/api/lol/versions", fetcher)
     const { data: ranks, mutate: mutateRank } = useSWR<ILeagueEntry[]>("/api/tft/league/"+summoner?.id+"?region="+router.query.region, fetcher)
     const { data: matches, mutate: mutateMatch } = useSWR<TFTMatch[]>("/api/tft/summoners/matches?puuid="+summoner?.puuid+"&region="+router.query.region, fetcher)
-    const icon = `https://ddragon.leagueoflegends.com/cdn/12.13.1/img/profileicon/${summoner?.profileIconId}.png`
+    const icon = `https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${summoner?.profileIconId}.png`
 
 
     /*Update summoners in database*/
@@ -154,6 +156,20 @@ const Account = () => {
                                 )}
                             </div>
                             <div className={"inline-block w-[752px] mt-2 ml-2 align-top"}>
+                                <div className={"divide-y divide-black bg-summoner-light w-full h-48 text-white rounded-t"}>
+                                    <div className={"h-7 flex items-center"}>
+                                        <p className={"text-md ml-2 font-medium"}>Match History Stats</p>
+                                    </div>
+                                    <div>
+                                        {matches ? (
+                                            <div className={"flex flex-row gap-4"}>
+                                                <div className={"bg-summoner-dark w-60"}>
+                                                    Wins 11
+                                                </div>
+                                            </div>
+                                        ): <div></div>}
+                                    </div>
+                                </div>
                                 <div className={"flex bg-summoner-light items-center rounded-b rounded"}>
                                     <div className={"flex flex-col w-full h-auto mb-3 items-center"}>
                                         <span className={"text-summoner-gray font-medium"}>Match History</span>
@@ -161,7 +177,7 @@ const Account = () => {
                                         {matches ? (
                                             matches.map((match) => (
                                                 <div key={match.metadata.match_id}>
-                                                    <Tftmatch key={match.metadata.match_id} match={match} summoner={summoner}/>
+                                                    <Tftmatch key={match.metadata.match_id} match={match} summoner={summoner} region={String(router.query.region)}/>
                                                 </div>
                                             ))
                                         ): (
