@@ -3,13 +3,6 @@ import Image from "next/image";
 import {useState} from "react";
 import {useRouter} from "next/router";
 
-/*
-* Name: Mikkel Bentsen
-* Date: 14/9-2022
-*/
-interface Igames {
-	game: IGamesProps
-}
 
 interface IGamesProps {
 	nick: string,
@@ -20,7 +13,8 @@ interface IGamesProps {
 }
 
 interface IGameIter extends IGamesProps {
-	iter: number
+	iter: number,
+	selectedColor: string
 }
 
 const games = [
@@ -76,7 +70,7 @@ const Navbar = () => {
 						</Link>
 					</div>
 					{filterGames().map((game, i) => (
-						<NavLink key={game.name} {...game} iter={i}/>
+						<NavLink key={game.name} {...game} selectedColor={selectedColor} iter={i}/>
 					))}
 				</div>
 			</nav>
@@ -99,20 +93,21 @@ const Navbar = () => {
 }
 
 const NavLink = (props: IGameIter) => {
-	const {nick, name, link, color, svg} = props
+	const {nick, name, link, color, svg, selectedColor} = props
 
 	const first = props.iter == 0;
 	const secondLink = props.iter == 1
 
 	return (
 		<Link href={link} passHref>
-			<div className={`flex flex-row justify-center items-center cursor-pointer h-full w-full 
-			${first ? color : ""} ${secondLink && "rounded-2xl"}`}>
-				<div className={"flex justify-center items-center text-white font-medium"}>
-					<div className={"h-6 w-6 relative"}>
-						<Image src={svg} alt={name} layout={"fill"}/>
+			<div className={`flex flex-row justify-center items-center cursor-pointer ${secondLink ? selectedColor : "bg-default-color"}`}>
+				<div className={`relative flex justify-center items-center h-full w-full ${secondLink ? "rounded-bl-2xl" : ""} ${first ? color : "bg-default-color"}`}>
+					<div className={"flex justify-center items-center text-white font-medium mx-5"}>
+						<div className={"h-6 w-6 relative"}>
+							<Image src={svg} alt={name} layout={"fill"}/>
+						</div>
+						<p className={"text-xs font-heading"}>{name}</p>
 					</div>
-					<p className={"text-xs font-heading"}>{name}</p>
 				</div>
 			</div>
 		</Link>
