@@ -14,6 +14,7 @@ const Tftmatch = ({match, summoner, region} : {match: TFTMatch, summoner: ISummo
     const fetcher = async (url: any) => await axios.get(url).then((res) => res.data)
     const { data: version } = useSWR("/api/lol/versions", fetcher)
 
+    /*
     useEffect(() => {
         async function getParticipants() {
             if(match == undefined) return
@@ -26,7 +27,7 @@ const Tftmatch = ({match, summoner, region} : {match: TFTMatch, summoner: ISummo
         }
         getParticipants()
     })
-
+    */
 
     const getParticipantByPuuid = (puuid: string) => {
         for(let i = 0; i < participants.length; i++){
@@ -50,16 +51,6 @@ const Tftmatch = ({match, summoner, region} : {match: TFTMatch, summoner: ISummo
             else {
                 console.log("undefined")
                 return null
-            }
-        }
-    }
-
-    const getChampion = (championId: string) => {
-        for(let i = 0; i < champions.length; i++){
-            if(champions[i].id == championId)
-            {
-                const champion: TFTChampion = champions[i]
-                return champion
             }
         }
     }
@@ -147,9 +138,9 @@ const Tftmatch = ({match, summoner, region} : {match: TFTMatch, summoner: ISummo
         <>
             <div className={"w-[740px] my-0 mx-auto"}>
                 <li className={"relative list-none mt-2 bg-summoner-dark"}>
-                    <div className={"flex items-center h-24 rounded border-l-4 border-solid " + (getSummerParticipant()?.placement == 1 ? "border-tft-yellow" : getSummerParticipant()?.placement == 2 ? "border-summoner-gray": getSummerParticipant()?.placement == 3 ? "border-amber-700": "border-match-text")}>
+                    <div className={"flex items-center h-24 rounded border-l-4 border-solid " + (getSummerParticipant()?.placement == 1 ? "border-tft-yellow" : getSummerParticipant()?.placement == 2 ? "border-gray-300": getSummerParticipant()?.placement == 3 ? "border-amber-700": "border-gray-500")}>
                         <div className={"ml-3 w-20 leading-4 text-xs"}>
-                            <div className={"font-bold text-summoner-gray " + (getSummerParticipant()?.placement == 1 ? "text-tft-yellow" : getSummerParticipant()?.placement == 2 ? "text-summoner-gray": getSummerParticipant()?.placement == 3 ? "text-amber-700": "text-match-text")}>Ranked</div>
+                            <div className={"font-bold text-summoner-gray " + (getSummerParticipant()?.placement == 1 ? "text-tft-yellow" : getSummerParticipant()?.placement == 2 ? "text-gray-300": getSummerParticipant()?.placement == 3 ? "text-amber-700": "text-gray-500")}>Ranked</div>
                             <div>
                                 <div className={"relative text-summoner-gray pb-1"}>{timeSince()}</div>
                             </div>

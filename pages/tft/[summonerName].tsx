@@ -162,9 +162,30 @@ const Account = () => {
                                     </div>
                                     <div>
                                         {matches ? (
-                                            <div className={"flex flex-row gap-4"}>
-                                                <div className={"bg-summoner-dark w-60"}>
-                                                    Wins 11
+                                            <div className={"flex flex-row justify-center"}>
+                                                <div className={"bg-summoner-dark w-36 mt-10 h-20 rounded flex items-center"}>
+                                                    <div>
+                                                        <span className={"ml-2 block"}>Wins</span>
+                                                        <span className={"ml-2 font-extrabold"}>11</span>
+                                                    </div>
+                                                </div>
+                                                <div className={"bg-summoner-dark w-36 mt-10 ml-10 h-20 rounded flex items-center"}>
+                                                    <div>
+                                                        <span className={"ml-2 block"}>Losses</span>
+                                                        <span className={"ml-2 font-extrabold"}>11</span>
+                                                    </div>
+                                                </div>
+                                                <div className={"bg-summoner-dark w-36 mt-10 ml-10 h-20 rounded flex items-center"}>
+                                                    <div>
+                                                        <span className={"ml-2 block"}>Win %</span>
+                                                        <span className={"ml-2 font-extrabold"}>11</span>
+                                                    </div>
+                                                </div>
+                                                <div className={"bg-summoner-dark w-36 mt-10 ml-10 h-20 rounded flex items-center"}>
+                                                    <div>
+                                                        <span className={"ml-2 block"}>Matches Played</span>
+                                                        <span className={"ml-2 font-extrabold"}>11</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         ): <div></div>}
