@@ -528,7 +528,7 @@ const Account = () => {
                                     </div>
                                     <div className={"pl-6"}>
                                         <div className={"mt-3 flex flex-row"}>
-                                            <motion.button onClick={updateSummoner} whileHover={{scale: 1.1}} className={"bg-leagueoflegends-color text-white w-16 h-10 rounded text-sm font-heading"}>
+                                            <motion.button onClick={updateSummoner} whileHover={{scale: 1.1}} className={"bg-lol-color text-white w-16 h-10 rounded text-sm font-heading"}>
                                                 {updateLoading ? (
                                                     <div className={"flex justify-center"}>
                                                         <div role="status">
@@ -541,7 +541,7 @@ const Account = () => {
                                                     </div>
                                                 ): ("Update")}
                                             </motion.button>
-                                            <motion.button whileHover={{scale: 1.1}} className={"bg-transparent border-leagueoflegends-color border ml-2 text-leagueoflegends-color w-20 h-10 rounded text-sm font-heading"}>Tier-Graph</motion.button>
+                                            <motion.button whileHover={{scale: 1.1}} className={"bg-transparent border-lol-color border ml-2 text-lol-color w-20 h-10 rounded text-sm font-heading"}>Tier-Graph</motion.button>
                                         </div>
                                         <p className={"text-summoner-gray text-xs mt-2"}>Last updated:</p>
                                     </div>
