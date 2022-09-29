@@ -31,7 +31,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
                 puuid: newSummoner.puuid
             },
             data: {
-                id: newSummoner.id,
+                id: String(newSummoner.id),
                 accountId: newSummoner.accountId,
                 puuid: newSummoner.puuid,
                 name: newSummoner.name,
