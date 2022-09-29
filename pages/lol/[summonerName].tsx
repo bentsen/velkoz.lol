@@ -51,7 +51,7 @@ const Account = () => {
             await mutateSummoner();
         }
         console.log("jeg opdatere matches")
-        const matchResponse = await axios.delete<IMatch[]>("/api/lol/summoners/matches?summonerName="+router.query.summonerName+"&region="+router.query.region)
+        const matchResponse = await axios.put<IMatch[]>("/api/lol/summoners/matches?summonerName="+router.query.summonerName+"&region="+router.query.region)
         if(matchResponse.status !== 200){
             console.log("something went wrong updating matches")
         }else{
