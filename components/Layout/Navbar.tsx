@@ -48,6 +48,8 @@ const games = [
 	},
 ]
 
+const bgColor = "bg-black";
+const hover = "hover:bg-gray-500"
 
 const Navbar = () => {
 	/*Usestate for game that is chosen on navbar*/
@@ -62,11 +64,11 @@ const Navbar = () => {
 
 	return (
 		<>
-			<nav className={"h-10 bg-default-color"}>
+			<nav className={"h-10 "+bgColor}>
 				<div className={`flex flex-row h-full`}>
-					<div className={`flex justify-start items-center text-white ${selectedColor} h-full w-fit`}>
+					<div className={`flex justify-start items-center cursor-pointer text-white ${selectedColor} h-full w-fit`}>
 						<Link href={"/"} passHref>
-							<p className={"mx-5 font-extrabold text-xl"}>Velkoz</p>
+							<p className={"mx-5 font-extrabold text-2xl"}>Velkoz</p>
 						</Link>
 					</div>
 					{filterGames().map((game, i) => (
@@ -74,7 +76,7 @@ const Navbar = () => {
 					))}
 				</div>
 			</nav>
-			<div className={`flex flex-row h-10 text-white ${selectedColor}`}>
+			<div className={`flex flex-row items-center h-10 text-white ${selectedColor}`}>
 				<div>
 					Test
 				</div>
@@ -100,8 +102,8 @@ const NavLink = (props: IGameIter) => {
 
 	return (
 		<Link href={link} passHref>
-			<div className={`flex flex-row justify-center items-center cursor-pointer ${secondLink ? selectedColor : "bg-default-color"}`}>
-				<div className={`relative flex justify-center items-center h-full w-full ${secondLink ? "rounded-bl-2xl" : ""} ${first ? color : "bg-default-color"}`}>
+			<div className={`flex flex-row justify-center items-center cursor-pointer ${secondLink ? selectedColor : bgColor}`}>
+				<div className={`relative flex justify-center items-center h-full w-full ${secondLink ? "rounded-bl-2xl" : ""} ${first ? color : bgColor} ${!first && "hover:bg-neutral-900"}`}>
 					<div className={"flex justify-center items-center text-white font-medium mx-5"}>
 						<div className={"h-6 w-6 relative"}>
 							<Image src={svg} alt={name} layout={"fill"}/>
