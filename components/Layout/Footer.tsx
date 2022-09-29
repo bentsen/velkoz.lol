@@ -16,7 +16,7 @@ const Footer = () => {
             <footer className="p-4 rounded-lg shadow md:px-6 md:py-8">
                 <div className="sm:flex sm:items-center sm:justify-between">
                     <a href="components/Layout/Footer" className="flex items-center mb-4 sm:mb-0">
-                        <div className={"rounded-full h-10 w-10 text-white text-xs flex items-center justify-center " + (game == "/lol" ? "bg-leagueoflegends-color" : game == "/valorant" ? "bg-valorant-color" : game == "/tft" ? "bg-tft-color" : game == "lor" ? "bg-lor-color" : "bg-summoner-dark")}>
+                        <div className={"rounded-full h-10 w-10 text-white text-xs flex items-center justify-center " + (game == "/lol" ? "bg-lol-color" : game == "/valorant" ? "bg-valorant-color" : game == "/tft" ? "bg-tft-color" : game == "lor" ? "bg-lor-color" : "bg-summoner-dark")}>
                             ss.gg
                         </div>
                         <span

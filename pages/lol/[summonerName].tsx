@@ -500,6 +500,15 @@ const Account = () => {
         router.push(`/lol/champions/${champName}`)
     }
 
+    const showMore = () => {
+        if(matches == undefined) return
+        if(matchesToShow + 20 > matches?.length){
+            setMatchesToShow(matches?.length)
+        }else{
+            setMatchesToShow(matchesToShow + 20)
+        }
+    }
+
 
     return(
         <>
@@ -787,6 +796,17 @@ const Account = () => {
                                             </div>
                                         )}
                                     </div>
+                                </div>
+                                <div className={"flex items-center justify-center"}>
+                                    {matchesToShow == matches?.length ? (
+                                        <div className={"w-72 mt-2 h-10 justify-center flex items-center bg-summoner-light text-white rounded"}>
+                                            No more matches recorded
+                                        </div>
+                                    ): (
+                                        <div onClick={showMore} className={"w-72 mt-2 h-10 justify-center flex items-center bg-summoner-light text-white rounded cursor-pointer"}>
+                                            Show More
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
