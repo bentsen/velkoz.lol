@@ -8,7 +8,7 @@ import Link from "next/link";
 
 /*
 * Name: Mikkel Bentsen
-* Date: 14/9-2022
+* Dat: 14/9-2022
 */
 
 const Lol: NextPage = () => {
