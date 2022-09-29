@@ -1,6 +1,6 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
-import Layout from "../components/Layout";
+import Layout from "../components/Layout/Layout"
 import VersionListProvider from "../store/VersionContext/VersionList";
 import ChampionListProvider from "../store/ChampionContext/ChampionList";
 
