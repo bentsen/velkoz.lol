@@ -14,7 +14,7 @@ datasource db {
 
 //Summoner table
 model Summoner {
-  id            String      @id @unique
+  id            String   @id @unique
   accountId     String   @unique
   puuid         String   @unique
   name          String
