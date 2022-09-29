@@ -19,6 +19,8 @@ const Account = () => {
     const [updateLoading, setUpdateLoading] = useState(false)
     /*router instance*/
     const router = useRouter()
+    /**/
+    const [matchesToShow, setMatchesToShow] = useState(20)
     /*fetcher engine*/
     const fetcher = async (url: any) => await axios.get(url).then((res) => res.data)
     /*ddragon vesion*/
@@ -764,7 +766,7 @@ const Account = () => {
                                         <div className={"h-px w-96 bg-match-text"}></div>
                                         {matches ? (
                                             sortMatches(),
-                                            matches.map((match) => (
+                                            matches.slice(0, matchesToShow).map((match) => (
                                                 <Match key={match.info.gameId} match={match} summoner={summoner}/>
                                             ))
                                         ) : (
