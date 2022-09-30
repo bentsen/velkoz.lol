@@ -28,7 +28,7 @@ model Summoner {
 
 //Match table
 model Match {
-  id         Int       @id @unique @default(autoincrement())
+  id         Int?       @id @unique @default(autoincrement())
   metaData   Metadata?
   info       Info?
   summoner   Summoner  @relation(fields: [summonerId], references: [id], onDelete: Cascade)
