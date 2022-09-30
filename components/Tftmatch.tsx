@@ -1,4 +1,4 @@
-import items from "../data/tft/set7/items.json"
+import items from "../data/tft/set7.5/items.json"
 import champions from "../data/tft/set7.5/champions.json"
 import traits from "../data/tft/set7/traits.json"
 import {TFTChampion} from "../utils/types/tft/champion.t";
@@ -134,6 +134,14 @@ const Tftmatch = ({match, summoner, region} : {match: TFTMatch, summoner: ISummo
         return match.info.participants.slice(half_length)
     }
 
+    const getItemById = (itemId: number) => {
+        for(let i = 0; i < items.length; i++){
+            if(items[i].id == itemId){
+                return items[i]
+            }
+        }
+    }
+
     return(
         <>
             <div className={"w-[740px] my-0 mx-auto"}>
@@ -157,6 +165,11 @@ const Tftmatch = ({match, summoner, region} : {match: TFTMatch, summoner: ISummo
                                             <div className={"relative block"}>
                                                 <img className={"rounded"} src={`/tft/set7.5/champions/${unit.character_id}.png`} alt={unit.character_id}/>
                                                 <span className={"absolute left-[0.02rem] text-[.8rem] bottom-[-0.2rem] text-center w-full " + (unit.tier == 2 ? "text-gray-300" : "text-tft-yellow")}>{getStars(unit.tier)}</span>
+                                            </div>
+                                            <div className={"flex flex-row gap-0.5 h-5 items-center justify-start"}>
+                                                {unit.items.map((item, index) => (
+                                                    <img key={index} className={"rounded w-2.5 h-2.5 text-xs"} src={`/tft/set7.5/items/${getItemById(item)?.name}.png`} alt={getItemById(item)?.name}/>
+                                                ))}
                                             </div>
                                         </li>
                                     </Tooltip>
