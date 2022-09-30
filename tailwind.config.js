@@ -12,7 +12,7 @@ module.exports = {
         'summoner-dark' : 'rgb(31,31,31)',
         'lol-color' : 'rgb(24,87,145)',
         'valorant-color' : 'rgb(253,75,89)',
-        'tft-color' : 'rgb(48,98,108)',
+        'tft-color' : 'rgb(36, 45, 88)',
         'lor-color' : 'rgb(231,133,200)',
         'navbar-color' : 'rgb(13,13,13)',
         'default-color' : 'rgb(49,49,60)',
