@@ -2,9 +2,9 @@ import type { NextPage } from 'next'
 import Image from 'next/image'
 import Modal from "../components/Modal";
 import {ChangeEvent, Dispatch, SetStateAction, useEffect, useState} from "react";
-import {motion} from "framer-motion";
 import Link from "next/link";
 import {FiSearch} from "react-icons/fi"
+import Searchbar from "../components/Searchbar/Searchbar";
 
 
 /*
@@ -45,7 +45,7 @@ const Home: NextPage = () => {
 					<div>
 						<h1 className={"text-white text-8xl font-medium py-8"}>VELKOZ.LOL</h1>
 					</div>
-					<SearchBar setState={setSummoner}/>
+					<Searchbar />
 					<div className={"flex flex-row pt-6"}>
 						{regions.map((r, i) => (
 							<button
@@ -62,6 +62,7 @@ const Home: NextPage = () => {
 	);
 };
 
+/**
 const SearchBar = ({setState}: {setState: Dispatch<SetStateAction<string>>}) => {
 	const [search, setSearch] = useState("");
 
@@ -86,5 +87,6 @@ const SearchBar = ({setState}: {setState: Dispatch<SetStateAction<string>>}) => 
 		</>
 	)
 };
+ **/
 
 export default Home;

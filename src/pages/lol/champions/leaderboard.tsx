@@ -1,12 +1,12 @@
 import Image from "next/image";
 import {useEffect, useState} from "react";
-import {League, Entry} from "../utils/types/league.t";
+import {League, Entry} from "../../../utils/types/league.t";
 import {motion} from "framer-motion";
-import Modal from "../components/Modal";
+import Modal from "../../../components/Modal";
 import axios from "axios";
 import useSWR from "swr";
 import {ISummoner} from "reksai/src/@types/summoner";
-import summonerName from "./summoners/[summonerName]";
+import summonerName from "../../summoners/[summonerName]";
 import Link from "next/link";
 
 const Leaderboard = () => {

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import {useContext, useEffect, useState} from "react";
-import {VersionContext} from "../../store/VersionContext/VersionList";
+import {VersionContext} from "../../../store/VersionContext/VersionList";
 import {useRouter} from "next/router";
 import {ddragon} from "reksai";
 import {IChampion} from "reksai/src/@types/champion";
@@ -14,10 +14,10 @@ const Champions = () => {
 
     useEffect(() => {
         async function getChampions(){
-            const response = await ddragon.champion.getAll()
+            const response = await ddragon.champion.getAll();
             let championData = []
             for(let key in response.data){
-                championData.push(response.data[key])
+                championData.push(response.data[key]);
             }
             setChampions(championData)
             console.log(response)
