@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 import Image from 'next/image'
 import Modal from "../components/Modal";
-import {ChangeEvent, useState} from "react";
+import {ChangeEvent, Dispatch, SetStateAction, useEffect, useState} from "react";
 import {motion} from "framer-motion";
 import Link from "next/link";
 import {FiSearch} from "react-icons/fi"
@@ -30,7 +30,13 @@ const Home: NextPage = () => {
 
 	const regionColors = ["bg-yellow-400", "bg-blue-400", "bg-teal-400", "bg-purple-600", "bg-emerald-400",
 		"bg-pink-400", "bg-red-500", "bg-teal-400", "bg-amber-600", "bg-yellow-400", "bg-amber-600"]
+
 	const [region, setRegion] = useState("NA");
+	const [summoner, setSummoner] = useState("")
+
+	useEffect(() => {
+		console.log(summoner)
+	}, [summoner])
 
 	return (
 		<main className={"flex flex-col w-full items-center"}>
@@ -39,10 +45,8 @@ const Home: NextPage = () => {
 					<div>
 						<h1 className={"text-white text-8xl font-medium py-8"}>VELKOZ.LOL</h1>
 					</div>
-					<SearchBar/>
-					<div className={"pt-6"}>
-					</div>
-					<div className={"flex flex-row"}>
+					<SearchBar setState={setSummoner}/>
+					<div className={"flex flex-row pt-6"}>
 						{regions.map((r, i) => (
 							<button
 								className={`px-3 py-1 mr-2 text-white font-bold rounded-xl ${r == region ? regionColors[i] : "bg-gray-900 hover:bg-gray-700"}`}
@@ -58,13 +62,14 @@ const Home: NextPage = () => {
 	);
 };
 
-const SearchBar = () => {
+const SearchBar = ({setState}: {setState: Dispatch<SetStateAction<string>>}) => {
 	const [search, setSearch] = useState("");
 
 	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		event.preventDefault();
 		const value = event.target.value;
-		setSearch(value);
+		setSearch(value)
+		setState(value);
 	}
 	return (
 		<>
