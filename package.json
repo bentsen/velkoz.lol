@@ -22,6 +22,7 @@
     "react": "18.2.0",
     "react-chartjs-2": "^4.3.1",
     "react-dom": "18.2.0",
+    "react-icons": "^4.4.0",
     "react-router-dom": "^6.3.0",
     "reksai": "^0.1.5",
     "swr": "^1.3.0"

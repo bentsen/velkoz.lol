@@ -1,11 +1,11 @@
 import Image from "next/image";
-import Match from "../../components/Match";
+import Match from "../components/Match";
 import {motion} from "framer-motion";
 import axios from "axios";
 import {ISummoner} from "reksai/src/@types/summoner";
 import {IMatch, Participant} from "reksai/src/@types/match";
 import useSWR from 'swr'
-import DoughnutChart from "../../components/DoughnutChart";
+import DoughnutChart from "../components/DoughnutChart";
 import { useRouter } from "next/router";
 import {ILeagueEntry} from "reksai/src/@types/league";
 import {useState} from "react";

@@ -5,9 +5,12 @@ import Footer from "./Footer";
 const Layout = ({children}: {children: ReactNode}) => {
 	return (
 		<>
+			<div className={"min-h-screen flex flex-col"}>
 			<Navbar />
-			<div className={"mb-52"}>
-				{children}
+				<div className={"relative flex flex-grow"}>
+
+					{children}
+				</div>
 			</div>
 			<Footer />
 		</>

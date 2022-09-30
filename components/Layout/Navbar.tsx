@@ -21,7 +21,7 @@ const games = [
 	{
 		nick: "lol",
 		name: "League of Legends",
-		link: "/lol",
+		link: "/",
 		color: "bg-lol-color",
 		svg: "/game-icons/leagueoflegends.svg"
 	},
