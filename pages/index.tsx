@@ -34,10 +34,10 @@ const Home: NextPage = () => {
 
 	return (
 		<main className={"flex flex-col w-full items-center"}>
-			<div className={"flex h-full w-full h-52"}>
-				<div className={"flex flex-col justify-center items-center w-full"}>
+			<div className={"flex w-full h-full"}>
+				<div className={"flex flex-col justify-center items-center h-full w-full"}>
 					<div>
-						<h1 className={"text-white text-8xl py-8"}>VELKOZ.LOL</h1>
+						<h1 className={"text-white text-8xl font-medium py-8"}>VELKOZ.LOL</h1>
 					</div>
 					<SearchBar/>
 					<div className={"pt-6"}>
