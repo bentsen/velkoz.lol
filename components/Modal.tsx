@@ -78,6 +78,7 @@ const Modal = ({isOpen, setIsOpen, region, setRegion} : any) => {
                                             </div>
                                         </div>
                                         <div className={"flex justify-center"}>
+                                            hej
                                             <button className={"bg-leagueoflegends-color text-white w-20 h-10 rounded mt-8"} onClick={() => setIsOpen(false)}>save</button>
                                         </div>
                                     </div>

@@ -50,6 +50,7 @@ export interface Trait {
 
 export interface Unit {
     character_id: string;
+    itemNames:    string[];
     items:        number[];
     chosen:       string;
     name:         string;
