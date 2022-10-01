@@ -20,7 +20,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
     const router = useRouter()
     /*useStake for match state*/
     const [matchWon, setMatchWon] = useState<boolean>()
-    /*useStake for summoners*/
+    /*useStake for summoner*/
     const [summonerParticipant, setSummonerParticipant] = useState<ISummoner>(summoner)
     /*useState for Runes array*/
     const [runes, setRunes] = useState<Runes[]>([])
@@ -78,7 +78,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         getRunes()
     }, [])
 
-    /*Get summoners spell by id*/
+    /*Get summoner spell by id*/
     const getSummonerSpell = (id: number | undefined) => {
         if(id != undefined){
             for(let i = 0; i < spells.length; i++){
@@ -116,7 +116,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
 
     }
 
-    /*Get summoners from match*/
+    /*Get summoner from match*/
     const getSummerParticipant = () => {
         let participant: Participant
 
@@ -169,7 +169,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         return gold
     }
 
-    /*get total earned gold from summoners team*/
+    /*get total earned gold from summoner team*/
     const getTotalGoldSummonerTeam = () => {
         let gold: number = 0
         for(let i = 0; i < getSummonerPlayers().length; i++){
@@ -188,7 +188,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
-    /*get summoners team*/
+    /*get summoner team*/
     const getSummonerTeam = () => {
         for(let i = 0; i < match.info.teams.length; i++ ){
             if(match.info.teams[i].teamId == getSummerParticipant()?.teamId){
@@ -197,7 +197,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
-    /*get players on summoners team*/
+    /*get players on summoner team*/
     const getSummonerPlayers = () => {
         for(let i = 0; i < getFirstHalf().length; i++){
             if(getFirstHalf()[i].puuid == summonerParticipant.puuid){
@@ -231,7 +231,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         return match.info.participants.slice(half_length)
     }
 
-    /*Calculate kda of summoners*/
+    /*Calculate kda of summoner*/
     const calculateKDA = (kills:number | undefined, deaths:number | undefined, assists:number | undefined) => {
        if(kills != undefined && deaths != undefined && assists != undefined) {
             const KDA: number = (kills + assists) / deaths
@@ -244,7 +244,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
        }
     }
 
-    /*Calculate total cs of summoners*/
+    /*Calculate total cs of summoner*/
     const calculateSummonerCs = () => {
         const totalMinions = getSummerParticipant()?.totalMinionsKilled
         const totalJungleMonsters = getSummerParticipant()?.neutralMinionsKilled
@@ -284,7 +284,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         return Math.floor(seconds) + " seconds";
     }
 
-    /*Calculate summoners cs per minute*/
+    /*Calculate summoner cs per minute*/
     const calculateCsPerMin = (totalCs: number | undefined) => {
         const matchDuration = match.info.gameDuration
         const totalMinions = totalCs
@@ -297,7 +297,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
        }
     }
 
-    /*Get summoners team total kills*/
+    /*Get summoner team total kills*/
     const getTeamKills = (teamId: number | undefined) => {
         for(let i = 0; i < match.info.teams.length; i++){
             if(match.info.teams[i].teamId == teamId){
@@ -306,7 +306,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
-    /*Calculate summoners kill participation*/
+    /*Calculate summoner kill participation*/
     const calculateKillPerticipation = (teamId: number | undefined, kills: number | undefined, assists: number | undefined) => {
         if(teamId == undefined) return
         const teamKill = getTeamKills(teamId)
@@ -341,7 +341,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
         }
     }
 
-    /*OnClick go to another summoners profile*/
+    /*OnClick go to another summoner profile*/
     const goToProfile = (e: any, summonerName: string) => {
         e.preventDefault()
         router.push(`/lol/${summonerName}?region=${router.query.region}`)

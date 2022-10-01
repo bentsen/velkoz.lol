@@ -50,7 +50,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
         const query = req.query
         const {summonerName, region} = query
 
-        /*Checks if a summoners exists in database by name and region*/
+        /*Checks if a summoner exists in database by name and region*/
         let placeCount = await prisma.summoner.count(
             {
                 where: {
@@ -60,7 +60,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
             }
         )
 
-        /*If no summoners exists in database fetch and push summoners to database and return json*/
+        /*If no summoner exists in database fetch and push summoner to database and return json*/
         if(placeCount == 0){
             const reksai = new Reksai(process.env.RIOT_API_KEY)
             const summoner: ISummoner = await reksai.summoner.bySummonerName(String(summonerName), String(region))
@@ -84,7 +84,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
                 res.status(500).json({error: "Error creating Summoner"})
             }
         }
-        /*If summoners exists in database pull summoners from database and return json*/
+        /*If summoner exists in database pull summoner from database and return json*/
         else{
             try{
                 const summoner = await prisma.summoner.findFirst({

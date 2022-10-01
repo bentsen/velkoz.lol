@@ -104,7 +104,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
 
     async function updateMatches(req: NextApiRequest, res: NextApiResponse) {
         console.log("jeg kører put")
-        /*Find matchIds in the database that belongs to summoners*/
+        /*Find matchIds in the database that belongs to summoner*/
         if (summonerData != null) {
             const matchIds = await reksai.match.idsByPuuid(summonerData.puuid, regions.get(String(region)))
             /*Loop through matchIds array and remove matchId elements that already exits in database*/
@@ -129,7 +129,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
                 const temp = await reksai.match.byMatchId(matchIds[i], regions.get(String(region)))
                 matches.push(temp)
             }
-            /*if no matches exits in the databse for the summoners*/
+            /*if no matches exits in the databse for the summoner*/
             if (matches.length != 0) {
                 /*Save all recent matches in database*/
                 try {
@@ -140,7 +140,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
                     res.status(500).json({error: "Error creating Match"})
                 }
             }
-            /*If summoners has matches in database pull out and return*/
+            /*If summoner has matches in database pull out and return*/
             else {
                 return res.status(200).json(getAllMatchesFromDatabase())
             }

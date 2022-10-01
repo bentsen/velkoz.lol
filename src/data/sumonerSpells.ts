@@ -18,8 +18,8 @@ export const summonerSpells = [
     {
         "id": 1,
         "name": "Cleanse",
-        "description": "Removes all disables (excluding suppression and airborne) and summoners spell debuffs affecting your items and lowers the duration of incoming disables by 65% for 3 seconds.",
-        "tooltip": "Removes all disables (excluding suppression and airborne) and summoners spell debuffs affecting your items and reduces the duration of disables by 65% for the next {{ f1 }} seconds.",
+        "description": "Removes all disables (excluding suppression and airborne) and summoner spell debuffs affecting your items and lowers the duration of incoming disables by 65% for 3 seconds.",
+        "tooltip": "Removes all disables (excluding suppression and airborne) and summoner spell debuffs affecting your items and reduces the duration of disables by 65% for the next {{ f1 }} seconds.",
         "cooldown": 210,
         "datavalues": {},
         "summonerLevel": 9,

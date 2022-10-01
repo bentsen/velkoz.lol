@@ -6,7 +6,7 @@ import Modal from "../../../components/Modal";
 import axios from "axios";
 import useSWR from "swr";
 import {ISummoner} from "reksai/src/@types/summoner";
-import summonerName from "../../summoners/[summonerName]";
+import summonerName from "../summoner/[summonerName]";
 import Link from "next/link";
 
 const Leaderboard = () => {
@@ -154,7 +154,7 @@ const Leaderboard = () => {
                 </div>
                 <div className={"w-full h-auto mt-4"}>
                     <div className={"w-full h-12 rounded bg-summoner-light flex justify-between items-center"}>
-                        <button onClick={() => setIsOpen(true)} className={"flex flex-row text-summoner-gray ml-2 border rounded text-sm w-auto justify-center h-10 items-center border-summoners-dark"}>
+                        <button onClick={() => setIsOpen(true)} className={"flex flex-row text-summoner-gray ml-2 border rounded text-sm w-auto justify-center h-10 items-center border-summoner-dark"}>
                             <span>{region}</span>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20"
                                  fill="currentColor">

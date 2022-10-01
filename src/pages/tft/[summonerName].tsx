@@ -16,14 +16,14 @@ const Account = () => {
     const router = useRouter()
     const [updateLoading, setUpdateLoading] = useState(false)
     const fetcher = async (url: any) => await axios.get(url).then((res) => res.data)
-    const { data: summoner, error: summonerError, mutate: mutateSummoner } = useSWR<ISummoner>("/api/tft/summoners/by-name/"+router.query.summonerName+"?region="+router.query.region, fetcher)
+    const { data: summoner, error: summonerError, mutate: mutateSummoner } = useSWR<ISummoner>("/api/tft/summoner/by-name/"+router.query.summonerName+"?region="+router.query.region, fetcher)
     const { data: version } = useSWR("/api/lol/versions", fetcher)
     const { data: ranks, mutate: mutateRank } = useSWR<ILeagueEntry[]>("/api/tft/league/"+summoner?.id+"?region="+router.query.region, fetcher)
-    const { data: matches, mutate: mutateMatch } = useSWR<TFTMatch[]>("/api/tft/summoners/matches?puuid="+summoner?.puuid+"&region="+router.query.region, fetcher)
+    const { data: matches, mutate: mutateMatch } = useSWR<TFTMatch[]>("/api/tft/summoner/matches?puuid="+summoner?.puuid+"&region="+router.query.region, fetcher)
     const icon = `https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${summoner?.profileIconId}.png`
 
 
-    /*Update summoners in database*/
+    /*Update summoner in database*/
     const updateSummoner = async () => {
 
     }

@@ -1,11 +1,11 @@
 import Image from "next/image";
-import Match from "../../components/Match";
+import Match from "../../../components/Match";
 import {motion} from "framer-motion";
 import axios from "axios";
 import {ISummoner} from "reksai/src/@types/summoner";
 import {IMatch, Participant} from "reksai/src/@types/match";
 import useSWR from 'swr'
-import DoughnutChart from "../../components/DoughnutChart";
+import DoughnutChart from "../../../components/DoughnutChart";
 import { useRouter } from "next/router";
 import {ILeagueEntry} from "reksai/src/@types/league";
 import {useState} from "react";
@@ -26,9 +26,9 @@ const Account = () => {
     /*ddragon vesion*/
     const { data: version } = useSWR("/api/lol/versions", fetcher)
     /*Summoner fetcher using SWR and axios*/
-    const { data: summoner, error: summonerError, mutate: mutateSummoner } = useSWR<ISummoner>("/api/lol/summoners/by-name/"+router.query.summonerName+"?region="+router.query.region, fetcher)
+    const { data: summoner, error: summonerError, mutate: mutateSummoner } = useSWR<ISummoner>("/api/lol/summoner/by-name/"+router.query.summonerName+"?region="+router.query.region, fetcher)
     /*Match fetcher using SWR and axios*/
-    const { data: matches, mutate: mutateMatch } = useSWR<IMatch[]>("/api/lol/summoners/matches?summonerName="+router.query.summonerName+"&region="+router.query.region, fetcher)
+    const { data: matches, mutate: mutateMatch } = useSWR<IMatch[]>("/api/lol/summoner/matches?summonerName="+router.query.summonerName+"&region="+router.query.region, fetcher)
     /*Rank fetcher using SWR and axios*/
     const { data: ranks, mutate: mutateRank } = useSWR<ILeagueEntry[]>("/api/lol/league/"+summoner?.id+"?region="+router.query.region, fetcher)
     /*Icon url*/
@@ -41,10 +41,10 @@ const Account = () => {
         })
     }
 
-    /*Update summoners in database*/
+    /*Update summoner in database*/
     const updateSummoner = async () => {
         setUpdateLoading(true)
-        console.log("jeg opdatere summoners")
+        console.log("jeg opdatere summoner")
         const response = await axios.put<ISummoner>("/api/lol/summoners/by-name/"+router.query.summonerName+"?region="+router.query.region);
         if(response.status !== 200){
             console.log("something went wrong updating summoner")
@@ -63,7 +63,7 @@ const Account = () => {
         }
     }
 
-    /*Calculates the win rate of a summoners*/
+    /*Calculates the win rate of a summoner*/
     const calculateWinRate = (wins: number, loss: number) => {
         const sum = wins + loss
         const deci = wins / sum
@@ -72,7 +72,7 @@ const Account = () => {
         return Math.round(winrate)
     }
 
-    /*Calculates a summoners favorite position by reason matches*/
+    /*Calculates a summoner favorite position by reason matches*/
     const getFavoritePosition = () => {
         if (matches == undefined) return;
         let positionArray: string[] = []
@@ -119,7 +119,7 @@ const Account = () => {
         return laneTypes.get(favoriteLane);
     }
 
-    /*Identifies the summoners in all matches*/
+    /*Identifies the summoner in all matches*/
     const getSummerParticipantFromMatch = (match: IMatch) => {
         let participant: Participant
 
@@ -136,7 +136,7 @@ const Account = () => {
         }
     }
 
-    /*Gets the total kills by the summoners team*/
+    /*Gets the total kills by the summoner team*/
     const getTeamKillsRecentGames = () => {
         let number1: number = 0
         let number2: number = 0
@@ -205,7 +205,7 @@ const Account = () => {
         return parseFloat(String(averageDeaths)).toFixed(1)
     }
 
-    /*Calculates summoners kill participation in all recent games*/
+    /*Calculates summoner kill participation in all recent games*/
     const calculateKillPerticipationRecentGames = () => {
         const teamKill = getTeamKillsRecentGames()
         let number1: number = 0
@@ -292,7 +292,7 @@ const Account = () => {
         return topThreeChampions.sort((a, b) => b.games - a.games)
     }
 
-    /*calculate frequency of champs played by summoners (should be refactored)*/
+    /*calculate frequency of champs played by summoner (should be refactored)*/
     const calculateTopChampions = () => {
         let champions = []
         let topThreeChampions = []
@@ -395,7 +395,7 @@ const Account = () => {
         return favoriteParticipants.sort((a, b) => b.games - a.games)
     }
 
-    /*Calculates summoners kda in all recent games*/
+    /*Calculates summoner kda in all recent games*/
     const calculateKDARecentGames = () => {
         let number1: number = 0
         let number2: number = 0

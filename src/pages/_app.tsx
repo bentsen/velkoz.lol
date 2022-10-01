@@ -1,19 +1,18 @@
 import '../styles/globals.css'
-import type { AppProps } from 'next/app'
+import type {AppProps} from 'next/app'
 import Layout from "../components/Layout/Layout"
-import VersionListProvider from "../store/VersionContext/VersionList";
-import ChampionListProvider from "../store/ChampionContext/ChampionList";
+import VersionContext from "../store/VersionContext";
+import ChampionListProvider from "../store/ChampionContext";
+import StaticProvider from "../store/StaticProvider";
 
-function MyApp({ Component, pageProps }: AppProps) {
-  return (
-      <VersionListProvider>
-          <ChampionListProvider>
-              <Layout>
-                  <Component {...pageProps}/>
-              </Layout>
-          </ChampionListProvider>
-      </VersionListProvider>
-  )
+function MyApp({Component, pageProps}: AppProps) {
+	return (
+		<StaticProvider>
+			<Layout>
+				<Component {...pageProps}/>
+			</Layout>
+		</StaticProvider>
+	)
 }
 
 export default MyApp

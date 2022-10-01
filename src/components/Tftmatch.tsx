@@ -20,7 +20,7 @@ const Tftmatch = ({match, summoner, region} : {match: TFTMatch, summoner: ISummo
             if(match == undefined) return
             let participant: ISummoner[] = []
             for (let i = 0; i < match.info.participants.length; i++) {
-                const response = await axios.get<ISummoner>("/api/tft/summoners/by-puuid/" + match.info.participants[i].puuid + "?region=" + region)
+                const response = await axios.get<ISummoner>("/api/tft/summoner/by-puuid/" + match.info.participants[i].puuid + "?region=" + region)
                 participant.push(response.data)
             }
             setParticipants(participant)
@@ -38,7 +38,7 @@ const Tftmatch = ({match, summoner, region} : {match: TFTMatch, summoner: ISummo
     }
 
 
-    /*Get summoners from match*/
+    /*Get summoner from match*/
     const getSummerParticipant = () => {
         let participant: Participant
 

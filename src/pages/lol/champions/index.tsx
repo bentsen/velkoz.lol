@@ -1,6 +1,6 @@
 import Image from "next/image";
 import {useContext, useEffect, useState} from "react";
-import {VersionContext} from "../../../store/VersionContext/VersionList";
+import {VersionContext} from "../../../store/VersionContext";
 import {useRouter} from "next/router";
 import {ddragon} from "reksai";
 import {IChampion} from "reksai/src/@types/champion";

@@ -4,21 +4,18 @@ import axios from "axios";
 
 export const VersionContext = React.createContext<string | undefined>("");
 
-export default function VersionListProvider({children}: {children: ReactNode}) {
+export default function VersionProvider({children}: {children: ReactNode}) {
     const [version, setVersion] = useState<string>("");
 
     useEffect(() =>{
         async function getVersions() {
-            axios.get<string[]>("https://ddragon.leagueoflegends.com/api/versions.json")
-                .then(response => {
-                        setVersion(response.data[0])
-                })
-                .catch(e => {
-                    console.log(e)
-                })
+			const url = "https://ddragon.leagueoflegends.com/api/versions.json";
+			const res = await axios.get(url);
+			const data = await res.data[0];
+			setVersion(data)
         }
         getVersions()
-    })
+    }, [])
 
     return (
         <>

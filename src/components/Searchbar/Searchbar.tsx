@@ -1,47 +1,32 @@
-import {ChangeEvent, useEffect, useState} from "react";
+import {Fragment, useContext, useEffect, useState} from "react";
 import {ISummoner} from "reksai/src/@types/summoner";
 import {Combobox} from "@headlessui/react";
 import {IChampion} from "reksai/src/@types/champion";
 import {ddragon} from "reksai";
 import Image from "next/image"
-import {icon} from "@fortawesome/fontawesome-svg-core";
 import axios from "axios";
-import reksai from "reksai/src/Reksai";
 import DDragonVersions from "reksai/dist/clients/ddragon/DDragonVersions";
+import {ChampionContext} from "../../store/ChampionContext";
 
 
 const Searchbar = () => {
 	const [search, setSearch] = useState("");
 	const [selected, setSelected] = useState();
 	const [summoners, setSummoners] = useState<ISummoner[]>([]);
-	const [champions, setChampions] = useState<IChampion[]>([]);
+	const champions = useContext(ChampionContext);
 	const [champAssets, setChampAssets] = useState(new Map<string, string>());
 	const [summonerIcons, setSummonerIcons] = useState(new Map<string, string>());
-
-
-	/** Handle champ data **/
-	useEffect(() => {
-		const handleChamps = async () => {
-			const res = await ddragon.champion.getAll();
-			let champs = [];
-			for (let key in res.data) {
-				champs.push(res.data[key]);
-				await handleChampAsset(res.data[key].id)
-			}
-			setChampions(champs);
-		}
-		handleChamps();
 
 		const handleChampAsset = async (champId: string) => {
 			const img = await ddragon.asset.champion(champId);
 			setChampAssets(champAssets.set(champId, img));
 		}
-	}, [champAssets])
 
+		/**
 	useEffect(() => {
 		const handleSummonerIcons = async () => {
-			const x = Date.now();
 			const latest = await DDragonVersions.getLatestVersion();
+			const x = Date.now();
 			const res = await axios.get(`https://ddragon.leagueoflegends.com/cdn/${latest}/data/en_US/profileicon.json`);
 			const data = await res.data.data;
 			let icons = [];
@@ -61,7 +46,10 @@ const Searchbar = () => {
 			setSummonerIcons(summonerIcons.set(iconId, res));
 		}
 
-	}, [summonerIcons])
+	}, [])
+		 **/
+
+		console.log(champions)
 
 
 	const filteredSummoners = !search
@@ -69,18 +57,24 @@ const Searchbar = () => {
 		: summoners.filter((s) => s.name.toLowerCase().startsWith(search.toLowerCase()));
 
 	const filteredChamps = !search
-		? champions
-		: champions.filter((c) => c.name.toLowerCase().startsWith(search.toLowerCase()));
+		? champions!
+		: champions!.filter((c) => c.name.toLowerCase().startsWith(search.toLowerCase()));
 
 	return (
 		<>
 			<div className={"relative w-full rounded-full max-w-4xl"}>
 				<Combobox value={selected} onChange={setSelected}>
 					<div className={"w-full flex flex-row"}>
-						<Combobox.Input onChange={(e) => setSearch(e.target.value)}
-										className={`relative w-full text-black p-4 text-2xl w-full max-w-4xl px-8 pr-16 ${search ? "rounded-t-3xl" : "rounded-3xl"}`}
-										placeholder={"Search Summoner og Champion..."}
-						/>
+						<Combobox.Input
+							as={Fragment}
+							onChange={(e) => setSearch(e.target.value)}
+						>
+							<input
+								placeholder={"Search Summoner og Champion..."}
+								className={`relative w-full text-black p-4 text-2xl w-full max-w-4xl px-8 pr-16 ${search ? "rounded-t-3xl" : "rounded-3xl"}`}
+								autoComplete={"off"}
+							/>
+						</Combobox.Input>
 					</div>
 					{search && (
 						<Combobox.Options className={"absolute max-h-96 w-full overflow-auto rounded-b-3xl bg-white"}>
@@ -91,7 +85,7 @@ const Searchbar = () => {
 									</div>
 									{filteredChamps.map((c) => (
 										<Combobox.Option key={c.id} value={c}>
-											<UnifiedSearchOption img={champAssets.get(c.id)} name={c.name}/>
+											<UnifiedSearchOption img={c.image.sprite} name={c.name} link={`/lol/champion/${c.id}`}/>
 										</Combobox.Option>
 									))}
 								</>
@@ -101,12 +95,12 @@ const Searchbar = () => {
 								<p className={"ml-5 text-gray-600"}>Summoner</p>
 							</div>
 							{filteredSummoners.length === 0 ? (
-								<UnifiedSearchOption img={summonerIcons.get("0")} name={search}/>
+								<UnifiedSearchOption img={summonerIcons.get("0")} name={search} link={`/summoner/${search}`}/>
 							) : (
 								filteredSummoners.map((s) => (
 									<Combobox.Option key={s.puuid} value={s}
 													 className={"relative cursor-pointer py-2"}>
-										<UnifiedSearchOption img={summonerIcons.get(s.profileIconId.toString())} name={s.name}/>
+										<UnifiedSearchOption img={summonerIcons.get(s.profileIconId.toString())} name={s.name} link={`/lol/summoner/${s.name}`}/>
 									</Combobox.Option>
 								))
 							)}
@@ -122,7 +116,8 @@ interface UnifiedSearchOptionProps {
 	img?: string,
 	region?: string,
 	name: string,
-	summonerLvl?: number
+	summonerLvl?: number,
+	link: string,
 }
 
 const UnifiedSearchOption = (props: UnifiedSearchOptionProps) => {
