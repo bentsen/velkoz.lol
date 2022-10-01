@@ -11,16 +11,10 @@ import {ChampionContext} from "../../store/ChampionContext";
 
 const Searchbar = () => {
 	const [search, setSearch] = useState("");
-	const [selected, setSelected] = useState();
+	const [selected, setSelected] = useState("");
 	const [summoners, setSummoners] = useState<ISummoner[]>([]);
 	const champions = useContext(ChampionContext);
-	const [champAssets, setChampAssets] = useState(new Map<string, string>());
 	const [summonerIcons, setSummonerIcons] = useState(new Map<string, string>());
-
-		const handleChampAsset = async (champId: string) => {
-			const img = await ddragon.asset.champion(champId);
-			setChampAssets(champAssets.set(champId, img));
-		}
 
 		/**
 	useEffect(() => {
@@ -49,9 +43,6 @@ const Searchbar = () => {
 	}, [])
 		 **/
 
-		console.log(champions)
-
-
 	const filteredSummoners = !search
 		? summoners
 		: summoners.filter((s) => s.name.toLowerCase().startsWith(search.toLowerCase()));
@@ -68,6 +59,7 @@ const Searchbar = () => {
 						<Combobox.Input
 							as={Fragment}
 							onChange={(e) => setSearch(e.target.value)}
+							displayValue={(selected: string) => selected}
 						>
 							<input
 								placeholder={"Search Summoner og Champion..."}
@@ -84,7 +76,7 @@ const Searchbar = () => {
 										<p className={"ml-5 text-gray-600"}>Champion</p>
 									</div>
 									{filteredChamps.map((c) => (
-										<Combobox.Option key={c.id} value={c}>
+										<Combobox.Option key={c.id} value={c} onClick={() => setSelected(c.name)}>
 											<UnifiedSearchOption img={c.image.sprite} name={c.name} link={`/lol/champion/${c.id}`}/>
 										</Combobox.Option>
 									))}
@@ -123,7 +115,7 @@ interface UnifiedSearchOptionProps {
 const UnifiedSearchOption = (props: UnifiedSearchOptionProps) => {
 	return (
 		<>
-			<div className={"bg-white"}>
+			<div className={"bg-white cursor-pointer hover:bg-gray-200"}>
 				<div className={"flex flex-row p-2"}>
 					<div className={"relative w-6 h-6"}>
 						{props.img && (

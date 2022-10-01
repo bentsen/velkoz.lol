@@ -238,7 +238,7 @@ const Account = () => {
             champions.push(getSummerParticipantFromMatch(matches[i])?.championName)
         }
 
-        /*creates object with the name of champions with value of how many times it occurs*/
+        /*creates object with the name of champion with value of how many times it occurs*/
         const occurrences = champions.reduce(function (acc: any, curr: any) {
             if(!curr)return
             return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
@@ -257,7 +257,7 @@ const Account = () => {
             champions.push(getSummerParticipantFromMatch(matches[i])?.championName)
         }
 
-        /*creates object with the name of champions with value of how many times it occurs*/
+        /*creates object with the name of champion with value of how many times it occurs*/
         const occurrences = champions.reduce(function (acc: any, curr: any) {
             if(!curr)return
             return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
@@ -303,13 +303,13 @@ const Account = () => {
            champions.push(getSummerParticipantFromMatch(matches[i])?.championName)
         }
 
-        /*creates object with the name of champions with value of how many times it occurs*/
+        /*creates object with the name of champion with value of how many times it occurs*/
         const occurrences = champions.reduce(function (acc: any, curr: any) {
             if(!curr)return
             return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
         }, {})
 
-        /*deletes the champions with the smallest value until it has the three highest*/
+        /*deletes the champion with the smallest value until it has the three highest*/
         for(let i = 0; Object.keys(occurrences).length > 3; i++){
             let key = Object.keys(occurrences).reduce((key, v) => occurrences[v] < occurrences[key] ? v : key);
             delete occurrences[key]

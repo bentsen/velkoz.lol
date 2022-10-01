@@ -1,27 +1,36 @@
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {ddragon} from "reksai";
-import {IChampion} from "reksai/src/@types/champion";
+import {ChampionResponse, IChampion} from "reksai/src/@types/champion";
 import {useRouter} from "next/router";
+import {VersionContext} from "../../../store/VersionContext";
 import axios from "axios";
-import useSWR from "swr";
 
-const Champion = () => {
+const ChampionPage = () => {
     const [champion, setChampion] = useState<IChampion>()
     const router = useRouter()
-    /*fetcher engine*/
-    const fetcher = async (url: any) => await axios.get(url).then((res) => res.data)
-    /*ddragon vesion*/
-    const { data: version } = useSWR("/api/lol/versions", fetcher)
-
+	const latestVersion = useContext(VersionContext);
 
     useEffect(() => {
         async function getChampions(){
+			if (!latestVersion) return;
             if(typeof router.query.championName != "string") return
-            const response = await ddragon.champion.get(router.query.championName)
-            setChampion(response)
+			const champId = router.query.championName;
+			const url = `http://ddragon.leagueoflegends.com/cdn/${latestVersion}/data/en_US/champion/${champId}.json`
+			const res = await axios.get<ChampionResponse>(url)
+            const champ = await res.data.data[champId]
+			champ.image = {
+				full: `https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/champion/${champ.id}_0.png`,
+				sprite: `https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/champion/${champ.id}.png`,
+				group: "champion",
+				x: champ.image.x,
+				y: champ.image.y,
+				w: champ.image.w,
+				h: champ.image.h,
+			};
+            setChampion(champ)
         }
         getChampions()
-    }, [])
+    }, [latestVersion, router])
 
     const getSpellKey = (index: number) => {
         const spell = new Map([
@@ -57,7 +66,10 @@ const Champion = () => {
                                     <div className={"absolute bottom-[-6px] right-[-2px] w-[22px] h-[24px] block"}>
 
                                     </div>
-                                    <img className={"w-full h-full rounded-2xl overflow-hidden border-0 items-center"} src={`http://ddragon.leagueoflegends.com/cdn/12.13.1/img/champion/${champion?.name == "FiddleSticks" ? "Fiddlesticks" : champion?.name}.png`} alt=""/>
+                                    <img
+										src={champion?.image.sprite} alt=""
+										className={"w-full h-full rounded-2xl overflow-hidden border-0 items-center"}
+									/>
                                 </div>
                                 <div className={"flex flex-col justify-end"}>
                                     <h1 className={"font-normal leading-[0] text-[0] m-0 p-0 block"}>
@@ -80,7 +92,7 @@ const Champion = () => {
                                                             {getSpellKey(index)?.spellKey}
                                                         </div>
                                                     </div>
-                                                    <img className={"block border-0 align-middle w-[24px] h-[24px]"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${spell.image.full}`} alt=""/>
+                                                    <img className={"block border-0 align-middle w-[24px] h-[24px]"} src={`https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/spell/${spell.image.full}`} alt=""/>
                                                 </div>
                                             </div>
                                         ))}
@@ -105,4 +117,4 @@ const Champion = () => {
     )
 }
 
-export default Champion
+export default ChampionPage

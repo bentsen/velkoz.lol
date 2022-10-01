@@ -665,7 +665,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                         </td>
                                         <td className={"pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
                                             <div className={"flex justify-center"}>
-                                                <Tooltip content={"Total damage inflicted to champions: " + player.totalDamageDealtToChampions} color={"invert"}>
+                                                <Tooltip content={"Total damage inflicted to champion: " + player.totalDamageDealtToChampions} color={"invert"}>
                                                     <div className={"relative block"}>
                                                         <div className={"text-center text-gray-500 text-[11px] leading-[14px] block"}>
                                                             {player.totalDamageDealtToChampions}
@@ -936,7 +936,7 @@ const Match = ({match, summoner} : {match: IMatch, summoner: ISummoner}) => {
                                     </td>
                                     <td className={"pt-2.5 pr-0 pl-0 pb-[3px] align-middle"}>
                                         <div className={"flex justify-center"}>
-                                            <Tooltip content={"Total damage inflicted to champions: " + player.totalDamageDealtToChampions} color={"invert"}>
+                                            <Tooltip content={"Total damage inflicted to champion: " + player.totalDamageDealtToChampions} color={"invert"}>
                                                 <div className={"relative block"}>
                                                     <div className={"text-center text-gray-500 text-[11px] leading-[14px] block"}>
                                                         {player.totalDamageDealtToChampions}

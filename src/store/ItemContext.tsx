@@ -20,7 +20,7 @@ export default function ItemProvider({children}: {children: ReactNode}) {
 					for(let key in response.data['data']) {
 						itemData.push(response.data['data'][key])
 					}
-					//puts champions data object into state
+					//puts champion data object into state
 					setItems(itemData)
 				})
 				.catch(e => {

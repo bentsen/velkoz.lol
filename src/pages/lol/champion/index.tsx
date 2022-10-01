@@ -4,26 +4,14 @@ import {VersionContext} from "../../../store/VersionContext";
 import {useRouter} from "next/router";
 import {ddragon} from "reksai";
 import {IChampion} from "reksai/src/@types/champion";
+import Link from "next/link";
+import {ChampionContext} from "../../../store/ChampionContext";
 
 const Champions = () => {
     const router = useRouter()
-    const [champions, setChampions] = useState<IChampion[]>([])
-    const Version = useContext(VersionContext);
+	const champions = useContext(ChampionContext)
     const [role, setRole] = useState("all")
     const [inputValue, setInputValue] = useState<string>("")
-
-    useEffect(() => {
-        async function getChampions(){
-            const response = await ddragon.champion.getAll();
-            let championData = []
-            for(let key in response.data){
-                championData.push(response.data[key]);
-            }
-            setChampions(championData)
-            console.log(response)
-        }
-        getChampions()
-    }, [])
 
     const handleChange = (e:any) => {
         e.preventDefault()
@@ -59,7 +47,7 @@ const Champions = () => {
             <div className={"container mx-auto px-20 mt-10"}>
                 <div className={"flex justify-between text-xs text-summoner-gray"}>
                     <div>
-                        There are currently {champions.length} Champions available on Summoner&apos;s Rift
+                        There are currently {champions!.length} Champions available on Summoner&apos;s Rift
                     </div>
                     <div>
                         Displaying Champions active in the game. Champions are updated periodically.
@@ -99,11 +87,21 @@ const Champions = () => {
                 </div>
                 <div className={"bg-summoner-light rounded-b overflow-hidden flex justify-center"}>
                     <div className="mt-3 mb-2 grid grid-cols-12 gap-x-5 gap-y-5 text-summoner-gray text-xs text-center">
-                        {filterChampion()?.map((item) => (
-                            <div onClick={() => goToChampion(event, item.name)} key={item.id}>
-                                <Image className={"cursor-pointer"} key={item.id} src={`https://ddragon.leagueoflegends.com/cdn/${Version}/img/champion/${item.image.full}`} unoptimized={true} width={60} height={60} alt={`picture of ${item.name}`}/>
-                                <span>{item.name}</span>
-                            </div>
+                        {filterChampion()?.map((c) => (
+							<>
+								<Link href={`/lol/champion/${c.id}`} key={c.id} passHref>
+									<div>
+										<Image className={"cursor-pointer"}
+											   key={c.id}
+											   src={c.image.sprite}
+											   unoptimized={true}
+											   width={60}
+											   height={60}
+											   alt={`picture of ${c.name}`}/>
+										<span>{c.name}</span>
+									</div>
+								</Link>
+							</>
                         ))}
                     </div>
                 </div>
