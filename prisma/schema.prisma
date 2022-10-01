@@ -45,6 +45,7 @@ model Metadata {
   participants MetaParticipant[]
 }
 
+//MetaParticipant table
 model MetaParticipant {
   id              Int      @id @unique @default(autoincrement())
   metaParticipant String
