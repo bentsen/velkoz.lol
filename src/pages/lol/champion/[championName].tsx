@@ -15,7 +15,7 @@ const ChampionPage = () => {
 			if (!latestVersion) return;
             if(typeof router.query.championName != "string") return
 			const champId = router.query.championName;
-			const url = `http://ddragon.leagueoflegends.com/cdn/${latestVersion}/data/en_US/champion/${champId}.json`
+			const url = `https://ddragon.leagueoflegends.com/cdn/${latestVersion}/data/en_US/champion/${champId}.json`
 			const res = await axios.get<ChampionResponse>(url)
             const champ = await res.data.data[champId]
 			champ.image = {
