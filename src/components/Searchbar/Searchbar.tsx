@@ -16,33 +16,6 @@ const Searchbar = () => {
 	const champions = useContext(ChampionContext);
 	const [summonerIcons, setSummonerIcons] = useState(new Map<string, string>());
 
-		/**
-	useEffect(() => {
-		const handleSummonerIcons = async () => {
-			const latest = await DDragonVersions.getLatestVersion();
-			const x = Date.now();
-			const res = await axios.get(`https://ddragon.leagueoflegends.com/cdn/${latest}/data/en_US/profileicon.json`);
-			const data = await res.data.data;
-			let icons = [];
-			for (let key in data) {
-				icons.push(data[key]);
-				await handleIcon(data[key].id.toString());
-			}
-
-			const y = Date.now() - x;
-			console.log("DONE in: " + y)
-
-		}
-		handleSummonerIcons()
-
-		const handleIcon = async (iconId: string) => {
-			const res = await ddragon.asset.profileIcon(iconId);
-			setSummonerIcons(summonerIcons.set(iconId, res));
-		}
-
-	}, [])
-		 **/
-
 	const filteredSummoners = !search
 		? summoners
 		: summoners.filter((s) => s.name.toLowerCase().startsWith(search.toLowerCase()));
@@ -119,7 +92,7 @@ const UnifiedSearchOption = (props: UnifiedSearchOptionProps) => {
 				<div className={"flex flex-row p-2"}>
 					<div className={"relative w-6 h-6"}>
 						{props.img && (
-							<Image src={props.img} alt={`${props.name} splash art`} layout={"fill"}/>
+							<Image priority src={props.img} alt={`${props.name} splash art`} layout={"fill"}/>
 						)}
 					</div>
 					<div className={"ml-2"}>
