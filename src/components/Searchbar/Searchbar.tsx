@@ -1,11 +1,7 @@
-import {Fragment, useContext, useEffect, useState} from "react";
+import {Fragment, useContext, useState} from "react";
 import {ISummoner} from "reksai/src/@types/summoner";
 import {Combobox} from "@headlessui/react";
-import {IChampion} from "reksai/src/@types/champion";
-import {ddragon} from "reksai";
-import Image from "next/image"
-import axios from "axios";
-import DDragonVersions from "reksai/dist/clients/ddragon/DDragonVersions";
+import Image from "next/future/image"
 import {ChampionContext} from "../../store/ChampionContext";
 
 
@@ -92,7 +88,7 @@ const UnifiedSearchOption = (props: UnifiedSearchOptionProps) => {
 				<div className={"flex flex-row p-2"}>
 					<div className={"relative w-6 h-6"}>
 						{props.img && (
-							<Image priority src={props.img} alt={`${props.name} splash art`} layout={"fill"}/>
+							<Image priority src={props.img} alt={`${props.name} splash art`} fill />
 						)}
 					</div>
 					<div className={"ml-2"}>
