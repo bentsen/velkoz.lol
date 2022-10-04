@@ -1,10 +1,11 @@
 import type { NextPage } from 'next'
-import Image from 'next/image'
-import Modal from "../components/Modal";
-import {ChangeEvent, Dispatch, SetStateAction, useEffect, useState} from "react";
+import Image from 'next/future/image'
+import {ChangeEvent, Dispatch, Fragment, SetStateAction, useContext, useEffect, useState} from "react";
 import Link from "next/link";
 import {FiSearch} from "react-icons/fi"
-import Searchbar from "../components/Searchbar/Searchbar";
+import {ISummoner} from "reksai/src/@types/summoner";
+import {ChampionContext} from "../store/ChampionContext";
+import {Combobox} from "@headlessui/react";
 
 
 /*
@@ -62,31 +63,101 @@ const Home: NextPage = () => {
 	);
 };
 
-/**
-const SearchBar = ({setState}: {setState: Dispatch<SetStateAction<string>>}) => {
+const Searchbar = () => {
 	const [search, setSearch] = useState("");
+	const [selected, setSelected] = useState("");
+	const [summoners, setSummoners] = useState<ISummoner[]>([]);
+	const champions = useContext(ChampionContext);
+	const [summonerIcons, setSummonerIcons] = useState(new Map<string, string>());
 
-	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-		event.preventDefault();
-		const value = event.target.value;
-		setSearch(value)
-		setState(value);
-	}
+	const filteredSummoners = !search
+		? summoners
+		: summoners.filter((s) => s.name.toLowerCase().startsWith(search.toLowerCase()));
+
+	const filteredChamps = !search
+		? champions!
+		: champions!.filter((c) => c.name.toLowerCase().startsWith(search.toLowerCase()));
+
 	return (
 		<>
-			<div className={"relative w-full max-w-4xl px-4"}>
-				<div className={"relative text-gray-400 flex justify-center"}>
-					<input type={"text"} autoComplete={"off"} placeholder={"Search Summoner or a Champion"}
-						   spellCheck={"false"} value={search} onChange={handleChange}
-						   className={"text-black p-4 rounded-full text-2xl w-full max-w-4xl px-8 pr-16"}/>
-					<div className={"flex justify-center items-center"}>
-						<FiSearch className={"absolute h-8 w-8 mr-6 right-0"}/>
+			<div className={"relative w-full rounded-full max-w-4xl"}>
+				<Combobox value={selected} onChange={setSelected}>
+					<div className={"w-full flex flex-row"}>
+						<Combobox.Input
+							as={Fragment}
+							onChange={(e) => setSearch(e.target.value)}
+							displayValue={(selected: string) => selected}
+						>
+							<input
+								placeholder={"Search Summoner og Champion..."}
+								className={`relative w-full text-black p-4 text-2xl w-full max-w-4xl px-8 pr-16 ${search ? "rounded-t-3xl" : "rounded-3xl"}`}
+								autoComplete={"off"}
+							/>
+						</Combobox.Input>
 					</div>
-				</div>
+					{search && (
+						<Combobox.Options className={"absolute max-h-96 w-full overflow-auto rounded-b-3xl bg-white"}>
+							{filteredChamps.length > 0 && (
+								<>
+									<div className={"bg-gray-300"}>
+										<p className={"ml-5 text-gray-600"}>Champion</p>
+									</div>
+									{filteredChamps.map((c) => (
+										<Combobox.Option key={c.id} value={c.name}>
+											<UnifiedSearchOption img={c.image.sprite} name={c.name} link={`/lol/champion/${c.id}`}/>
+										</Combobox.Option>
+									))}
+								</>
+							)}
+
+							<div className={"bg-gray-300"}>
+								<p className={"ml-5 text-gray-600"}>Summoner</p>
+							</div>
+							{filteredSummoners.length === 0 ? (
+								<UnifiedSearchOption img={summonerIcons.get("0")!} name={search} link={`/summoner/${search}`}/>
+							) : (
+								filteredSummoners.map((s) => (
+									<Combobox.Option key={s.puuid} value={s}
+													 className={"relative cursor-pointer py-2"}>
+										<UnifiedSearchOption img={summonerIcons.get(s.profileIconId.toString())} name={s.name} link={`/lol/summoner/${s.name}`}/>
+									</Combobox.Option>
+								))
+							)}
+						</Combobox.Options>
+					)}
+				</Combobox>
 			</div>
 		</>
 	)
-};
- **/
+}
+
+interface UnifiedSearchOptionProps {
+	img?: string,
+	region?: string,
+	name: string,
+	summonerLvl?: number,
+	link: string,
+}
+
+const UnifiedSearchOption = (props: UnifiedSearchOptionProps) => {
+	return (
+		<>
+			<Link href={props.link} passHref>
+				<div className={"bg-white cursor-pointer hover:bg-gray-200 focus:bg-gray-200"}>
+					<div className={"flex flex-row p-2"}>
+						<div className={"relative w-6 h-6"}>
+							{props.img && (
+								<Image priority src={props.img} alt={`${props.name} splash art`} fill />
+							)}
+						</div>
+						<div className={"ml-2"}>
+							<p className={"text-gray-700 text-lg"}>{props.name}</p>
+						</div>
+					</div>
+				</div>
+			</Link>
+		</>
+	)
+}
 
 export default Home;
