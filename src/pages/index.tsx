@@ -142,7 +142,7 @@ interface UnifiedSearchOptionProps {
 	name: string,
 	summonerLvl?: number,
 	link: string,
-	active: boolean,
+	active?: boolean,
 }
 
 const UnifiedSearchOption = (props: UnifiedSearchOptionProps) => {
