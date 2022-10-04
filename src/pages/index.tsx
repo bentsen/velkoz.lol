@@ -1,6 +1,6 @@
 import type { NextPage } from 'next'
 import Image from 'next/future/image'
-import {ChangeEvent, Dispatch, Fragment, SetStateAction, useContext, useEffect, useState} from "react";
+import React, {ChangeEvent, Dispatch, Fragment, SetStateAction, useContext, useEffect, useState} from "react";
 import Link from "next/link";
 import {FiSearch} from "react-icons/fi"
 import {ISummoner} from "reksai/src/@types/summoner";
@@ -103,8 +103,13 @@ const Searchbar = () => {
 										<p className={"ml-5 text-gray-600"}>Champion</p>
 									</div>
 									{filteredChamps.map((c) => (
-										<Combobox.Option key={c.id} value={c.name}>
-											<UnifiedSearchOption img={c.image.sprite} name={c.name} link={`/lol/champion/${c.id}`}/>
+										<Combobox.Option key={c.id} value={c.name} className={({active}) =>
+											`bg-amber-200 
+											${active ? "bg-gray-200" : "bg-white"}`}>
+											{({selected, active}) => (
+												<UnifiedSearchOption img={c.image.sprite} name={c.name} link={`/lol/champion/${c.id}`} active={active}/>
+											)}
+
 										</Combobox.Option>
 									))}
 								</>
@@ -137,21 +142,23 @@ interface UnifiedSearchOptionProps {
 	name: string,
 	summonerLvl?: number,
 	link: string,
+	active?: boolean,
 }
 
 const UnifiedSearchOption = (props: UnifiedSearchOptionProps) => {
+	const {img, region, name, summonerLvl, link, active} = props;
 	return (
 		<>
 			<Link href={props.link} passHref>
-				<div className={"bg-white cursor-pointer hover:bg-gray-200 focus:bg-gray-200"}>
+				<div className={`cursor-pointer ${active ? "bg-gray-200" : "bg-white"} hover:bg-gray-200 `}>
 					<div className={"flex flex-row p-2"}>
 						<div className={"relative w-6 h-6"}>
-							{props.img && (
-								<Image priority src={props.img} alt={`${props.name} splash art`} fill />
+							{img && (
+								<Image priority src={img} alt={`${name} splash art`} fill />
 							)}
 						</div>
 						<div className={"ml-2"}>
-							<p className={"text-gray-700 text-lg"}>{props.name}</p>
+							<p className={"text-gray-700 text-lg"}>{name}</p>
 						</div>
 					</div>
 				</div>
