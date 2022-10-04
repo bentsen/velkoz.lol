@@ -183,10 +183,10 @@ const Tft: NextPage = () => {
                     </div>
                     <div className={"flex flex-row justify-center gap-5 h-96 mt-5"}>
                         {league?.map((summoner) => (
-                            <div key={summoner.entry.summonerId} className={"bg-summoner-dark w-72 h-72 overflow-hidden rounded relative cursor-pointer"}>
+                            <div key={summoner.entry.summonerId} className={"bg-summoner-dark w-72 h-72 rounded relative cursor-pointer"}>
                                 <div className={"absolute top-0 right-0 text-summoner-dark bg-tft-yellow rounded-bl-2xl font-semibold text-lg pl-2.5 pt-1 w-10 h-10 z-10"}>#1</div>
-                                <div className={"bg-gradient-to-r from-gray-700 via-gray-900 to-black flex justify-center items-center relative block h-40"}>
-                                    <img className={"h-32 w-30 rounded"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${getIcon(summoner.entry.summonerId)}.png`}/>
+                                <div className={"flex justify-center items-center relative block h-40 w-72 overflow-hidden"}>
+                                    <img className={"h-auto w-72 rounded filter hover:blur-sm hover:brightness-50 hover:scale-[1.15] transition-all duration-300"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${getIcon(summoner.entry.summonerId)}.png`}/>
                                 </div>
                                 <div className={"flex flex-col pt-[1px] pr-[1.5px] pl-[1.5px] pb-[1.5px]"}>
                                     <div className={"flex justify-between p-2 text-white"}>
