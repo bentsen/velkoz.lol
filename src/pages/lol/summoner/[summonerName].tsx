@@ -26,9 +26,9 @@ const Account = () => {
     /*ddragon vesion*/
     const { data: version } = useSWR("/api/lol/versions", fetcher)
     /*Summoner fetcher using SWR and axios*/
-    const { data: summoner, error: summonerError, mutate: mutateSummoner } = useSWR<ISummoner>("/api/lol/summoner/by-name/"+router.query.summonerName+"?region="+router.query.region, fetcher)
+    const { data: summoner, error: summonerError, mutate: mutateSummoner } = useSWR<ISummoner>("/api/lol/summoners/by-name/"+router.query.summonerName+"?region="+router.query.region, fetcher)
     /*Match fetcher using SWR and axios*/
-    const { data: matches, mutate: mutateMatch } = useSWR<IMatch[]>("/api/lol/summoner/matches?summonerName="+router.query.summonerName+"&region="+router.query.region, fetcher)
+    const { data: matches, mutate: mutateMatch } = useSWR<IMatch[]>("/api/lol/summoners/matches?summonerName="+router.query.summonerName+"&region="+router.query.region, fetcher)
     /*Rank fetcher using SWR and axios*/
     const { data: ranks, mutate: mutateRank } = useSWR<ILeagueEntry[]>("/api/lol/league/"+summoner?.id+"?region="+router.query.region, fetcher)
     /*Icon url*/
