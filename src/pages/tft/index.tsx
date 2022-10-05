@@ -83,6 +83,14 @@ const Tft: NextPage = () => {
         setSearch('')
     }
 
+    const calculateWinRate = (wins: number, loss: number) => {
+        const sum = wins + loss
+        const deci = wins / sum
+        const winrate = deci * 100
+
+        return Math.round(winrate)
+    }
+
     const handleRegion = (regionValue: string) => {
         setRegion(regionValue)
         setDropdown(!dropdown)
@@ -94,7 +102,7 @@ const Tft: NextPage = () => {
 
     return (
         <>
-            <div className={"block w-full my-0 mx-auto"}>
+            <div className={"sm:block flex flex-col w-[1080px] sm:w-full overflow-hidden sm:overflow-auto"}>
                 <div className={"h-[600px] w-full bg-gradient-to-r from-gray-700 via-gray-900 to-black"}>
                     <div className={"bg-[url('/tft/main_bg.png')] h-[550px] w-full bg-cover overflow-hidden rounded-bl-[100px]"}>
                         <div className={"flex flex-col w-full h-full items-center mt-10"}>
@@ -176,23 +184,23 @@ const Tft: NextPage = () => {
                         </div>
                     </div>
                 </div>
-                <div className={"block w-[1080px] my-0 mx-auto"}>
-                    <div className={"flex items-center mt-20 text-white"}>
+                <div className={"block w-auto my-0 mx-auto"}>
+                    <div className={"flex items-center mt-20 text-white justify-center"}>
                         <h1 className={"text-2xl font-bold font-heading"}>View Top Players</h1>
-                        <hr className={"w-4/5 ml-2 bg-gray-600 border-none h-0.5"}/>
+                        <hr className={"w-1/2 bg-white ml-2 bg-gray-600 border-none h-0.5"}/>
                     </div>
-                    <div className={"flex flex-row justify-center gap-5 h-96 mt-5"}>
+                    <div className={"flex flex-col md:flex-row items-center md:justify-center gap-5 h-auto mt-5"}>
                         {league?.map((summoner) => (
-                            <div key={summoner.entry.summonerId} className={"bg-summoner-dark w-72 h-72 overflow-hidden rounded relative cursor-pointer"}>
+                            <div key={summoner.entry.summonerId} className={"bg-summoner-dark w-72 h-72 rounded relative cursor-pointer"}>
                                 <div className={"absolute top-0 right-0 text-summoner-dark bg-tft-yellow rounded-bl-2xl font-semibold text-lg pl-2.5 pt-1 w-10 h-10 z-10"}>#1</div>
-                                <div className={"bg-gradient-to-r from-gray-700 via-gray-900 to-black flex justify-center items-center relative block h-40"}>
-                                    <img className={"h-32 w-30 rounded"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${getIcon(summoner.entry.summonerId)}.png`}/>
+                                <div className={"flex justify-center items-center relative block h-40 w-72 overflow-hidden"}>
+                                    <img className={"h-auto w-72 rounded filter hover:blur-sm hover:brightness-50 hover:scale-[1.15] transition-all duration-300"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${getIcon(summoner.entry.summonerId)}.png`}/>
                                 </div>
                                 <div className={"flex flex-col pt-[1px] pr-[1.5px] pl-[1.5px] pb-[1.5px]"}>
                                     <div className={"flex justify-between p-2 text-white"}>
                                         <span>{summoner.entry.wins + summoner.entry.losses} games</span>
                                         <span>{summoner.entry.leaguePoints} LP</span>
-                                        <span>20 win%</span>
+                                        <span>{calculateWinRate(summoner.entry.wins,summoner.entry.losses)} win%</span>
                                     </div>
                                     <div className={"text-white p-2"}>
                                         <h1 className={"text-xl font-semibold inline-block"}>{summoner.entry.summonerName}</h1>

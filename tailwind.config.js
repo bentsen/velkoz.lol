@@ -13,6 +13,7 @@ module.exports = {
         'lol-color' : 'rgb(24,87,145)',
         'valorant-color' : 'rgb(253,75,89)',
         'tft-color' : 'rgb(36, 45, 88)',
+        'tft-color2' : 'rgb(16, 24, 38)',
         'tft-dropdown-color' : 'rgb(28, 34, 55)',
         'lor-color' : 'rgb(231,133,200)',
         'navbar-color' : 'rgb(13,13,13)',

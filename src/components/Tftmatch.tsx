@@ -144,9 +144,9 @@ const Tftmatch = ({match, summoner, region} : {match: TFTMatch, summoner: ISummo
 
     return(
         <>
-            <div className={"w-[740px] my-0 mx-auto"}>
-                <li className={"relative list-none mt-2 bg-summoner-dark"}>
-                    <div className={"flex items-center h-24 rounded border-l-4 border-solid " + (getSummerParticipant()?.placement == 1 ? "border-tft-yellow" : getSummerParticipant()?.placement == 2 ? "border-gray-300": getSummerParticipant()?.placement == 3 ? "border-amber-700": "border-gray-500")}>
+            <div className={"w-[900px] my-0 mx-auto"}>
+                <li className={"relative list-none mt-2 bg-gradient-to-r from-summoner-light via-zinc-900 to-summoner-light"}>
+                    <div className={"flex items-center h-24  border-l-4 border-solid " + (getSummerParticipant()?.placement == 1 ? "border-tft-yellow" : getSummerParticipant()?.placement == 2 ? "border-gray-300": getSummerParticipant()?.placement == 3 ? "border-amber-700": "border-gray-500")}>
                         <div className={"ml-3 w-20 leading-4 text-xs"}>
                             <div className={"font-bold text-summoner-gray " + (getSummerParticipant()?.placement == 1 ? "text-tft-yellow" : getSummerParticipant()?.placement == 2 ? "text-gray-300": getSummerParticipant()?.placement == 3 ? "text-amber-700": "text-gray-500")}>Ranked</div>
                             <div>
