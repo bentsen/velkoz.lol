@@ -94,7 +94,7 @@ const Searchbar = () => {
 			}
 		}
 		handleSummoners()
-	})
+	}, [search])
 
 	const filteredSummoners = !search
 		? summoners
