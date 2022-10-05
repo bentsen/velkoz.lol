@@ -1,4 +1,4 @@
-import type { NextPage } from 'next'
+import type {NextPage} from 'next'
 import Image from 'next/future/image'
 import React, {ChangeEvent, Dispatch, Fragment, SetStateAction, useContext, useEffect, useState} from "react";
 import Link from "next/link";
@@ -6,6 +6,9 @@ import {FiSearch} from "react-icons/fi"
 import {ISummoner} from "reksai/src/@types/summoner";
 import {ChampionContext} from "../store/ChampionContext";
 import {Combobox} from "@headlessui/react";
+import {useRouter} from "next/router";
+import {Simulate} from "react-dom/test-utils";
+import select = Simulate.select;
 
 
 /*
@@ -46,7 +49,7 @@ const Home: NextPage = () => {
 					<div>
 						<h1 className={"text-white text-8xl font-medium py-8"}>VELKOZ.LOL</h1>
 					</div>
-					<Searchbar />
+					<Searchbar/>
 					<div className={"flex flex-row pt-6"}>
 						{regions.map((r, i) => (
 							<button
@@ -65,10 +68,17 @@ const Home: NextPage = () => {
 
 const Searchbar = () => {
 	const [search, setSearch] = useState("");
-	const [selected, setSelected] = useState("");
+	const [selected, setSelected] = useState<UnifiedOption>();
 	const [summoners, setSummoners] = useState<ISummoner[]>([]);
 	const champions = useContext(ChampionContext);
 	const [summonerIcons, setSummonerIcons] = useState(new Map<string, string>());
+	const router = useRouter()
+
+	const handleLink = async(state: UnifiedOption) => {
+		if (state == null) return;
+		state.link && await router.push(state.link);
+		setSelected(state);
+	}
 
 	const filteredSummoners = !search
 		? summoners
@@ -81,12 +91,12 @@ const Searchbar = () => {
 	return (
 		<>
 			<div className={"relative w-full rounded-full max-w-4xl"}>
-				<Combobox value={selected} onChange={setSelected}>
+				<Combobox value={selected} onChange={handleLink} nullable>
 					<div className={"w-full flex flex-row"}>
 						<Combobox.Input
 							as={Fragment}
 							onChange={(e) => setSearch(e.target.value)}
-							displayValue={(selected: string) => selected}
+							displayValue={(selected: UnifiedOption) => selected?.name}
 						>
 							<input
 								placeholder={"Search Summoner og Champion..."}
@@ -103,14 +113,11 @@ const Searchbar = () => {
 										<p className={"ml-5 text-gray-600"}>Champion</p>
 									</div>
 									{filteredChamps.map((c) => (
-										<Combobox.Option key={c.id} value={c.name} className={({active}) =>
-											`bg-amber-200 
-											${active ? "bg-gray-200" : "bg-white"}`}>
-											{({selected, active}) => (
-												<UnifiedSearchOption img={c.image.sprite} name={c.name} link={`/lol/champion/${c.id}`} active={active}/>
-											)}
-
-										</Combobox.Option>
+										<UnifiedOption
+											key={c.id}
+											name={c.name}
+											img={c.image.sprite}
+											link={`/lol/champion/${c.id}`}/>
 									))}
 								</>
 							)}
@@ -119,13 +126,16 @@ const Searchbar = () => {
 								<p className={"ml-5 text-gray-600"}>Summoner</p>
 							</div>
 							{filteredSummoners.length === 0 ? (
-								<UnifiedSearchOption img={summonerIcons.get("0")!} name={search} link={`/summoner/${search}`}/>
+								<UnifiedOption
+									name={search}
+									link={`/lol/summoner/${search}`}/>
 							) : (
 								filteredSummoners.map((s) => (
-									<Combobox.Option key={s.puuid} value={s}
-													 className={"relative cursor-pointer py-2"}>
-										<UnifiedSearchOption img={summonerIcons.get(s.profileIconId.toString())} name={s.name} link={`/lol/summoner/${s.name}`}/>
-									</Combobox.Option>
+									<UnifiedOption
+										key={s.id}
+										img={summonerIcons.get(s.profileIconId.toString())}
+										name={s.name}
+										link={`/lol/summoner/${s.name}`}/>
 								))
 							)}
 						</Combobox.Options>
@@ -136,34 +146,39 @@ const Searchbar = () => {
 	)
 }
 
-interface UnifiedSearchOptionProps {
+interface UnifiedOption {
 	img?: string,
 	region?: string,
 	name: string,
 	summonerLvl?: number,
 	link: string,
-	active?: boolean,
 }
 
-const UnifiedSearchOption = (props: UnifiedSearchOptionProps) => {
-	const {img, region, name, summonerLvl, link, active} = props;
+const UnifiedOption = (props: UnifiedOption) => {
+	const {img, region, name, summonerLvl, link} = props;
+	const router = useRouter();
+
 	return (
-		<>
-			<Link href={props.link} passHref>
-				<div className={`cursor-pointer ${active ? "bg-gray-200" : "bg-white"} hover:bg-gray-200 `}>
-					<div className={"flex flex-row p-2"}>
-						<div className={"relative w-6 h-6"}>
-							{img && (
-								<Image priority src={img} alt={`${name} splash art`} fill />
-							)}
-						</div>
-						<div className={"ml-2"}>
-							<p className={"text-gray-700 text-lg"}>{name}</p>
+		<Combobox.Option value={props} >
+			{({active, selected}) => (
+			<>
+				<Link href={link} passHref>
+					<div className={`cursor-pointer hover:bg-gray-200 ${active ? "bg-gray-200" : "bg-white"} ${selected ? "bg-blue-500": "bg-white"}`}>
+						<div className={"flex flex-row p-2"}>
+							<div className={"relative w-6 h-6"}>
+								{img && (
+									<Image priority src={img} alt={`${name} splash art`} fill/>
+								)}
+							</div>
+							<div className={"ml-2"}>
+								<p className={"text-gray-700 text-lg"}>{name}</p>
+							</div>
 						</div>
 					</div>
-				</div>
-			</Link>
-		</>
+				</Link>
+			</>
+			)}
+		</Combobox.Option>
 	)
 }
 
