@@ -9,13 +9,15 @@ import DoughnutChart from "../../../components/DoughnutChart";
 import { useRouter } from "next/router";
 import {ILeagueEntry} from "reksai/src/@types/league";
 import {useState} from "react";
+import Link from "next/link";
+import {NextPage} from "next";
 
 /*
 * Name: Mikkel Bentsen
 * Date: 14/9-2022
 */
 
-const Account = () => {
+const Account:NextPage = () => {
     const [updateLoading, setUpdateLoading] = useState(false)
     /*router instance*/
     const router = useRouter()
@@ -343,6 +345,7 @@ const Account = () => {
     }
 
     const getRecentlyPlayedWith = () => {
+    const getRecentlyPlayedWith = () => {
         const participants = []
         let favoriteParticipants = []
 
@@ -467,7 +470,7 @@ const Account = () => {
 
     const goToSummoner = (e: any, summonerName: string) => {
         e.preventDefault()
-        router.push(`/lol/${summonerName}?region=${router.query.region}`)
+        router.push(`/lol/summoner/${summonerName}?region=${router.query.region}`)
     }
 
     const romanToInt = (roman: string) => {
@@ -635,10 +638,12 @@ const Account = () => {
                                             {getRecentlyPlayedWith().map((participant) => (
                                                 <tr key={participant.name} className={"border-t border-solid align-middle border-black"}>
                                                     <td className={"text-left pl-[12px] whitespace-nowrap text-ellipsis overflow-hidden pt-[4px] pb-[4px] m-0 table-cell"}>
-                                                        <div onClick={() => goToSummoner(event, participant.name)} className={"text-gray-300 text-[12px] decoration-0 cursor-pointer hover:underline"}>
-                                                            <img className={"w-[24px] h-[24px] rounded-full mr-[8px] align-middle inline-block"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${participant.icon}.png`} alt={"image of champ"}/>
-                                                            {participant.name}
-                                                        </div>
+														<Link href={`/lol/summoner/${participant.name}`} passHref>
+															<div className={"text-gray-300 text-[12px] decoration-0 cursor-pointer hover:underline"}>
+																<img className={"w-[24px] h-[24px] rounded-full mr-[8px] align-middle inline-block"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${participant.icon}.png`} alt={"image of champ"}/>
+																{participant.name}
+															</div>
+														</Link>
                                                     </td>
                                                     <td className={"pt-1 pb-1 text-summoner-gray text-xs text-center"}>
                                                         {participant.games}
@@ -766,13 +771,13 @@ const Account = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        ): <div></div>}
+                                        ): null}
                                     </div>
                                 </div>
                                 <div className={"flex bg-summoner-light items-center rounded-b"}>
                                     <div className={"flex flex-col w-full h-auto mb-3 items-center"}>
                                         <span className={"text-summoner-gray font-medium"}>Match History</span>
-                                        <div className={"h-px w-96 bg-match-text"}></div>
+                                        <div className={"h-px w-96 bg-match-text"}/>
                                         {matches ? (
                                             sortMatches(),
                                             matches.slice(0, matchesToShow).map((match) => (
