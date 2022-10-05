@@ -160,7 +160,9 @@ const Searchbar = () => {
 										key={s.id}
 										img={summonerIcons.get(s.profileIconId.toString())}
 										name={s.name}
-										link={`/lol/summoner/${s.name}`}/>
+										summonerLvl={s.summonerLevel}
+										link={`/lol/summoner/${s.name}`}
+									/>
 								))
 							)}
 						</Combobox.Options>
@@ -181,7 +183,6 @@ interface UnifiedOption {
 
 const UnifiedOption = (props: UnifiedOption) => {
 	const {img, region, name, summonerLvl, link} = props;
-	const router = useRouter();
 
 	return (
 		<Combobox.Option value={props} >
