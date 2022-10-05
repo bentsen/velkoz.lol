@@ -2,13 +2,14 @@ import type {NextPage} from 'next'
 import Image from 'next/future/image'
 import React, {ChangeEvent, Dispatch, Fragment, SetStateAction, useContext, useEffect, useState} from "react";
 import Link from "next/link";
-import {FiSearch} from "react-icons/fi"
+import {FiSearch, FiX} from "react-icons/fi"
 import {ISummoner} from "reksai/src/@types/summoner";
 import {ChampionContext} from "../store/ChampionContext";
 import {Combobox} from "@headlessui/react";
 import {useRouter} from "next/router";
-import {Simulate} from "react-dom/test-utils";
-import select = Simulate.select;
+import {axes} from "@motionone/dom/types/animate/utils/transforms";
+import axios from "axios";
+
 
 
 /*
@@ -80,6 +81,19 @@ const Searchbar = () => {
 		setSelected(state);
 	}
 
+	useEffect(() => {
+		const handleSummoners = async() => {
+			if (search.length == 1) {
+				console.log("hello")
+				const res = await axios.get(`/api/lol/summoners/by-part/?name=${search[0]}`);
+				const data = await res.data;
+				console.log(data)
+				data.length == 0 && setSummoners(data)
+			}
+		}
+		handleSummoners()
+	})
+
 	const filteredSummoners = !search
 		? summoners
 		: summoners.filter((s) => s.name.toLowerCase().startsWith(search.toLowerCase()));
@@ -92,18 +106,27 @@ const Searchbar = () => {
 		<>
 			<div className={"relative w-full rounded-full max-w-4xl"}>
 				<Combobox value={selected} onChange={handleLink} nullable>
-					<div className={"w-full flex flex-row"}>
+					<div className={`w-full flex flex-row bg-white w-full text-black p-4 text-2xl w-full max-w-4xl ${search ? "rounded-t-3xl" : "rounded-3xl"}`}>
 						<Combobox.Input
 							as={Fragment}
 							onChange={(e) => setSearch(e.target.value)}
 							displayValue={(selected: UnifiedOption) => selected?.name}
+
 						>
 							<input
 								placeholder={"Search Summoner og Champion..."}
-								className={`relative w-full text-black p-4 text-2xl w-full max-w-4xl px-8 pr-16 ${search ? "rounded-t-3xl" : "rounded-3xl"}`}
 								autoComplete={"off"}
+								className={"w-full mx-4"}
 							/>
 						</Combobox.Input>
+						{ search && (
+								<button
+									className={"flex justify-center items-center"}
+									onClick={() => setSearch("")}
+								>
+									<FiX className={"w-6 h-6"}/>
+								</button>
+							)}
 					</div>
 					{search && (
 						<Combobox.Options className={"absolute max-h-96 w-full overflow-auto rounded-b-3xl bg-white"}>

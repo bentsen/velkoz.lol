@@ -1,5 +1,5 @@
 import Link from "next/link"
-import Image from "next/image";
+import Image from "next/future/image";
 import {useState} from "react";
 import {useRouter} from "next/router";
 
@@ -106,7 +106,7 @@ const NavLink = (props: IGameIter) => {
 				<div className={`relative flex justify-center items-center h-full w-full ${secondLink ? "rounded-bl-2xl" : ""} ${first ? color : bgColor} ${!first && "hover:bg-neutral-900"}`}>
 					<div className={"flex justify-center items-center text-white font-medium mx-5"}>
 						<div className={"h-6 w-6 relative"}>
-							<Image src={svg} alt={name} layout={"fill"}/>
+							<Image src={svg} alt={name} fill/>
 						</div>
 						<p className={"text-xs font-heading"}>{name}</p>
 					</div>
