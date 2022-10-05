@@ -88,7 +88,9 @@ const Searchbar = () => {
 				const res = await axios.get(`/api/lol/summoners/by-part/?name=${search[0]}`);
 				const data = await res.data;
 				console.log(data)
-				data.length == 0 && setSummoners(data)
+				data.length == 0
+					? setSummoners([])
+					: setSummoners(data)
 			}
 		}
 		handleSummoners()

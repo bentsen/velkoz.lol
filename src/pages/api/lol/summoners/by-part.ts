@@ -9,7 +9,7 @@ export default async(req: NextApiRequest, res: NextApiResponse) => {
 	const summoners = await prisma.summoner.findMany({
 		where: {
 			name: {
-				contains: name
+				startsWith: name
 			}
 		}
 	})
