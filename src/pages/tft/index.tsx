@@ -1,7 +1,7 @@
 import Image from 'next/future/image'
 import {NextPage} from "next";
 import Link from "next/link";
-import {useContext, useEffect, useRef, useState} from "react";
+import {Fragment, useContext, useEffect, useRef, useState} from "react";
 import {ISummoner} from "reksai/src/@types/summoner";
 import axios from "axios";
 import useSWR from "swr";
@@ -127,50 +127,54 @@ const SearchBar = ({version} : {version: string}) => {
 
     return(
         <>
-            <div className={"flex flex-row"}>
-                <div ref={divRef} onClick={() => setDropdown(prev => !prev)} className={"cursor-pointer bg-tft-color w-24 rounded-l h-16"}>
-                    <div className={"flex flex-col h-full justify-center ml-2"}>
-                        <div className={"text-gray-500 text-sm font-semibold"}>
-                            Region
-                        </div>
-                        <div className={"text-lg text-white -mt-2.5"}>
-                            {region}
-                            <div className={"inline-block ml-2 mb-1"}>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
-                                     stroke="currentColor" className="w-3 h-3">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
-                                </svg>
+            <Combobox>
+                <div className={"flex flex-row"}>
+                    <div ref={divRef} onClick={() => setDropdown(prev => !prev)} className={"cursor-pointer bg-tft-color w-24 rounded-l h-16"}>
+                        <div className={"flex flex-col h-full justify-center ml-2"}>
+                            <div className={"text-gray-500 text-sm font-semibold"}>
+                                Region
+                            </div>
+                            <div className={"text-lg text-white -mt-2.5"}>
+                                {region}
+                                <div className={"inline-block ml-2 mb-1"}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
+                                         stroke="currentColor" className="w-3 h-3">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+                                    </svg>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <div className={"flex items-center bg-white w-[400px] h-16 rounded-r"}>
+                        <Combobox.Input as={Fragment} onChange={(e) => setSearch(e.target.value)} displayValue={(selected: SearchOptions) => selected?.name}>
+                            <input className={"ml-2 w-[350px] font-medium rounded-r"} type="text"  value={search} placeholder={"Search Summoner"}/>
+                        </Combobox.Input>
+                        <svg onClick={inputDelete} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
+                             stroke="currentColor" className="w-6 h-6 cursor-pointer">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </div>
                 </div>
-                <div className={"flex items-center bg-white w-[400px] h-16 rounded-r"}>
-                    <input className={"ml-2 w-[350px] font-medium rounded-r"} type="text" onChange={(e) => setSearch(e.target.value)} value={search} placeholder={"Search Summoner"}/>
-                    <svg onClick={inputDelete} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
-                         stroke="currentColor" className="w-6 h-6 cursor-pointer">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </div>
-            </div>
-            {search && (
-                <Combobox.Options className={"bg-tft-dropdown-color w-[495px] max-h-56 rounded overflow-y-scroll"}>
-                    <p className={"ml-3 text-summoner-gray"}>Summoners</p>
-                    {filteredSummoners != null && (
-                        filteredSummoners.length === 0 ? (
-                            <SearchOptions name={search} region={region} iconId={0} link={`/lol/summoner/${search}?region=${regions.get(region)}`}/>
-                        ) : (
-                            filteredSummoners.map((s) => (
-                                <SearchOptions key={s.id} name={s.name} region={region} iconId={s.profileIconId} level={s.summonerLevel} link={`/lol/summoner/${s.name}?region=${regions.get(region)}`}/>
-                            ))
-                        )
-                    )}
-                </Combobox.Options>
-            )}
-            {dropdown && (
-                <>
-                    <RegionOptions onRegionChange={changeRegion} onDropdownChange={ChangeDropdown}/>
-                </>
-            )}
+                {search && (
+                    <Combobox.Options className={"bg-tft-dropdown-color w-[495px] max-h-56 rounded overflow-y-scroll"}>
+                        <p className={"ml-3 text-summoner-gray"}>Summoners</p>
+                        {filteredSummoners != null && (
+                            filteredSummoners.length === 0 ? (
+                                <SearchOptions name={search} region={region} iconId={0} link={`/lol/summoner/${search}?region=${regions.get(region)}`}/>
+                            ) : (
+                                filteredSummoners.map((s) => (
+                                    <SearchOptions key={s.id} name={s.name} region={region} iconId={s.profileIconId} level={s.summonerLevel} link={`/lol/summoner/${s.name}?region=${regions.get(region)}`}/>
+                                ))
+                            )
+                        )}
+                    </Combobox.Options>
+                )}
+                {dropdown && (
+                    <>
+                        <RegionOptions onRegionChange={changeRegion} onDropdownChange={ChangeDropdown}/>
+                    </>
+                )}
+            </Combobox>
         </>
     )
 }
