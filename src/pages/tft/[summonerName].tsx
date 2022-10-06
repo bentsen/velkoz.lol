@@ -187,7 +187,7 @@ const Account = () => {
                                         <p className={"text-lg ml-2 font-medium"}>Match History Stats</p>
                                     </div>
                                     <div className={"inline-block align-top"}>
-                                        
+
                                     </div>
                                 </div>
                                 <div className={"flex bg-gradient-to-r from-summoner-dark via-zinc-900 to-summoner-dark border-solid border-r-[1px] border-l-[1px] border-b-[1px] border-summoner-light items-center rounded-b"}>
