@@ -2,7 +2,7 @@ import {NextApiRequest, NextApiResponse} from "next";
 import Reksai from "reksai";
 import {ISummoner} from "reksai/src/@types/summoner";
 import axios from "axios";
-import {TFTMatch} from "../../../../utils/types/tft/matches.t";
+import {TFTMatch} from "../../../../utils/@types/tft/matches.t";
 import {IMatch} from "reksai/src/@types/match";
 
 

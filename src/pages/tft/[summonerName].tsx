@@ -8,7 +8,7 @@ import {ILeagueEntry} from "reksai/src/@types/league";
 import {useState} from "react";
 import Tftmatch from "../../components/Tftmatch";
 import Match from "../../components/Match";
-import {TFTMatch, Participant} from "../../utils/types/tft/matches.t";
+import {TFTMatch, Participant} from "../../utils/@types/tft/matches.t";
 import DoughnutChart from "../../components/DoughnutChart";
 
 const Account = () => {

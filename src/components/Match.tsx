@@ -3,8 +3,8 @@ import {useEffect, useState} from "react";
 import {IMatch, Participant} from "reksai/src/@types/match";
 import {ISummoner} from "reksai/src/@types/summoner";
 import axios from "axios";
-import {Runes} from "../utils/types/runes.t";
-import {Spell} from "../utils/types/spell.t"
+import {Runes} from "../utils/@types/runes.t";
+import {Spell} from "../utils/@types/spell.t"
 import Image from "next/image";
 import {useRouter} from "next/router";
 import { Tooltip } from '@nextui-org/react';

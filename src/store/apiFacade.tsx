@@ -1,8 +1,8 @@
 import axios from "axios";
-import {Summoner} from "../utils/types/summoner.t";
-import {Matches} from "../utils/types/matches.t";
-import {Ladder} from "../utils/types/ladder.t";
-import {Champion} from "../utils/types/champion.t";
+import {Summoner} from "../utils/@types/summoner.t";
+import {Matches} from "../utils/@types/matches.t";
+import {Ladder} from "../utils/@types/ladder.t";
+import {Champion} from "../utils/@types/champion.t";
 import {useState} from "react";
 
 const URL = "http://127.0.0.1:8000/api/";

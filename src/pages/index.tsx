@@ -84,10 +84,8 @@ const Searchbar = () => {
 	useEffect(() => {
 		const handleSummoners = async() => {
 			if (search.length == 1) {
-				console.log("hello")
 				const res = await axios.get(`/api/lol/summoners/by-part/?name=${search[0]}`);
 				const data = await res.data;
-				console.log(data)
 				data.length == 0
 					? setSummoners([])
 					: setSummoners(data)

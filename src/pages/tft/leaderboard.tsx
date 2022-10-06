@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {useEffect, useState} from "react";
 import apiFacade from "../../store/apiFacade";
-import {Ladder} from "../../utils/types/ladder.t";
+import {Ladder} from "../../utils/@types/ladder.t";
 import {motion} from "framer-motion";
 import Modal from "../../components/Modal";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";

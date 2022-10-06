@@ -25,3 +25,14 @@ export interface Flex {
     wins: number
     losses: number
 }
+
+export interface ISummoner {
+	id:            string;
+	accountId:     string;
+	puuid:         string;
+	name:          string;
+	region:	   	   string;
+	profileIconId: number;
+	revisionDate:  number;
+	summonerLevel: number;
+}

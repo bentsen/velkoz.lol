@@ -4,7 +4,7 @@ import {IChampion} from "reksai/src/@types/champion";
 import {useRouter} from "next/router";
 import axios from "axios";
 import useSWR from "swr";
-import {Agents, Agent} from "../../../utils/types/agents.t";
+import {Agents, Agent} from "../../../utils/@types/agents.t";
 
 const Agent = () => {
     const [agent, setAgent] = useState<Agent>()

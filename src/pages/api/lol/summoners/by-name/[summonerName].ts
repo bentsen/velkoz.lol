@@ -1,7 +1,8 @@
 import Reksai from "reksai";
-import {ISummoner} from "reksai/src/@types/summoner";
+import {ISummoner} from "../../../../../utils/@types/summoner.t";
 import type {NextApiRequest, NextApiResponse} from "next";
 import { prisma } from "../../../../../lib/prisma";
+import axios from "axios";
 
 /*
 * Name: Mikkel Bentsen
@@ -22,6 +23,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
     async function updateSummoner(req: NextApiRequest, res: NextApiResponse){
         const query = req.query
         const {summonerName, region} = query
+		console.log(query.summerName, region)
 
         const reksai = new Reksai(process.env.RIOT_API_KEY)
         const newSummoner: ISummoner = await reksai.summoner.bySummonerName(String(summonerName), String(region))
@@ -63,7 +65,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
         /*If no summoner exists in database fetch and push summoner to database and return json*/
         if(placeCount == 0){
             const reksai = new Reksai(process.env.RIOT_API_KEY)
-            const summoner: ISummoner = await reksai.summoner.bySummonerName(String(summonerName), String(region))
+			const apiRes = await axios.get<ISummoner>(`https://${region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${summonerName}`)
+			const summoner = await apiRes.data
 
             try{
                 await prisma.summoner.create({
