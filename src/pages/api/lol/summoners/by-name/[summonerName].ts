@@ -64,9 +64,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
 
         /*If no summoner exists in database fetch and push summoner to database and return json*/
         if(placeCount == 0){
-            const reksai = new Reksai(process.env.RIOT_API_KEY)
-			const apiRes = await axios.get<ISummoner>(`https://${region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${summonerName}`)
-			const summoner = await apiRes.data
+			const apiKey = process.env.RIOT_API_KEY;
+			const url = `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${summonerName}`;
+			const apiReq = axios.create({
+				headers: {
+					"X-Riot-Token": apiKey!
+				}
+			});
+
+			const apiRes = await apiReq.get<ISummoner>(url);
+			const summoner = await apiRes.data;
 
             try{
                 await prisma.summoner.create({
