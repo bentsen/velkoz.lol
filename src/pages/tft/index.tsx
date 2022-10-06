@@ -5,7 +5,7 @@ import {useEffect, useRef, useState} from "react";
 import {ISummoner} from "reksai/src/@types/summoner";
 import axios from "axios";
 import useSWR from "swr";
-import {Entry} from "../../utils/types/league.t";
+import {Entry} from "../../utils/@types/league.t";
 
 interface customLeague {
     entry: Entry,

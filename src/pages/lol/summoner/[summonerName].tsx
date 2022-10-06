@@ -27,7 +27,6 @@ const Account = () => {
 	const fetcher = async (url: string) => await axios.get(url).then((res) => res.data)
 	const version = useContext(VersionContext);
 
-	console.log(router.query.summonerName + " " + router.query.region)
 	/*Summoner fetcher using SWR and axios*/
 	const {
 		data: summoner,

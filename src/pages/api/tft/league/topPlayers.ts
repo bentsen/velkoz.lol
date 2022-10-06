@@ -1,6 +1,6 @@
 import {NextApiRequest, NextApiResponse} from "next";
 import axios from "axios";
-import {Entry, League} from "../../../../utils/types/league.t";
+import {Entry, League} from "../../../../utils/@types/league.t";
 
 interface customLeague {
     entry: Entry,

@@ -1,5 +1,5 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {League} from "../../../../utils/types/league.t";
+import {League} from "../../../../utils/@types/league.t";
 import axios from "axios";
 
 

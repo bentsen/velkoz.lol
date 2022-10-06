@@ -1,9 +1,9 @@
 import items from "../data/tft/set7.5/items.json"
 import champions from "../data/tft/set7.5/champions.json"
 import traits from "../data/tft/set7/traits.json"
-import {TFTChampion} from "../utils/types/tft/champion.t";
+import {TFTChampion} from "../utils/@types/tft/champion.t";
 import {ISummoner} from "reksai/src/@types/summoner";
-import {TFTMatch, Participant} from "../utils/types/tft/matches.t";
+import {TFTMatch, Participant} from "../utils/@types/tft/matches.t";
 import {Tooltip} from "@nextui-org/react";
 import axios from "axios";
 import {useEffect, useState} from "react";

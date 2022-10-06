@@ -1,6 +1,6 @@
 import {NextApiRequest, NextApiResponse} from "next";
 import axios from "axios";
-import {Agent} from "../../../../utils/types/agents.t"
+import {Agent} from "../../../../utils/@types/agents.t"
 
 export default async (req: NextApiRequest, res: NextApiResponse) =>  {
 

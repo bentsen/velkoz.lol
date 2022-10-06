@@ -1,5 +1,5 @@
 import React, {ReactNode, useContext, useEffect, useState} from "react";
-import {Champion} from "../utils/types/champion.t";
+import {Champion} from "../utils/@types/champion.t";
 import axios from "axios";
 import {ChampionContext} from "./ChampionContext";
 import {IItem} from "reksai/src/@types/items";
