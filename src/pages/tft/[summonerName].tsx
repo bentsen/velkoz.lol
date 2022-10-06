@@ -78,30 +78,31 @@ const Account = () => {
 
     return(
         <>
-            <div className={"block w-full my-0 mx-auto"}>
+            <div className={"block w-[1080px] sm:w-full my-0 mx-auto"}>
                 {summonerError ? (
                     <div className={"flex justify-center items-center mt-10"}>
                         <h1 className={"text-white text-xl"}>This summoner does not exist. Please check spelling</h1>
                     </div>
                 ) : summoner ? (
-                    <div className={"sm:block flex flex-col w-[1080px] sm:w-full overflow-hidden sm:overflow-auto"}>
-                        <div className={"bg-[url('/tft/main_bg.png')] h-[350px] w-full bg-cover overflow-hidden"}>
-                        </div>
-                        <div className={"absolute flex items-center top-72 ml-52 w-full h-24"}>
-                            <div className={"w-28 h-28 rounded border-2 border-black left-0 relative"}>
-                                <img className={""} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${summoner.profileIconId}.png`} alt=""/>
-                                <div className={"absolute right-2.5 bottom-2.5 w-[14px] h-[14px] block mb-0.5"}>
-                                    <div className={`flex text-white items-center justify-center w-[24px] h-[26px] rounded-tl rounded-br-sm bg-default-color text-[11px] font-bold leading-[1]`}>
+                    <div className={"flex-1 mx-0 my-auto"}>
+                        <div className={"relative z-20 mb-[1rem]"}>
+                            <div className={"bg-[url('/tft/main_bg.png')] h-[350px] relative -z-10 bg-cover bg-[50%]"}></div>
+                            <div className={"pt-0 pb-0 pl-[1.5rem] pr[1.5rem] max-w-[1400px] flex mt-[-3.5rem] mr-auto ml-auto mb-[-2.5rem]"}>
+                                <div className={"h-[6rem] w-[6rem] relative mr-[1.5rem] flex-shrink-0"}>
+                                    <img className={"border border-black"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${summoner.profileIconId}.png`} alt=""/>
+                                    <div className={"absolute bottom-0 right-0 text-white bg-default-color border-r border-b border-black rounded-tl-lg min-w-[23px] w-auto flex items-center justify-center"}>
                                         {summoner.summonerLevel}
                                     </div>
                                 </div>
+                                <div className={"text-white flex items-center"}>
+                                    <h1 className={"text-3xl pb-5"}>{summoner.name}</h1>
+                                </div>
                             </div>
-                            <div className={"text-white align-top ml-10"}>
-                                <h1 className={"text-3xl pb-5"}>{summoner.name}</h1>
+                            <div className={"h-14 bg-gradient-to-r from-gray-700 via-gray-900 to-black"}>
+                                <div className={"overflow-x-auto overflow-y-hidden ml-[9.5rem] pl-0 max-w-[1400px] flex h-full"}>
+                                    hef
+                                </div>
                             </div>
-                        </div>
-                        <div className={"bg-white h-14 bg-gradient-to-r from-gray-700 via-gray-900 to-black"}>
-                            hej
                         </div>
                         <div className={"flex flex-col w-[1080px] my-0 mx-auto"}>
                             <div className={"w-[900px] align-top"}>
@@ -185,9 +186,6 @@ const Account = () => {
                                 <div className={"bg-gradient-to-r from-summoner-dark via-zinc-900 to-summoner-dark w-full border-solid border-l-[1px] border-t-[1px] border-r-[1px] border-summoner-light h-32 text-white rounded-t overflow-hidden"}>
                                     <div className={"h-7 flex items-center pt-10 pl-5"}>
                                         <p className={"text-lg ml-2 font-medium"}>Match History Stats</p>
-                                    </div>
-                                    <div className={"inline-block align-top"}>
-
                                     </div>
                                 </div>
                                 <div className={"flex bg-gradient-to-r from-summoner-dark via-zinc-900 to-summoner-dark border-solid border-r-[1px] border-l-[1px] border-b-[1px] border-summoner-light items-center rounded-b"}>

@@ -46,8 +46,8 @@ const Tft: NextPage = () => {
             <div className={"sm:block flex flex-col w-[1080px] sm:w-full overflow-hidden sm:overflow-auto"}>
                 <div className={"h-[600px] w-full bg-gradient-to-r from-gray-700 via-gray-900 to-black"}>
                     <div className={"bg-[url('/tft/main_bg.png')] h-[550px] w-full bg-cover overflow-hidden rounded-bl-[100px]"}>
-                        <div className={"flex flex-col w-full h-full items-center mt-20 gap-2"}>
-                            <Image className={"mb-7"} src={"/tft/logo.svg"} width={400} height={200} alt={"logo"}/>
+                        <div className={"flex flex-col w-screen h-full items-center mt-20 gap-2"}>
+                            <Image className={"mb-7 w-[210px] sm:w-[410px]"} src={"/tft/logo.svg"} width={210} height={100} alt={"logo"}/>
                             <SearchBar version={version!}/>
                         </div>
                     </div>
@@ -57,7 +57,7 @@ const Tft: NextPage = () => {
                         <h1 className={"text-2xl font-bold font-heading"}>View Top Players</h1>
                         <hr className={"w-1/2 bg-white ml-2 bg-gray-600 border-none h-0.5"}/>
                     </div>
-                    <div className={"flex flex-col md:flex-row items-center md:justify-center gap-5 h-auto mt-5"}>
+                    <div className={"flex flex-col md:flex-row items-center md:justify-center gap-5 h-auto mt-5 mb-10 sm:mb-0"}>
                         {league?.map((summoner) => (
                             <TopPlayers key={summoner.entry.summonerId} summoner={summoner} version={version!} iconId={getIcon(summoner.entry.summonerId)!}/>
                         ))}
@@ -145,7 +145,7 @@ const SearchBar = ({version} : {version: string}) => {
                             </div>
                         </div>
                     </div>
-                    <div className={"flex items-center bg-white w-[400px] h-16 rounded-r"}>
+                    <div className={"flex items-center bg-white w-[250px] sm:w-[400px] h-16 rounded-r"}>
                         <Combobox.Input as={Fragment} onChange={(e) => setSearch(e.target.value)} displayValue={(selected: SearchOptions) => selected?.name}>
                             <input className={"ml-2 w-[350px] font-medium rounded-r"} type="text"  value={search} placeholder={"Search Summoner"}/>
                         </Combobox.Input>
@@ -160,10 +160,10 @@ const SearchBar = ({version} : {version: string}) => {
                         <p className={"ml-3 text-summoner-gray"}>Summoners</p>
                         {filteredSummoners != null && (
                             filteredSummoners.length === 0 ? (
-                                <SearchOptions name={search} region={region} iconId={0} link={`/lol/summoner/${search}?region=${regions.get(region)}`}/>
+                                <SearchOptions name={search} region={region} iconId={0} link={`/tft/${search}?region=${regions.get(region)}`}/>
                             ) : (
                                 filteredSummoners.map((s) => (
-                                    <SearchOptions key={s.id} name={s.name} region={region} iconId={s.profileIconId} level={s.summonerLevel} link={`/lol/summoner/${s.name}?region=${regions.get(region)}`}/>
+                                    <SearchOptions key={s.id} name={s.name} region={region} iconId={s.profileIconId} level={s.summonerLevel} link={`/tft/${s.name}?region=${regions.get(region)}`}/>
                                 ))
                             )
                         )}
