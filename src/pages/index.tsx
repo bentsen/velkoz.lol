@@ -1,16 +1,32 @@
 import type {NextPage} from 'next'
 import Image from 'next/future/image'
-import React, {ChangeEvent, Dispatch, Fragment, SetStateAction, useContext, useEffect, useState} from "react";
+import React, { Fragment, useContext, useEffect, useState} from "react";
 import Link from "next/link";
-import {FiSearch, FiX} from "react-icons/fi"
-import {ISummoner} from "reksai/src/@types/summoner";
+import {FiX} from "react-icons/fi"
+import {ISummoner} from "../utils/@types/summoner.t";
 import {ChampionContext} from "../store/ChampionContext";
 import {Combobox} from "@headlessui/react";
 import {useRouter} from "next/router";
-import {axes} from "@motionone/dom/types/animate/utils/transforms";
 import axios from "axios";
+import {VersionContext} from "../store/VersionContext";
+import Head from "next/head";
 
-
+const regions = ["NA", "EUW", "EUNE", "KR", "BR", "JP", "RU", "OCE", "TR", "LAN", "LAS"];
+const regionColors = ["bg-yellow-400", "bg-blue-400", "bg-teal-400", "bg-purple-600", "bg-emerald-400",
+	"bg-pink-400", "bg-red-500", "bg-teal-400", "bg-amber-600", "bg-yellow-400", "bg-amber-600"];
+const regionMap: Map<string, {region: string, color: string}> = new Map([
+	["na1", {region: "NA", color: "bg-yellow-400"}],
+	["euw1", {region: "EUW", color: "bg-blue-400"}],
+	["eun1", {region: "EUNE", color: "bg-teal-400"}],
+	["kr1", {region: "KR", color: "bg-purple-600"}],
+	["br1", {region: "BR", color: "bg-emerald-400"}],
+	["jp1", {region: "JP", color: "bg-pink-400"}],
+	["ru1", {region: "RU", color: "bg-red-500"}],
+	["oc1", {region: "OCE", color: "bg-teal-400"}],
+	["tr1", {region: "TR", color: "bg-amber-600"}],
+	["la1", {region: "LAN", color: "bg-yellow-400"}],
+	["la2", {region: "LAS", color: "bg-amber-600"}],
+]);
 
 /*
 * Name: Mikkel Bentsen
@@ -18,52 +34,24 @@ import axios from "axios";
 */
 
 const Home: NextPage = () => {
-	const regions = ["NA", "EUW", "EUN", "KR", "BR", "JP", "RU", "OCE", "TR", "LAN", "LAS"]
-	const regionsMap: Map<string, string> = new Map([
-		["Europa West", "euw1"],
-		["Europe Nordic & East", "eun1"],
-		["North America", "NA1"],
-		["Oceania", "OC1"],
-		["Japan", "JP1"],
-		["Russia", "RU"],
-		["LAS", "LA1"],
-		["LAN", "LA2"],
-		["Brazil", "BR1"],
-		["Korea", "KR"],
-		["Türkiye", "TR1"],
-	])
-
-	const regionColors = ["bg-yellow-400", "bg-blue-400", "bg-teal-400", "bg-purple-600", "bg-emerald-400",
-		"bg-pink-400", "bg-red-500", "bg-teal-400", "bg-amber-600", "bg-yellow-400", "bg-amber-600"]
-
-	const [region, setRegion] = useState("NA");
 	const [summoner, setSummoner] = useState("")
 
-	useEffect(() => {
-		console.log(summoner)
-	}, [summoner])
-
 	return (
-		<main className={"flex flex-col w-full items-center"}>
-			<div className={"flex w-full h-full"}>
-				<div className={"flex flex-col justify-center items-center h-full w-full"}>
-					<div>
-						<h1 className={"text-white text-8xl font-medium py-8"}>VELKOZ.LOL</h1>
-					</div>
-					<Searchbar/>
-					<div className={"flex flex-row pt-6"}>
-						{regions.map((r, i) => (
-							<button
-								className={`px-3 py-1 mr-2 text-white font-bold rounded-xl ${r == region ? regionColors[i] : "bg-gray-900 hover:bg-gray-700"}`}
-								onClick={() => setRegion(r)}
-								key={r}>
-								{r}
-							</button>
-						))}
+		<>
+			<Head>
+				<title>Velkoz.lol</title>
+			</Head>
+			<main className={"flex flex-col w-full items-center"}>
+				<div className={"flex w-full h-full"}>
+					<div className={"flex flex-col justify-center items-center h-full w-full"}>
+						<div>
+							<h1 className={"text-white text-6xl sm:text-8xl font-medium py-8"}>VELKOZ.LOL</h1>
+						</div>
+						<Searchbar/>
 					</div>
 				</div>
-			</div>
-		</main>
+			</main>
+		</>
 	);
 };
 
@@ -71,9 +59,10 @@ const Searchbar = () => {
 	const [search, setSearch] = useState("");
 	const [selected, setSelected] = useState<UnifiedOption>();
 	const [summoners, setSummoners] = useState<ISummoner[]>([]);
+	const [_region, setRegion] = useState("na1");
 	const champions = useContext(ChampionContext);
-	const [summonerIcons, setSummonerIcons] = useState(new Map<string, string>());
-	const router = useRouter()
+	const router = useRouter();
+	const version = useContext(VersionContext);
 
 	const handleLink = async(state: UnifiedOption) => {
 		if (state == null) return;
@@ -84,11 +73,11 @@ const Searchbar = () => {
 	useEffect(() => {
 		const handleSummoners = async() => {
 			if (search.length == 1) {
-				const res = await axios.get(`/api/lol/summoners/by-part/?name=${search[0]}`);
-				const data = await res.data;
-				data.length == 0
+				const res = await axios.get<ISummoner[]>(`/api/lol/summoners/by-part/?name=${search[0]}`);
+				const summoner = await res.data;
+				summoner.length == 0
 					? setSummoners([])
-					: setSummoners(data)
+					: setSummoners(summoner)
 			}
 		}
 		handleSummoners()
@@ -150,22 +139,37 @@ const Searchbar = () => {
 							</div>
 							{filteredSummoners.length === 0 ? (
 								<UnifiedOption
+									key={search}
 									name={search}
-									link={`/lol/summoner/${search}`}/>
+									img={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/0.png`}
+									link={`/lol/summoner/${_region}/${search}`}
+									region={_region}
+								/>
 							) : (
 								filteredSummoners.map((s) => (
 									<UnifiedOption
 										key={s.id}
-										img={summonerIcons.get(s.profileIconId.toString())}
+										img={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${s.profileIconId}.png`}
 										name={s.name}
 										summonerLvl={s.summonerLevel}
-										link={`/lol/summoner/${s.name}`}
+										link={`/lol/summoner/${s.region}/${s.name}`}
+										region={s.region}
 									/>
 								))
 							)}
 						</Combobox.Options>
 					)}
 				</Combobox>
+			</div>
+			<div className={"flex flex-row flex-wrap justify-center pt-6"}>
+				{[...regionMap.keys()].map((r, i) => (
+					<button
+						className={`px-3 py-1 mr-2 text-white font-bold rounded-xl ${r == _region ? regionColors[i] : "bg-gray-900 hover:bg-gray-700"}`}
+						onClick={() => setRegion(r)}
+						key={r}>
+						{regionMap.get(r)!.region}
+					</button>
+				))}
 			</div>
 		</>
 	)
@@ -188,15 +192,27 @@ const UnifiedOption = (props: UnifiedOption) => {
 			<>
 				<Link href={link} passHref>
 					<div className={`cursor-pointer hover:bg-gray-200 ${active ? "bg-gray-200" : "bg-white"} ${selected ? "bg-blue-500": "bg-white"}`}>
-						<div className={"flex flex-row p-2"}>
+						<div className={"flex w-full flex-row p-2 pl-4"}>
 							<div className={"relative w-6 h-6"}>
 								{img && (
-									<Image priority src={img} alt={`${name} splash art`} fill/>
+									<Image priority src={img} alt={`${name} splash art`} sizes={"100vw"} fill/>
 								)}
 							</div>
-							<div className={"ml-2"}>
+							<div className={"ml-2 w-fit"}>
 								<p className={"text-gray-700 text-lg"}>{name}</p>
 							</div>
+							{ summonerLvl && (
+								<div className={"flex items-center ml-2 w-16"}>
+									<p className={"text-gray-500 text-sm"}>Lvl {summonerLvl}</p>
+								</div>
+							)}
+							{ region && (
+                                <div className={"flex ml-auto items-center pr-4"}>
+									<div className={`${regionMap.get(region)!.color} flex rounded-2xl`}>
+										<p className={"text-white text-sm px-2"}>{regionMap.get(region)!.region}</p>
+									</div>
+                                </div>
+							)}
 						</div>
 					</div>
 				</Link>

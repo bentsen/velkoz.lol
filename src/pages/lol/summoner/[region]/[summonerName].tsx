@@ -1,13 +1,10 @@
 import {NextPage} from "next";
 import {useRouter} from "next/router";
-import {ISummoner} from "../../../../../utils/@types/summoner.t";
-import {useContext, useState} from "react";
-import {VersionContext} from "../../../../../store/VersionContext";
-import {fetcher, useSummoner} from "../../../../../hooks/useSummoner";
+import {ISummoner} from "../../../../utils/@types/summoner.t";
+import {fetcher, useSummoner} from "../../../../hooks/useSummoner";
 import useSWR from "swr";
-import {useProfileIcon} from "../../../../../data/useProfileIcon";
+import {useProfileIcon} from "../../../../data/useProfileIcon";
 import Image from "next/future/image"
-import summoner from "reksai/src/clients/Summoner";
 
 const SummonerPage: NextPage = () => {
 	const router = useRouter();

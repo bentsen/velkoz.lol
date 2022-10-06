@@ -6,7 +6,7 @@ import Modal from "../../../components/Modal";
 import axios from "axios";
 import useSWR from "swr";
 import {ISummoner} from "reksai/src/@types/summoner";
-import summonerName from "../summoner/[summonerName]";
+import summonerName from "../../../legacy/[summonerName]";
 import Link from "next/link";
 
 const Leaderboard = () => {

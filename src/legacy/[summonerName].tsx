@@ -1,25 +1,21 @@
 import Image from "next/future/image";
-import Match from "../../../components/Match";
+import Match from "../components/Match";
 import {motion} from "framer-motion";
 import axios from "axios";
 import {ISummoner} from "reksai/src/@types/summoner";
 import {IMatch, Participant} from "reksai/src/@types/match";
 import useSWR from 'swr'
-import DoughnutChart from "../../../components/DoughnutChart";
+import DoughnutChart from "../components/DoughnutChart";
 import {useRouter} from "next/router";
 import {ILeagueEntry} from "reksai/src/@types/league";
 import {useContext, useState} from "react";
 import Link from "next/link";
-import {VersionContext} from "../../../store/VersionContext";
+import {VersionContext} from "../store/VersionContext";
 
-/*
-* Name: Mikkel Bentsen
-* Date: 14/9-2022
-*/
 
 const Account = () => {
 	const [updateLoading, setUpdateLoading] = useState(false)
-	/*router instance*/
+
 	const router = useRouter()
 	/**/
 	const [matchesToShow, setMatchesToShow] = useState(20)
