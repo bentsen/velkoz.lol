@@ -47,9 +47,7 @@ const Home: NextPage = () => {
 						<div>
 							<h1 className={"text-white text-6xl sm:text-8xl font-medium py-8"}>VELKOZ.LOL</h1>
 						</div>
-						<div className={"mx-2 md:mx-0"}>
-							<Searchbar/>
-						</div>
+						<Searchbar/>
 					</div>
 				</div>
 			</main>
@@ -144,7 +142,7 @@ const Searchbar = () => {
 									key={search}
 									name={search}
 									img={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/0.png`}
-									link={`/lol/summoner/wip/${_region}/${search}`}
+									link={`/lol/summoner/${_region}/${search}`}
 									region={_region}
 								/>
 							) : (
@@ -154,7 +152,7 @@ const Searchbar = () => {
 										img={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${s.profileIconId}.png`}
 										name={s.name}
 										summonerLvl={s.summonerLevel}
-										link={`/lol/summoner/wip/${s.region}/${s.name}`}
+										link={`/lol/summoner/${s.region}/${s.name}`}
 										region={s.region}
 									/>
 								))
@@ -194,7 +192,7 @@ const UnifiedOption = (props: UnifiedOption) => {
 			<>
 				<Link href={link} passHref>
 					<div className={`cursor-pointer hover:bg-gray-200 ${active ? "bg-gray-200" : "bg-white"} ${selected ? "bg-blue-500": "bg-white"}`}>
-						<div className={"flex w-full flex-row p-2 ml-2"}>
+						<div className={"flex w-full flex-row p-2 pl-4"}>
 							<div className={"relative w-6 h-6"}>
 								{img && (
 									<Image priority src={img} alt={`${name} splash art`} sizes={"100vw"} fill/>
@@ -209,7 +207,7 @@ const UnifiedOption = (props: UnifiedOption) => {
 								</div>
 							)}
 							{ region && (
-                                <div className={"flex ml-auto items-center mr-4"}>
+                                <div className={"flex ml-auto items-center pr-4"}>
 									<div className={`${regionMap.get(region)!.color} flex rounded-2xl`}>
 										<p className={"text-white text-sm px-2"}>{regionMap.get(region)!.region}</p>
 									</div>
