@@ -14,7 +14,5 @@ export default async(req: NextApiRequest, res: NextApiResponse) => {
 		}
 	})
 
-	console.log(summoners)
-
 	res.status(200).json(summoners)
 }

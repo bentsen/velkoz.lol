@@ -9,6 +9,7 @@ import {Combobox} from "@headlessui/react";
 import {useRouter} from "next/router";
 import axios from "axios";
 import {VersionContext} from "../store/VersionContext";
+import Head from "next/head";
 
 const regions = ["NA", "EUW", "EUNE", "KR", "BR", "JP", "RU", "OCE", "TR", "LAN", "LAS"];
 const regionColors = ["bg-yellow-400", "bg-blue-400", "bg-teal-400", "bg-purple-600", "bg-emerald-400",
@@ -36,16 +37,23 @@ const Home: NextPage = () => {
 	const [summoner, setSummoner] = useState("")
 
 	return (
-		<main className={"flex flex-col w-full items-center"}>
-			<div className={"flex w-full h-full"}>
-				<div className={"flex flex-col justify-center items-center h-full w-full"}>
-					<div>
-						<h1 className={"text-white text-8xl font-medium py-8"}>VELKOZ.LOL</h1>
+		<>
+			<Head>
+				<title>Velkoz.lol</title>
+			</Head>
+			<main className={"flex flex-col w-full items-center"}>
+				<div className={"flex w-full h-full"}>
+					<div className={"flex flex-col justify-center items-center h-full w-full"}>
+						<div>
+							<h1 className={"text-white text-6xl sm:text-8xl font-medium py-8"}>VELKOZ.LOL</h1>
+						</div>
+						<div className={"mx-2 md:mx-0"}>
+							<Searchbar/>
+						</div>
 					</div>
-					<Searchbar/>
 				</div>
-			</div>
-		</main>
+			</main>
+		</>
 	);
 };
 
@@ -155,7 +163,7 @@ const Searchbar = () => {
 					)}
 				</Combobox>
 			</div>
-			<div className={"flex flex-row pt-6"}>
+			<div className={"flex flex-row flex-wrap justify-center pt-6"}>
 				{[...regionMap.keys()].map((r, i) => (
 					<button
 						className={`px-3 py-1 mr-2 text-white font-bold rounded-xl ${r == _region ? regionColors[i] : "bg-gray-900 hover:bg-gray-700"}`}
@@ -189,7 +197,7 @@ const UnifiedOption = (props: UnifiedOption) => {
 						<div className={"flex w-full flex-row p-2 ml-2"}>
 							<div className={"relative w-6 h-6"}>
 								{img && (
-									<Image priority src={img} alt={`${name} splash art`} fill/>
+									<Image priority src={img} alt={`${name} splash art`} sizes={"100vw"} fill/>
 								)}
 							</div>
 							<div className={"ml-2 w-fit"}>
