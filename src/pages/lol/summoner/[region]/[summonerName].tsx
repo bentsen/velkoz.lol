@@ -1,9 +1,9 @@
 import {NextPage} from "next";
 import {useRouter} from "next/router";
-import {ISummoner} from "../../../../../utils/@types/summoner.t";
-import {fetcher, useSummoner} from "../../../../../hooks/useSummoner";
+import {ISummoner} from "../../../../utils/@types/summoner.t";
+import {fetcher, useSummoner} from "../../../../hooks/useSummoner";
 import useSWR from "swr";
-import {useProfileIcon} from "../../../../../data/useProfileIcon";
+import {useProfileIcon} from "../../../../data/useProfileIcon";
 import Image from "next/future/image"
 
 const SummonerPage: NextPage = () => {
