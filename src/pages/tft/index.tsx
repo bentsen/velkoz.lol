@@ -156,7 +156,7 @@ const SearchBar = ({version} : {version: string}) => {
                     </div>
                 </div>
                 {search && (
-                    <Combobox.Options className={"bg-tft-dropdown-color w-[495px] max-h-56 rounded overflow-y-scroll"}>
+                    <Combobox.Options className={"bg-tft-dropdown-color w-[348px] sm:w-[495px] max-h-56 rounded overflow-y-scroll"}>
                         <p className={"ml-3 text-summoner-gray"}>Summoners</p>
                         {filteredSummoners != null && (
                             filteredSummoners.length === 0 ? (
@@ -226,7 +226,7 @@ const RegionOptions = ({onRegionChange, onDropdownChange} : {onRegionChange: any
     }
     return(
         <>
-            <div className={"flex w-[495px]"}>
+            <div className={"flex w-[347px] sm:w-[495px]"}>
                 <div className={"bg-tft-color mt-0.5 rounded w-52 h-auto text-white"}>
                     <ul className={"flex flex-col list-none"}>
                         <li onClick={() => handleStates("EUW")} className={"hover:bg-button-color p-3 cursor-pointer"}>
