@@ -1,11 +1,13 @@
-import Image from "next/image";
+import Image from 'next/future/image'
 import {NextPage} from "next";
 import Link from "next/link";
-import {useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import {ISummoner} from "reksai/src/@types/summoner";
 import axios from "axios";
 import useSWR from "swr";
 import {Entry} from "../../utils/@types/league.t";
+import {VersionContext} from "../../store/VersionContext";
+import { Combobox } from '@headlessui/react'
 
 interface customLeague {
     entry: Entry,
@@ -13,8 +15,8 @@ interface customLeague {
 }
 
 const Tft: NextPage = () => {
+    const version = useContext(VersionContext)
     const fetcher = async (url: any) => await axios.get(url).then((res) => res.data)
-    const { data: version } = useSWR("/api/lol/versions", fetcher)
     const { data: league } = useSWR<customLeague[]>("/api/tft/league/topPlayers", fetcher)
     const [topSummoners, setTopSummoners] = useState<ISummoner[]>([]);
 
@@ -39,22 +41,14 @@ const Tft: NextPage = () => {
         }
     }
 
-    const calculateWinRate = (wins: number, loss: number) => {
-        const sum = wins + loss
-        const deci = wins / sum
-        const winrate = deci * 100
-
-        return Math.round(winrate)
-    }
-
     return (
         <>
             <div className={"sm:block flex flex-col w-[1080px] sm:w-full overflow-hidden sm:overflow-auto"}>
                 <div className={"h-[600px] w-full bg-gradient-to-r from-gray-700 via-gray-900 to-black"}>
                     <div className={"bg-[url('/tft/main_bg.png')] h-[550px] w-full bg-cover overflow-hidden rounded-bl-[100px]"}>
-                        <div className={"flex flex-col w-full h-full items-center mt-10"}>
-                            <Image src={"/tft/logo.svg"} width={400} height={200}/>
-                            <SearchBar version={version}/>
+                        <div className={"flex flex-col w-full h-full items-center mt-20 gap-2"}>
+                            <Image className={"mb-7"} src={"/tft/logo.svg"} width={400} height={200} alt={"logo"}/>
+                            <SearchBar version={version!}/>
                         </div>
                     </div>
                 </div>
@@ -65,23 +59,7 @@ const Tft: NextPage = () => {
                     </div>
                     <div className={"flex flex-col md:flex-row items-center md:justify-center gap-5 h-auto mt-5"}>
                         {league?.map((summoner) => (
-                            <div key={summoner.entry.summonerId} className={"bg-summoner-dark w-72 h-72 rounded relative cursor-pointer"}>
-                                <div className={"absolute top-0 right-0 text-summoner-dark bg-tft-yellow rounded-bl-2xl font-semibold text-lg pl-2.5 pt-1 w-10 h-10 z-10"}>#1</div>
-                                <div className={"flex justify-center items-center relative block h-40 w-72 overflow-hidden"}>
-                                    <img className={"h-auto w-72 rounded filter hover:blur-sm hover:brightness-50 hover:scale-[1.15] transition-all duration-300"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${getIcon(summoner.entry.summonerId)}.png`}/>
-                                </div>
-                                <div className={"flex flex-col pt-[1px] pr-[1.5px] pl-[1.5px] pb-[1.5px]"}>
-                                    <div className={"flex justify-between p-2 text-white"}>
-                                        <span>{summoner.entry.wins + summoner.entry.losses} games</span>
-                                        <span>{summoner.entry.leaguePoints} LP</span>
-                                        <span>{calculateWinRate(summoner.entry.wins,summoner.entry.losses)} win%</span>
-                                    </div>
-                                    <div className={"text-white p-2"}>
-                                        <h1 className={"text-xl font-semibold inline-block"}>{summoner.entry.summonerName}</h1>
-                                        <span className={"ml-2"}>- {summoner.region.replace(/\d/g,'').toUpperCase()}</span>
-                                    </div>
-                                </div>
-                            </div>
+                            <TopPlayers key={summoner.entry.summonerId} summoner={summoner} version={version!} iconId={getIcon(summoner.entry.summonerId)!}/>
                         ))}
                     </div>
                 </div>
@@ -175,18 +153,18 @@ const SearchBar = ({version} : {version: string}) => {
                 </div>
             </div>
             {search && (
-                <div className={"bg-tft-dropdown-color w-[495px] max-h-56 mt-1 rounded overflow-y-scroll"}>
+                <Combobox.Options className={"bg-tft-dropdown-color w-[495px] max-h-56 rounded overflow-y-scroll"}>
                     <p className={"ml-3 text-summoner-gray"}>Summoners</p>
                     {filteredSummoners != null && (
                         filteredSummoners.length === 0 ? (
-                            <SearchOptions name={search} region={region} link={`/lol/summoner/${search}?region=${regions.get(region)}`}/>
+                            <SearchOptions name={search} region={region} iconId={0} link={`/lol/summoner/${search}?region=${regions.get(region)}`}/>
                         ) : (
                             filteredSummoners.map((s) => (
-                                <SearchOptions key={s.id} name={s.name} region={region} iconId={s.profileIconId} version={version} link={`/lol/summoner/${s.name}?region=${regions.get(region)}`}/>
+                                <SearchOptions key={s.id} name={s.name} region={region} iconId={s.profileIconId} level={s.summonerLevel} link={`/lol/summoner/${s.name}?region=${regions.get(region)}`}/>
                             ))
                         )
                     )}
-                </div>
+                </Combobox.Options>
             )}
             {dropdown && (
                 <>
@@ -201,25 +179,37 @@ interface SearchOptions {
     region: string,
     name: string,
     iconId?: number,
-    version?: string,
-    link: string
+    link: string,
+    level?: number
 }
 
 const SearchOptions = (props: SearchOptions) => {
-    const {region, name, iconId, version, link} = props;
-
+    const {region, name, iconId, link, level} = props;
+    const version = useContext(VersionContext);
     return(
         <>
-            <ul className={"text-white"}>
-                <Link href={link}>
-                    <li className={"hover:bg-button-color p-3 cursor-pointer"}>
-                        <div className={"flex items-center"}>
-                            <Image loading={"eager"} priority={true} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${iconId}.png`} width={20} height={20}/>
-                            <span className={"ml-1"}>{name}</span>
-                        </div>
-                    </li>
-                </Link>
-            </ul>
+            <Combobox.Option value={props}>
+                {({active, selected}) => (
+                    <>
+                        <ul className={"text-white"}>
+                            <Link href={link}>
+                                <li className={`hover:bg-button-color ${active ? "bg-button-color" : ""} p-3 cursor-pointer`}>
+                                    <div className={"flex items-center"}>
+                                        <Image priority src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${iconId}.png`} width={20} height={20} alt={String(iconId)}/>
+                                        <div className={"flex justify-between items-center w-full"}>
+                                            <div>
+                                                <span className={"ml-1"}>{name}</span>
+                                                <span className={"ml-1 text-xs"}>lvl {level}</span>
+                                            </div>
+                                            <span>{region}</span>
+                                        </div>
+                                    </div>
+                                </li>
+                            </Link>
+                        </ul>
+                    </>
+                )}
+            </Combobox.Option>
         </>
     )
 }
@@ -246,6 +236,44 @@ const RegionOptions = ({onRegionChange, onDropdownChange} : {onRegionChange: any
                             </div>
                         </li>
                     </ul>
+                </div>
+            </div>
+        </>
+    )
+}
+
+const TopPlayers = ({summoner, version, iconId} : {summoner: customLeague, version: string, iconId: number}) => {
+
+    const calculateWinRate = (wins: number, loss: number) => {
+        const sum = wins + loss
+        const deci = wins / sum
+        const winrate = deci * 100
+
+        return Math.round(winrate)
+    }
+
+    return(
+        <>
+            <div key={summoner.entry.summonerId} className={"bg-summoner-dark w-72 h-72 rounded relative"}>
+                <div className={"absolute top-0 right-0 text-summoner-dark bg-tft-yellow rounded-bl-2xl font-semibold text-lg pl-2.5 pt-1 w-10 h-10 z-10"}>#1</div>
+                <div className={"flex justify-center items-center relative block h-40 w-72 overflow-hidden group"}>
+                    <img className={"h-auto w-72 rounded filter group-hover:blur-sm hover:brightness-50 hover:scale-[1.15] transition-all duration-300"} src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${iconId}.png`}/>
+                    <div className={"h-full w-72 rounded flex items-center justify-center opacity-0 group-hover:opacity-100 duration-300 text-white absolute cursor-pointer"}>
+                        <div>
+                            View Profile
+                        </div>
+                    </div>
+                </div>
+                <div className={"flex flex-col pt-[1px] pr-[1.5px] pl-[1.5px] pb-[1.5px]"}>
+                    <div className={"flex justify-between p-2 text-white"}>
+                        <span>{summoner.entry.wins + summoner.entry.losses} games</span>
+                        <span>{summoner.entry.leaguePoints} LP</span>
+                        <span>{calculateWinRate(summoner.entry.wins,summoner.entry.losses)} win%</span>
+                    </div>
+                    <div className={"text-white p-2"}>
+                        <h1 className={"text-xl font-semibold inline-block"}>{summoner.entry.summonerName}</h1>
+                        <span className={"ml-2"}>- {summoner.region.replace(/\d/g,'').toUpperCase()}</span>
+                    </div>
                 </div>
             </div>
         </>
