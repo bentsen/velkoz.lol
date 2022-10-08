@@ -8,6 +8,7 @@ import useSWR from "swr";
 import {Entry} from "../../utils/@types/league.t";
 import {VersionContext} from "../../store/VersionContext";
 import { Combobox } from '@headlessui/react'
+import {useRouter} from "next/router";
 
 interface customLeague {
     entry: Entry,
@@ -48,7 +49,7 @@ const Tft: NextPage = () => {
                     <div className={"bg-[url('/tft/main_bg.png')] h-[550px] w-full bg-cover overflow-hidden rounded-bl-[100px]"}>
                         <div className={"flex flex-col w-screen h-full items-center mt-20 gap-2"}>
                             <Image className={"mb-7 w-[210px] sm:w-[410px]"} src={"/tft/logo.svg"} width={210} height={100} alt={"logo"}/>
-                            <SearchBar version={version!}/>
+                            <SearchBar/>
                         </div>
                     </div>
                 </div>
@@ -68,12 +69,14 @@ const Tft: NextPage = () => {
     )
 }
 
-const SearchBar = ({version} : {version: string}) => {
+const SearchBar = () => {
     const divRef = useRef<any>();
     const [search, setSearch] = useState("")
     const [summoners, setSummoners] = useState<ISummoner[]>([]);
+    const [selected, setSelected] = useState<SearchOptions>();
     const [region, setRegion] = useState("EUW")
     const [dropdown, setDropdown] = useState(false)
+    const router = useRouter();
     const regions: Map<string, string> = new Map([
         ["EUW", "euw1"],
         ["EUN", "eun1"],
@@ -98,6 +101,12 @@ const SearchBar = ({version} : {version: string}) => {
 
     const inputDelete = () => {
         setSearch('')
+    }
+
+    const handleLink = async(state: SearchOptions) => {
+        if (state == null) return;
+        state.link && await router.push(state.link);
+        setSelected(state);
     }
 
     useEffect(() => {
@@ -127,7 +136,7 @@ const SearchBar = ({version} : {version: string}) => {
 
     return(
         <>
-            <Combobox>
+            <Combobox value={selected} onChange={handleLink} nullable>
                 <div className={"flex flex-row"}>
                     <div ref={divRef} onClick={() => setDropdown(prev => !prev)} className={"cursor-pointer bg-tft-color w-24 rounded-l h-16"}>
                         <div className={"flex flex-col h-full justify-center ml-2"}>
@@ -147,7 +156,7 @@ const SearchBar = ({version} : {version: string}) => {
                     </div>
                     <div className={"flex items-center bg-white w-[250px] sm:w-[400px] h-16 rounded-r"}>
                         <Combobox.Input as={Fragment} onChange={(e) => setSearch(e.target.value)} displayValue={(selected: SearchOptions) => selected?.name}>
-                            <input className={"ml-2 w-[350px] font-medium rounded-r"} type="text"  value={search} placeholder={"Search Summoner"}/>
+                            <input className={"ml-2 w-[350px] font-medium rounded-r"} type="text"  value={search} placeholder={"Search Summoner"} autoComplete={"off"}/>
                         </Combobox.Input>
                         <svg onClick={inputDelete} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
                              stroke="currentColor" className="w-6 h-6 cursor-pointer">
@@ -196,7 +205,7 @@ const SearchOptions = (props: SearchOptions) => {
                 {({active, selected}) => (
                     <>
                         <ul className={"text-white"}>
-                            <Link href={link}>
+                            <Link href={link} passHref>
                                 <li className={`hover:bg-button-color ${active ? "bg-button-color" : ""} p-3 cursor-pointer`}>
                                     <div className={"flex items-center"}>
                                         <Image priority src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${iconId}.png`} width={20} height={20} alt={String(iconId)}/>

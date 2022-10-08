@@ -1,5 +1,4 @@
-import Image from "next/image";
-import {motion} from "framer-motion";
+import Image from 'next/future/image'
 import axios from "axios";
 import useSWR from "swr";
 import {ISummoner} from "reksai/src/@types/summoner";
@@ -7,9 +6,7 @@ import {useRouter} from "next/router";
 import {ILeagueEntry} from "reksai/src/@types/league";
 import {useState} from "react";
 import Tftmatch from "../../components/Tftmatch";
-import Match from "../../components/Match";
 import {TFTMatch, Participant} from "../../utils/@types/tft/matches.t";
-import DoughnutChart from "../../components/DoughnutChart";
 
 const Account = () => {
     const router = useRouter()
@@ -19,61 +16,11 @@ const Account = () => {
     const { data: version } = useSWR("/api/lol/versions", fetcher)
     const { data: ranks, mutate: mutateRank } = useSWR<ILeagueEntry[]>("/api/tft/league/"+summoner?.id+"?region="+router.query.region, fetcher)
     const { data: matches, mutate: mutateMatch } = useSWR<TFTMatch[]>("/api/tft/summoners/matches?puuid="+summoner?.puuid+"&region="+router.query.region, fetcher)
-    const icon = `https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${summoner?.profileIconId}.png`
 
 
     /*Update summoner in database*/
     const updateSummoner = async () => {
 
-    }
-
-    const calculateWinRate = (wins: number, loss: number) => {
-        const sum = wins + loss
-        const deci = wins / sum
-        const winrate = deci * 100
-
-        return Math.round(winrate)
-    }
-
-    const romanToInt = (roman: string) => {
-
-        const values = new Map([
-            ['I', 1],
-            ['V', 5],
-            ['X', 10]
-        ]);
-
-        let result = 0,
-            current, previous = 0;
-        for (const char of roman.split("").reverse()) {
-            current = values.get(char);
-            if(current != undefined) {
-                if (current >= previous) {
-                    result += current;
-                } else {
-                    result -= current;
-                }
-                previous = current;
-            }
-        }
-        return result;
-    }
-
-    /*Identifies the summoner in all matches*/
-    const getSummerParticipantFromMatch = (match: TFTMatch) => {
-        let participant: Participant
-
-        for (let i=0;i < match.info.participants.length; i++){
-            if(match.info.participants[i]?.puuid != undefined) {
-                if (match.info.participants[i]?.puuid == summoner?.puuid) {
-                    return participant = match.info.participants[i]
-                }
-            }
-            else {
-                console.log("undefined")
-                return null
-            }
-        }
     }
 
     return(
@@ -109,85 +56,17 @@ const Account = () => {
                                 {ranks?.length != 0 && (
                                     <>
                                         {ranks?.map((rank) => (
-                                            <div key={rank.leagueID} className={"bg-gradient-to-r from-summoner-dark via-zinc-900 to-summoner-dark mt-2 w-full h-60 text-white rounded border-solid border-[1px] border-summoner-light"}>
-                                                <div className={"flex items-center h-16"}>
-                                                    <p className={"text-lg ml-2"}>{rank.queueType} - Recent Matches Overview</p>
-                                                </div>
-                                                <div className={"flex flex-row bg-gradient-to-r from-summoner-light via-zinc-900 to-summoner-light h-32 relative"}>
-                                                    <div className={"flex items-center w-[600px] mb-7"}>
-                                                        <div className={"mt-2 flex justify-center items-center w-20 h-20 ml-2"}>
-                                                            <Image src={`/lol/medals/${rank.tier.toLowerCase()}.webp`} width={60} height={60} alt={"flex-rank-emblem"}/>
-                                                        </div>
-                                                        <div className={"flex flex-col ml-2 capitalize"}>
-                                                            <p className={"text-md font-bold"}>{rank.tier.toLowerCase()} {romanToInt(rank.rank)}</p>
-                                                            <div className={"relative z-10"}>
-                                                                <div className={"bg-summoner-gray w-40 h-3 rounded opacity-70"}></div>
-                                                                <div style={{width: `${rank.leaguePoints}%`}} className={"absolute top-0 bottom-0 left-0 bg-tft-yellow rounded-full"}></div>
-                                                            </div>
-                                                            <p className={"text-xs text-summoner-gray mt-1"}>{rank.leaguePoints} LP</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className={"mr-10"}>
-                                                        <div className={"inline-block"}>
-                                                            <span className={"ml-1"}>recent matches</span>
-                                                            {matches && (
-                                                                <>
-                                                                    <div className={"flex flow-row h-7 gap-0.5"}>
-                                                                        {matches.slice(0, 10).map((match,index) => (
-                                                                            <div key={match.metadata.match_id} className={"ml-1 w-7 flex items-center justify-center " + (index == 0 ? "rounded-tl-md rounded-bl-md ": index == 9 ? "rounded-tr-md rounded-br-md " : " ") + (getSummerParticipantFromMatch(match)?.placement == 1 ? "bg-tft-yellow": getSummerParticipantFromMatch(match)?.placement == 2 ? "bg-gray-300": getSummerParticipantFromMatch(match)?.placement == 3 ? "bg-amber-700" : "bg-summoner-dark")}>
-                                                                                {getSummerParticipantFromMatch(match)?.placement}
-                                                                            </div>
-                                                                        ))}
-                                                                    </div>
-                                                                    <div className={"flex flex-row h-7 mt-1.5 gap-0.5"}>
-                                                                        {matches.slice(10).map((match,index) => (
-                                                                            <div key={match.metadata.match_id} className={"ml-1 w-7 flex items-center justify-center " + (index == 0 ? "rounded-tl-md rounded-bl-md ": index == 9 ? "rounded-tr-md rounded-br-md " : " ") + (getSummerParticipantFromMatch(match)?.placement == 1 ? "bg-tft-yellow": getSummerParticipantFromMatch(match)?.placement == 2 ? "bg-gray-300": getSummerParticipantFromMatch(match)?.placement == 3 ? "bg-amber-700" : "bg-summoner-dark")}>
-                                                                                {getSummerParticipantFromMatch(match)?.placement}
-                                                                            </div>
-                                                                        ))}
-                                                                    </div>
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    <div className={"flex flex-row gap-10 absolute pt-[105px] pl-16"}>
-                                                        <div className={"bg-summoner-light w-40 h-14 rounded"}>
-                                                            <div className={"p-3"}>
-                                                                <span className={"text-lg"}>Wins: {rank.wins}</span>
-                                                            </div>
-                                                        </div>
-                                                        <div className={"bg-summoner-light w-40 h-14 rounded"}>
-                                                            <div className={"p-3"}>
-                                                                <span className={"text-lg"}>Losses: {rank.losses}</span>
-                                                            </div>
-                                                        </div>
-                                                        <div className={"bg-summoner-light w-40 h-14 rounded"}>
-                                                            <div className={"p-3"}>
-                                                                <span className={"text-lg"}>Win Rate: {calculateWinRate(rank.wins, rank.losses)}%</span>
-                                                                <div className={"relative z-10"}>
-                                                                    <div className={"bg-summoner-gray w-32 h-1 rounded opacity-70"}></div>
-                                                                    <div style={{width: `${calculateWinRate(rank.wins,rank.losses)}%`}} className={"absolute top-0 bottom-0 left-0 rounded-full " + (calculateWinRate(rank.wins,rank.losses) < 50 ? "bg-loss-border" : "bg-win")}></div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className={"bg-summoner-light w-40 h-14 rounded"}>
-                                                            <div className={"p-3"}>
-                                                                <span className={"text-lg"}>Matches: {rank.losses + rank.wins}</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            matches != undefined &&(
+                                            <MatchOverview rank={rank} matches={matches} summoner={summoner}/>
+                                            )
                                         ))}
                                     </>
                                 )}
                             </div>
                             <div className={"w-[900px] mt-2 align-top"}>
-                                <div className={"bg-gradient-to-r from-summoner-dark via-zinc-900 to-summoner-dark w-full border-solid border-l-[1px] border-t-[1px] border-r-[1px] border-summoner-light h-32 text-white rounded-t overflow-hidden"}>
-                                    <div className={"h-7 flex items-center pt-10 pl-5"}>
-                                        <p className={"text-lg ml-2 font-medium"}>Match History Stats</p>
-                                    </div>
-                                </div>
+                                {matches != undefined &&(
+                                    <MatchHistory matches={matches} summoner={summoner}/>
+                                )}
                                 <div className={"flex bg-gradient-to-r from-summoner-dark via-zinc-900 to-summoner-dark border-solid border-r-[1px] border-l-[1px] border-b-[1px] border-summoner-light items-center rounded-b"}>
                                     <div className={"flex flex-col w-full h-auto mb-3 items-center"}>
                                         {matches ? (
@@ -227,6 +106,243 @@ const Account = () => {
                         <span className="sr-only">Loading...</span>
                     </div>
                 </div>}
+            </div>
+        </>
+    )
+}
+
+const MatchOverview = ({rank, matches, summoner} : {rank: ILeagueEntry, matches: TFTMatch[], summoner: ISummoner}) => {
+    const romanToInt = (roman: string) => {
+        const values = new Map([
+            ['I', 1],
+            ['V', 5],
+            ['X', 10]
+        ]);
+
+        let result = 0,
+            current, previous = 0;
+        for (const char of roman.split("").reverse()) {
+            current = values.get(char);
+            if(current != undefined) {
+                if (current >= previous) {
+                    result += current;
+                } else {
+                    result -= current;
+                }
+                previous = current;
+            }
+        }
+        return result;
+    }
+
+    const calculateWinRate = (wins: number, loss: number) => {
+        const sum = wins + loss
+        const deci = wins / sum
+        const winrate = deci * 100
+
+        return Math.round(winrate)
+    }
+
+    /*Identifies the summoner in all matches*/
+    const getSummerParticipantFromMatch = (match: TFTMatch) => {
+        let participant: Participant
+
+        for (let i=0;i < match.info.participants.length; i++){
+            if(match.info.participants[i]?.puuid != undefined) {
+                if (match.info.participants[i]?.puuid == summoner?.puuid) {
+                    return participant = match.info.participants[i]
+                }
+            }
+            else {
+                console.log("undefined")
+                return null
+            }
+        }
+    }
+
+    return(
+        <>
+            <div key={rank.leagueID} className={"bg-gradient-to-r from-summoner-dark via-zinc-900 to-summoner-dark mt-2 w-full h-60 text-white rounded border-solid border-[1px] border-summoner-light"}>
+                <div className={"flex items-center h-16"}>
+                    <p className={"text-lg ml-2"}>{rank.queueType} - Recent Matches Overview</p>
+                </div>
+                <div className={"flex flex-row bg-gradient-to-r from-summoner-light via-zinc-900 to-summoner-light h-32 relative"}>
+                    <div className={"flex items-center w-[600px] mb-7"}>
+                        <div className={"mt-2 flex justify-center items-center w-20 h-20 ml-2"}>
+                            <Image src={`/lol/medals/${rank.tier.toLowerCase()}.webp`} width={60} height={60} alt={"flex-rank-emblem"}/>
+                        </div>
+                        <div className={"flex flex-col ml-2 capitalize"}>
+                            <p className={"text-md font-bold"}>{rank.tier.toLowerCase()} {romanToInt(rank.rank)}</p>
+                            <div className={"relative z-10"}>
+                                <div className={"bg-summoner-gray w-40 h-3 rounded opacity-70"}></div>
+                                <div style={{width: `${rank.leaguePoints}%`}} className={"absolute top-0 bottom-0 left-0 bg-tft-yellow rounded-full"}></div>
+                            </div>
+                            <p className={"text-xs text-summoner-gray mt-1"}>{rank.leaguePoints} LP</p>
+                        </div>
+                    </div>
+                    <div className={"mr-10"}>
+                        <div className={"inline-block"}>
+                            <span className={"ml-1"}>recent matches</span>
+                            {matches && (
+                                <>
+                                    <div className={"flex flow-row h-7 gap-0.5"}>
+                                        {matches.slice(0, 10).map((match,index) => (
+                                            <div key={match.metadata.match_id} className={"ml-1 w-7 flex items-center justify-center " + (index == 0 ? "rounded-tl-md rounded-bl-md ": index == 9 ? "rounded-tr-md rounded-br-md " : " ") + (getSummerParticipantFromMatch(match)?.placement == 1 ? "bg-tft-yellow": getSummerParticipantFromMatch(match)?.placement == 2 ? "bg-gray-300": getSummerParticipantFromMatch(match)?.placement == 3 ? "bg-amber-700" : "bg-summoner-dark")}>
+                                                {getSummerParticipantFromMatch(match)?.placement}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className={"flex flex-row h-7 mt-1.5 gap-0.5"}>
+                                        {matches.slice(10).map((match,index) => (
+                                            <div key={match.metadata.match_id} className={"ml-1 w-7 flex items-center justify-center " + (index == 0 ? "rounded-tl-md rounded-bl-md ": index == 9 ? "rounded-tr-md rounded-br-md " : " ") + (getSummerParticipantFromMatch(match)?.placement == 1 ? "bg-tft-yellow": getSummerParticipantFromMatch(match)?.placement == 2 ? "bg-gray-300": getSummerParticipantFromMatch(match)?.placement == 3 ? "bg-amber-700" : "bg-summoner-dark")}>
+                                                {getSummerParticipantFromMatch(match)?.placement}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                    <div className={"flex flex-row gap-10 absolute pt-[105px] pl-16"}>
+                        <div className={"bg-summoner-light w-40 h-14 rounded"}>
+                            <div className={"p-3"}>
+                                <span className={"text-lg"}>Wins: {rank.wins}</span>
+                            </div>
+                        </div>
+                        <div className={"bg-summoner-light w-40 h-14 rounded"}>
+                            <div className={"p-3"}>
+                                <span className={"text-lg"}>Losses: {rank.losses}</span>
+                            </div>
+                        </div>
+                        <div className={"bg-summoner-light w-40 h-14 rounded"}>
+                            <div className={"p-3"}>
+                                <span className={"text-lg"}>Win Rate: {calculateWinRate(rank.wins, rank.losses)}%</span>
+                                <div className={"relative z-10"}>
+                                    <div className={"bg-summoner-gray w-32 h-1 rounded opacity-70"}></div>
+                                    <div style={{width: `${calculateWinRate(rank.wins,rank.losses)}%`}} className={"absolute top-0 bottom-0 left-0 rounded-full " + (calculateWinRate(rank.wins,rank.losses) < 50 ? "bg-loss-border" : "bg-win")}></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className={"bg-summoner-light w-40 h-14 rounded"}>
+                            <div className={"p-3"}>
+                                <span className={"text-lg"}>Matches: {rank.losses + rank.wins}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    )
+}
+
+const MatchHistory = ({matches, summoner} : {matches: TFTMatch[], summoner: ISummoner}) => {
+
+    /*Identifies the summoner in all matches*/
+    const getSummerParticipantFromMatch = (match: TFTMatch) => {
+        let participant: Participant
+
+        for (let i=0;i < match.info.participants.length; i++){
+            if(match.info.participants[i]?.puuid != undefined) {
+                if (match.info.participants[i]?.puuid == summoner?.puuid) {
+                    return participant = match.info.participants[i]
+                }
+            }
+            else {
+                console.log("undefined")
+                return null
+            }
+        }
+    }
+
+    const averagePlacement = () => {
+        let sum = 0
+        if(matches == undefined) return
+        for(let i = 0; i < matches?.length; i++) {
+            const placement = getSummerParticipantFromMatch(matches[i])?.placement
+            if(placement != undefined){
+                sum += placement
+            }
+        }
+        return sum / matches.length
+    }
+
+    const averageDamageToPlayers = () => {
+        let sum = 0
+        if(matches == undefined) return
+        for(let i = 0; i  < matches.length; i++) {
+            const damage = getSummerParticipantFromMatch(matches[i])?.total_damage_to_players
+            if(damage != undefined){
+                sum += damage
+            }
+        }
+
+        return sum / matches.length
+    }
+
+    const favoriteTrait = () => {
+        let traits = []
+        let topThreeTraits = []
+        /*gets all items names and save in array*/
+        if (matches == undefined) return
+        for (let i = 0; i < matches?.length; i++) {
+            for(let j = 0; j < getSummerParticipantFromMatch(matches[i])?.traits.length!; j++){
+                traits.push(getSummerParticipantFromMatch(matches[i])?.traits[j].name)
+            }
+        }
+
+        /*creates object with the name of champion with value of how many times it occurs*/
+        const occurrences = traits.reduce(function (acc: any, curr: any) {
+            if (!curr) return
+            return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+        }, {})
+
+
+        /*deletes the traits with the smallest value until it has the three highest*/
+        for (let i = 0; Object.keys(occurrences).length > 3; i++) {
+            let key = Object.keys(occurrences).reduce((key, v) => occurrences[v] < occurrences[key] ? v : key);
+            delete occurrences[key]
+        }
+
+        for(const key in occurrences){
+            const trait = {
+                name: key,
+                games: occurrences[key],
+            }
+
+            topThreeTraits.push(trait)
+        }
+
+        return topThreeTraits.sort((a, b) => b.games - a.games)
+    }
+
+    return(
+        <>
+            <div className={"bg-gradient-to-r from-summoner-dark via-zinc-900 to-summoner-dark w-full border-solid border-l-[1px] border-t-[1px] border-r-[1px] border-summoner-light h-32 text-white rounded-t overflow-hidden"}>
+                <div className={"h-7 flex items-center pt-10 pl-5"}>
+                    <p className={"text-xl ml-2 font-medium"}>Match History</p>
+                    <hr className={"h-0.5 ml-2 bg-summoner-gray w-9/12"}/>
+                </div>
+                <div className={"flex flex-row"}>
+                    <div className={"p-5 pl-10"}>
+                        <span>Average Placement: </span>
+                        {averagePlacement()}
+                    </div>
+                    <div className={"p-5 pl-10"}>
+                        <span>Average Damage To Players: </span>
+                        {averageDamageToPlayers()}
+                    </div>
+                    <div className={"p-5 pl-10"}>
+                        <span>Favorite Traits: </span>
+                        <div className={"flex flex-row gap-2"}>
+                            {favoriteTrait()?.map((trait) => (
+                                <div key={trait.games}>
+                                    {trait.name.split("_")[1]}
+                                    <Image src={`/tft/set7.5/items/TFT7_Item_${trait.name.split("_")[1]}EmblemItem.png`} width={20} height={20} alt={"emblem image"}/>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
         </>
     )
