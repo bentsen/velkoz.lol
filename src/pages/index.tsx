@@ -1,37 +1,66 @@
 import type {NextPage} from 'next'
 import Image from 'next/future/image'
-import React, { Fragment, useContext, useEffect, useState} from "react";
+import React, {Fragment, useContext, useEffect, useState} from "react";
 import Link from "next/link";
-import {FiX} from "react-icons/fi"
+import {FiChevronDown, FiX} from "react-icons/fi"
 import {ISummoner} from "../utils/@types/summoner.t";
 import {ChampionContext} from "../store/ChampionContext";
-import {Combobox} from "@headlessui/react";
+import {Combobox, Menu, Transition} from "@headlessui/react";
 import {useRouter} from "next/router";
 import axios from "axios";
 import {VersionContext} from "../store/VersionContext";
 import Head from "next/head";
 
-const regions = ["NA", "EUW", "EUNE", "KR", "BR", "JP", "RU", "OCE", "TR", "LAN", "LAS"];
-const regionColors = ["bg-yellow-400", "bg-blue-400", "bg-teal-400", "bg-purple-600", "bg-emerald-400",
-	"bg-pink-400", "bg-red-500", "bg-teal-400", "bg-amber-600", "bg-yellow-400", "bg-amber-600"];
-const regionMap: Map<string, {region: string, color: string}> = new Map([
-	["na1", {region: "NA", color: "bg-yellow-400"}],
-	["euw1", {region: "EUW", color: "bg-blue-400"}],
-	["eun1", {region: "EUNE", color: "bg-teal-400"}],
-	["kr1", {region: "KR", color: "bg-purple-600"}],
-	["br1", {region: "BR", color: "bg-emerald-400"}],
-	["jp1", {region: "JP", color: "bg-pink-400"}],
-	["ru1", {region: "RU", color: "bg-red-500"}],
-	["oc1", {region: "OCE", color: "bg-teal-400"}],
-	["tr1", {region: "TR", color: "bg-amber-600"}],
-	["la1", {region: "LAN", color: "bg-yellow-400"}],
-	["la2", {region: "LAS", color: "bg-amber-600"}],
-]);
+interface IRegion {
+	short: string,
+	long: string,
+	color: string,
+	keyValue: string,
+}
 
-/*
-* Name: Mikkel Bentsen
-* Dat: 14/9-2022
-*/
+const games = [
+	{
+		nick: "lol",
+		name: "League of Legends",
+		link: "/",
+		color: "bg-lol-color",
+		svg: "/game-icons/leagueoflegends.svg"
+	},
+	{
+		nick: "val",
+		name: "Valorant",
+		link: "/valorant",
+		color: "bg-valorant-color",
+		svg: "/game-icons/valorant.svg"
+	},
+	{
+		nick: "tft",
+		name: "Teamfight Tactics",
+		link: "/tft",
+		color: "bg-tft-color",
+		svg: "/game-icons/teamfighttactics.png"
+	},
+	{
+		nick: "lor",
+		name: "League of Runeterra",
+		link: "/lor",
+		color: "bg-lor-color",
+		svg: "/game-icons/legendsofruneterra.png"
+	},
+]
+
+
+const regionMap = new Map<string, IRegion>([
+	["na1", {short: "NA", long: "North America", color: "bg-yellow-400 hover:bg-yellow-500", keyValue: "na1"}],
+	["euw1", {short: "EUW", long: "Europe West", color: "bg-blue-400 hover:bg-blue-500", keyValue: "euw1"}],
+	["eun1", {short: "EUNE", long: "Europe Nordic East", color: "bg-teal-400 hover:bg-teal-500", keyValue: "eun1"}],
+	["kr1", {short: "KR", long: "Korea", color: "bg-purple-600 bg-purple-700", keyValue: "kr1"}],
+	["br1", {short: "BR", long: "Brazil", color: "bg-emerald-400 bg-emerald-500", keyValue: "br1"}],
+	["jp1", {short: "JP", long: "Japan", color: "bg-pink-400 bg-pink-500", keyValue: "jp1"}],
+	["ru1", {short: "RU", long: "Russia", color: "bg-red-500 bg-red-500", keyValue: "ru1"}],
+	["oc1", {short: "OCE", long: "Oceania", color: "bg-teal-400 bg-teal-500", keyValue: "oc1"}],
+	["tr1", {short: "TR", long: "Turky", color: "bg-amber-600 bg-amber-700", keyValue: "tr1"}],
+]);
 
 const Home: NextPage = () => {
 	const [summoner, setSummoner] = useState("")
@@ -59,19 +88,24 @@ const Searchbar = () => {
 	const [search, setSearch] = useState("");
 	const [selected, setSelected] = useState<UnifiedOption>();
 	const [summoners, setSummoners] = useState<ISummoner[]>([]);
-	const [_region, setRegion] = useState("na1");
+	const [region, setRegion] = useState<IRegion>({
+		short: "EUW",
+		long: "Europe West",
+		color: "bg-blue-400 hover:bg-blue-500",
+		keyValue: "euw1"
+	});
 	const champions = useContext(ChampionContext);
 	const router = useRouter();
 	const version = useContext(VersionContext);
 
-	const handleLink = async(state: UnifiedOption) => {
+	const handleLink = async (state: UnifiedOption) => {
 		if (state == null) return;
 		state.link && await router.push(state.link);
 		setSelected(state);
 	}
 
 	useEffect(() => {
-		const handleSummoners = async() => {
+		const handleSummoners = async () => {
 			if (search.length == 1) {
 				const res = await axios.get<ISummoner[]>(`/api/lol/summoners/by-part/?name=${search[0]}`);
 				const summoner = await res.data;
@@ -93,9 +127,15 @@ const Searchbar = () => {
 
 	return (
 		<>
-			<div className={"relative w-full rounded-full max-w-4xl"}>
+			<div className={`relative w-full max-w-4xl bg-neutral-200 ${search ? "rounded-t-xl" : "rounded-xl"}`}>
 				<Combobox value={selected} onChange={handleLink} nullable>
-					<div className={`w-full flex flex-row bg-white w-full text-black p-4 text-2xl w-full max-w-4xl ${search ? "rounded-t-3xl" : "rounded-3xl"}`}>
+					<div
+						className={`w-full flex flex-row justify-center items-center text-black text-2xl w-full max-w-4xl `}>
+						<div
+							className={"flex flex-row justify-center items-center w-fit h-16 border-r-2 border-slate-300 cursor-pointer"}>
+							<GameMenu />
+							<RegionMenu {...region}/>
+						</div>
 						<Combobox.Input
 							as={Fragment}
 							onChange={(e) => setSearch(e.target.value)}
@@ -103,25 +143,26 @@ const Searchbar = () => {
 
 						>
 							<input
-								placeholder={"Search Summoner og Champion..."}
+								placeholder={"Search Summoner or Champion..."}
 								autoComplete={"off"}
-								className={"w-full mx-4"}
+								className={"w-full mx-4 h-16 bg-neutral-200 text-lg text-neutral-400 font-bold rounded-2xl"}
 							/>
 						</Combobox.Input>
-						{ search && (
-								<button
-									className={"flex justify-center items-center"}
-									onClick={() => setSearch("")}
-								>
-									<FiX className={"w-6 h-6"}/>
-								</button>
-							)}
+						{search && (
+							<button
+								className={"flex justify-center mr-4 items-center"}
+								onClick={() => setSearch("")}
+							>
+								<FiX className={"w-6 h-6"}/>
+							</button>
+						)}
 					</div>
 					{search && (
-						<Combobox.Options className={"absolute max-h-96 w-full overflow-auto rounded-b-3xl bg-white"}>
+						<Combobox.Options
+							className={"absolute max-h-96 w-full overflow-auto rounded-b-xl bg-neutral-200"}>
 							{filteredChamps.length > 0 && (
 								<>
-									<div className={"bg-gray-300"}>
+									<div className={"bg-neutral-300"}>
 										<p className={"ml-5 text-gray-600"}>Champion</p>
 									</div>
 									{filteredChamps.map((c) => (
@@ -142,8 +183,8 @@ const Searchbar = () => {
 									key={search}
 									name={search}
 									img={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/0.png`}
-									link={`/lol/summoner/${_region}/${search}`}
-									region={_region}
+									link={`/lol/summoner/${region}/${search}`}
+									region={region.short}
 								/>
 							) : (
 								filteredSummoners.map((s) => (
@@ -161,17 +202,81 @@ const Searchbar = () => {
 					)}
 				</Combobox>
 			</div>
-			<div className={"flex flex-row flex-wrap justify-center pt-6"}>
-				{[...regionMap.keys()].map((r, i) => (
-					<button
-						className={`px-3 py-1 mr-2 text-white font-bold rounded-xl ${r == _region ? regionColors[i] : "bg-gray-900 hover:bg-gray-700"}`}
-						onClick={() => setRegion(r)}
-						key={r}>
-						{regionMap.get(r)!.region}
-					</button>
-				))}
-			</div>
 		</>
+	)
+}
+
+const GameMenu = () => {
+	return (
+		<div className={"flex h-full pr-2"}>
+			<Menu as={"div"} className={"relative inline-block"}>
+				<Menu.Button
+					className={"inline-flex items-center text-gray-700 h-full text-base whitespace-nowrap font-bold pl-4 pr-1"}>
+					All games
+					<span><FiChevronDown/></span>
+				</Menu.Button>
+				<Transition
+					as={Fragment}
+					enter="transition ease-out duration-200"
+					enterFrom="transform -translate-y-6 opacity-0"
+					enterTo="transform opacity-y-0 opacity-100"
+					leave="transition ease-in duration-75"
+					leaveFrom="transform opacity-100 scale-100"
+					leaveTo="transform opacity-0 scale-95"
+				>
+					<Menu.Items className={"absolute left-0 bg-neutral-200 mt-2 rounded w-64"}>
+						<div className={"p-3"}>
+							<div className={"inline-flex items-center"}>
+								<div className={"mr-4"}>
+									Game region:
+								</div>
+							</div>
+							{games.map((game) => (
+								<Menu.Item key={game.link} as={"div"}>
+									{game.name}
+								</Menu.Item>
+							))}
+						</div>
+					</Menu.Items>
+				</Transition>
+			</Menu>
+		</div>
+	)
+}
+
+const RegionMenu = (region: IRegion) => {
+	return (
+		<div className={"flex h-full pr-2 items-center"}>
+			<Menu as={"div"} className={"relative w-full inline-block"}>
+				<Menu.Button className={`text-white text-base font-bold px-2 py-1 rounded-xl ${region.color}`}>
+					{region.short}
+				</Menu.Button>
+				<Transition
+					as={Fragment}
+					enter="transition ease-out duration-200"
+					enterFrom="transform -translate-y-6 opacity-0"
+					enterTo="transform opacity-y-0 opacity-100"
+					leave="transition ease-in duration-75"
+					leaveFrom="transform opacity-100 scale-100"
+					leaveTo="transform opacity-0 scale-95"
+				>
+					<Menu.Items className={"absolute -right[200px] bg-neutral-200 mt-6 rounded w-64"}>
+						<div className={"p-3"}>
+							<div className={"inline-flex items-center"}>
+								<div className={"mr-4"}>
+									Game region:
+								</div>
+							</div>
+							{games.map((game) => (
+								<Menu.Item key={game.link} as={"div"}>
+									{game.name}
+								</Menu.Item>
+							))}
+						</div>
+					</Menu.Items>
+				</Transition>
+			</Menu>
+		</div>
 	)
 }
 
@@ -187,36 +292,37 @@ const UnifiedOption = (props: UnifiedOption) => {
 	const {img, region, name, summonerLvl, link} = props;
 
 	return (
-		<Combobox.Option value={props} >
+		<Combobox.Option value={props}>
 			{({active, selected}) => (
-			<>
-				<Link href={link} passHref>
-					<div className={`cursor-pointer hover:bg-gray-200 ${active ? "bg-gray-200" : "bg-white"} ${selected ? "bg-blue-500": "bg-white"}`}>
-						<div className={"flex w-full flex-row p-2 pl-4"}>
-							<div className={"relative w-6 h-6"}>
-								{img && (
-									<Image priority src={img} alt={`${name} splash art`} sizes={"100vw"} fill/>
+				<>
+					<Link href={link} passHref>
+						<div
+							className={`cursor-pointer hover:bg-neutral-200 ${active ? "bg-neutral-400" : "bg-neutral-200"}`}>
+							<div className={"flex w-full flex-row p-2 pl-4"}>
+								<div className={"relative w-6 h-6"}>
+									{img && (
+										<Image priority src={img} alt={`${name} splash art`} sizes={"100vw"} fill/>
+									)}
+								</div>
+								<div className={"ml-2 w-fit"}>
+									<p className={"text-gray-700 text-lg"}>{name}</p>
+								</div>
+								{summonerLvl && (
+									<div className={"flex items-center ml-2 w-16"}>
+										<p className={"text-gray-500 text-sm"}>Lvl {summonerLvl}</p>
+									</div>
+								)}
+								{region && (
+									<div className={"flex ml-auto items-center pr-4"}>
+										<div className={`${regionMap.get(region)?.color} flex rounded-2xl`}>
+											<p className={"text-white text-sm px-2"}>{regionMap.get(region)?.short}</p>
+										</div>
+									</div>
 								)}
 							</div>
-							<div className={"ml-2 w-fit"}>
-								<p className={"text-gray-700 text-lg"}>{name}</p>
-							</div>
-							{ summonerLvl && (
-								<div className={"flex items-center ml-2 w-16"}>
-									<p className={"text-gray-500 text-sm"}>Lvl {summonerLvl}</p>
-								</div>
-							)}
-							{ region && (
-                                <div className={"flex ml-auto items-center pr-4"}>
-									<div className={`${regionMap.get(region)!.color} flex rounded-2xl`}>
-										<p className={"text-white text-sm px-2"}>{regionMap.get(region)!.region}</p>
-									</div>
-                                </div>
-							)}
 						</div>
-					</div>
-				</Link>
-			</>
+					</Link>
+				</>
 			)}
 		</Combobox.Option>
 	)

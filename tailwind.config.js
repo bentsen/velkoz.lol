@@ -33,10 +33,12 @@ module.exports = {
         'tft-green' : 'rgb(51,102,60)',
         'tft-yellow' : 'rgb(230,179,58)'
       },
+        /**
       fontFamily: {
         'sans': ['Rajdhani', 'sans-serif'],
         'heading' : ['Roboto', 'sans-serif']
       }
+         */
     },
   },
   plugins: [],
