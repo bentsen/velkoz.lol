@@ -118,7 +118,8 @@ const Searchbar = () => {
 							</div>
 							<Combobox.Input
 								as={Fragment}
-								onChange={(e) => {}}
+								onChange={(e) => {setSearch(e.target.value)}}
+								displayValue={(e) => search}
 							>
 								<input
 									placeholder={"Search Summoner or Champion..."}
