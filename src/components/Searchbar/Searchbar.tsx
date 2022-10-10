@@ -8,6 +8,7 @@ import {Combobox, Menu, Transition} from "@headlessui/react";
 import {FiChevronDown, FiX} from "react-icons/fi";
 import Link from "next/link";
 import Image from "next/future/image";
+import RegionTag from "../RegionTag";
 
 interface IRegion {
 	short: string,
@@ -111,19 +112,17 @@ const Searchbar = () => {
 							<div
 								className={`flex flex-row justify-center items-center w-fit h-16 border-r-2 border-neutral-300 cursor-pointer bg-neutral-200 hover:bg-neutral-300 ${search ? "rounded-tl-xl" : "rounded-l-xl"}`}>
 								<GameMenu/>
-								<RegionMenu region={region} setRegion={setRegion}/>
+								<div className={"hidden md:block"}>
+									<RegionMenu region={region} setRegion={setRegion}/>
+								</div>
 							</div>
-							<Combobox.Input
-								as={Fragment}
+							<input
+								placeholder={"Search Summoner or Champion..."}
+								autoComplete={"off"}
+								className={`w-full mx-4 h-16 text-lg ${search ? "text-neutral-800" : "text-neutral-400"} bg-neutral-200 font-bold rounded-2xl`}
 								onChange={(e) => setSearch(e.target.value)}
-								displayValue={(selected: UnifiedOption) => selected?.name}
-							>
-								<input
-									placeholder={"Search Summoner or Champion..."}
-									autoComplete={"off"}
-									className={`w-full mx-4 h-16 text-lg ${search ? "text-neutral-800" : "text-neutral-400"} bg-neutral-200 font-bold rounded-2xl`}
-								/>
-							</Combobox.Input>
+								value={search}
+							/>
 							{search && (
 								<button
 									className={"flex justify-center mr-4 items-center"}
@@ -132,6 +131,9 @@ const Searchbar = () => {
 									<FiX className={"w-6 h-6"}/>
 								</button>
 							)}
+							<div className={"block md:hidden"}>
+								<RegionMenu region={region} setRegion={setRegion} />
+							</div>
 						</div>
 						<Transition
 							show={search.length > 0}
@@ -200,7 +202,8 @@ const GameMenu = () => {
 			<Menu as={"div"} className={"inline-block"}>
 				<Menu.Button
 					className={"inline-flex items-center text-gray-700 h-full text-base whitespace-nowrap font-bold pl-4 pr-1"}>
-					All games
+					<span className={"hidden md:inline-block"}>All games</span>
+					<span className={"inline-block md:hidden"}>All</span>
 					<span><FiChevronDown/></span>
 				</Menu.Button>
 				<Transition
@@ -231,12 +234,15 @@ const GameMenu = () => {
 	)
 }
 
-const RegionMenu = ({region, setRegion}: { region: IRegion, setRegion: React.Dispatch<React.SetStateAction<IRegion>> }) => {
+const RegionMenu = ({
+						region,
+						setRegion
+					}: { region: IRegion, setRegion: React.Dispatch<React.SetStateAction<IRegion>> }) => {
 	return (
 		<div className={"flex h-full pr-2 items-center"}>
 			<Menu as={"div"} className={"w-full inline-block"}>
-				<Menu.Button className={`text-white text-base font-bold px-2 py-1 rounded-xl ${region.color}`}>
-					{region.short}
+				<Menu.Button>
+					<RegionTag {...region} />
 				</Menu.Button>
 				<Transition
 					as={Fragment}
@@ -251,8 +257,9 @@ const RegionMenu = ({region, setRegion}: { region: IRegion, setRegion: React.Dis
 						<div className={"p-3"}>
 							{[...regionMap.values()].map((r) => (
 								<MenuItem key={r.keyValue}>
-									<button onClick={() => setRegion(r)} className={"w-full h-full flex items-center p-4"}>
-										{r.long}
+									<button onClick={() => setRegion(r)}
+											className={"w-full h-full flex items-center justify-between p-4"}>
+										<p>{r.long}</p>
 									</button>
 								</MenuItem>
 							))}
