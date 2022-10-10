@@ -10,19 +10,21 @@ const SummonerPage: NextPage = () => {
 	const router = useRouter();
 	let {region, summonerName} = router.query;
 
-	//const { summoner, error, mutate } = useSummoner(summonerName as string, region as string);
-	const {data: summoner, error} = useSWR<ISummoner>(summonerName ? `/api/lol/summoners/by-name/${summonerName}?region=${region}` : null, fetcher)
+	const {
+		data: summoner,
+		error
+	} = useSWR<ISummoner>(summonerName ? `/api/lol/summoners/by-name/${summonerName}?region=${region}` : null, fetcher)
 
 	if (!summoner) return <div className={"text-white"}>Loading...</div>
 
 	return (
-		<div className={"flex container mx-auto"}>
+		<div className={"flex mx-auto px-52"}>
 			<SummonerHeader summoner={summoner}/>
 		</div>
 	)
 }
 
-const SummonerHeader = ({summoner}: {summoner: ISummoner}) => {
+const SummonerHeader = ({summoner}: { summoner: ISummoner }) => {
 	return (
 		<div className={"mt-28"}>
 			<div className={"flex flex-row"}>
@@ -38,14 +40,17 @@ const SummonerHeader = ({summoner}: {summoner: ISummoner}) => {
 	)
 }
 
-const Avatar = ({img, lvl}: {img: string, lvl: number}) => {
+const Avatar = ({img, lvl}: { img: string, lvl: number }) => {
 	return (
-		<div className={"relative border-2 border-amber-500 rounded"}>
-			<div className={"absolute flex justify-center items-center border-2 border-white z-10 -bottom-4 left-1/2 -translate-x-1/2 bg-black text-white rounded-2xl px-2"}>
+		<div className={"relative"}>
+			<div
+				className={"absolute flex justify-center items-center border-2 border-neutral-800 z-10 -bottom-4 left-1/2 -translate-x-1/2 bg-brand text-white rounded-2xl px-2"}>
 				{lvl}
 			</div>
-			<div className={"w-28 h-28"}>
-				<Image src={img} alt={`Profile icon`} fill/>
+			<div className={"relative border-2 border-neutral-800 rounded-2xl overflow-hidden"}>
+				<div className={"w-28 h-28"}>
+					<Image src={img} alt={`Profile icon`} fill/>
+				</div>
 			</div>
 		</div>
 	)
