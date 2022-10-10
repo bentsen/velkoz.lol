@@ -116,13 +116,19 @@ const Searchbar = () => {
 									<RegionMenu region={region} setRegion={setRegion}/>
 								</div>
 							</div>
-							<input
-								placeholder={"Search Summoner or Champion..."}
-								autoComplete={"off"}
-								className={`w-full mx-4 h-16 text-lg ${search ? "text-neutral-800" : "text-neutral-400"} bg-neutral-200 font-bold rounded-2xl`}
-								onChange={(e) => setSearch(e.target.value)}
-								value={search}
-							/>
+							<Combobox.Input
+								as={Fragment}
+								onChange={(e) => {}}
+							>
+								<input
+									placeholder={"Search Summoner or Champion..."}
+									autoComplete={"off"}
+									className={`w-full mx-4 h-16 text-lg ${search ? "text-neutral-800" : "text-neutral-400"} bg-neutral-200 font-bold rounded-2xl`}
+									onChange={(e) => setSearch(e.target.value)}
+									value={search}
+								/>
+							</Combobox.Input>
+
 							{search && (
 								<button
 									className={"flex justify-center mr-4 items-center"}
