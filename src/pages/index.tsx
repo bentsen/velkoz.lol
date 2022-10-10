@@ -130,9 +130,9 @@ const Searchbar = () => {
 			<div className={`relative w-full max-w-4xl bg-neutral-200 ${search ? "rounded-t-xl" : "rounded-xl"}`}>
 				<Combobox value={selected} onChange={handleLink} nullable>
 					<div
-						className={`w-full flex flex-row justify-center items-center text-black text-2xl w-full max-w-4xl `}>
+						className={`relative w-full flex flex-row justify-center items-center text-black text-2xl w-full max-w-4xl`}>
 						<div
-							className={"flex flex-row justify-center items-center w-fit h-16 border-r-2 border-slate-300 cursor-pointer"}>
+							className={`flex flex-row justify-center items-center w-fit h-16 border-r-2 border-neutral-300 cursor-pointer bg-neutral-200 hover:bg-neutral-300 ${search ? "rounded-tl-xl" : "rounded-l-xl"}`}>
 							<GameMenu />
 							<RegionMenu {...region}/>
 						</div>
@@ -145,7 +145,7 @@ const Searchbar = () => {
 							<input
 								placeholder={"Search Summoner or Champion..."}
 								autoComplete={"off"}
-								className={"w-full mx-4 h-16 bg-neutral-200 text-lg text-neutral-400 font-bold rounded-2xl"}
+								className={`w-full mx-4 h-16 text-lg ${search ? "text-neutral-800" : "text-neutral-400"} bg-neutral-200 font-bold rounded-2xl`}
 							/>
 						</Combobox.Input>
 						{search && (
@@ -158,47 +158,57 @@ const Searchbar = () => {
 						)}
 					</div>
 					{search && (
-						<Combobox.Options
-							className={"absolute max-h-96 w-full overflow-auto rounded-b-xl bg-neutral-200"}>
-							{filteredChamps.length > 0 && (
-								<>
-									<div className={"bg-neutral-300"}>
-										<p className={"ml-5 text-gray-600"}>Champion</p>
-									</div>
-									{filteredChamps.map((c) => (
-										<UnifiedOption
-											key={c.id}
-											name={c.name}
-											img={c.image.sprite}
-											link={`/lol/champion/${c.id}`}/>
-									))}
-								</>
-							)}
+						<Transition
+							as={Fragment}
+							enter="transition ease-out duration-200"
+							enterFrom="transform -translate-y-6 opacity-0"
+							enterTo="transform opacity-y-0 opacity-100"
+							leave="transition ease-in duration-75"
+							leaveFrom="transform opacity-100 scale-100"
+							leaveTo="transform opacity-0 scale-95"
+						>
+							<Combobox.Options
+								className={"absolute max-h-96 w-full overflow-auto rounded-b-xl bg-neutral-200 border-t border-neutral-400"}>
+								{filteredChamps.length > 0 && (
+									<>
+										<div className={"bg-neutral-200 py-2"}>
+											<p className={"ml-5 text-gray-600"}>Champion</p>
+										</div>
+										{filteredChamps.map((c) => (
+											<UnifiedOption
+												key={c.id}
+												name={c.name}
+												img={c.image.sprite}
+												link={`/lol/champion/${c.id}`}/>
+										))}
+									</>
+								)}
 
-							<div className={"bg-gray-300"}>
-								<p className={"ml-5 text-gray-600"}>Summoner</p>
-							</div>
-							{filteredSummoners.length === 0 ? (
-								<UnifiedOption
-									key={search}
-									name={search}
-									img={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/0.png`}
-									link={`/lol/summoner/${region}/${search}`}
-									region={region.short}
-								/>
-							) : (
-								filteredSummoners.map((s) => (
+								<div className={"bg-neutral-200 py-2"}>
+									<p className={"ml-5 text-gray-600"}>Summoner</p>
+								</div>
+								{filteredSummoners.length === 0 ? (
 									<UnifiedOption
-										key={s.id}
-										img={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${s.profileIconId}.png`}
-										name={s.name}
-										summonerLvl={s.summonerLevel}
-										link={`/lol/summoner/${s.region}/${s.name}`}
-										region={s.region}
+										key={search}
+										name={search}
+										img={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/0.png`}
+										link={`/lol/summoner/${region}/${search}`}
+										region={region.short}
 									/>
-								))
-							)}
-						</Combobox.Options>
+								) : (
+									filteredSummoners.map((s) => (
+										<UnifiedOption
+											key={s.id}
+											img={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${s.profileIconId}.png`}
+											name={s.name}
+											summonerLvl={s.summonerLevel}
+											link={`/lol/summoner/${s.region}/${s.name}`}
+											region={s.region}
+										/>
+									))
+								)}
+							</Combobox.Options>
+						</Transition>
 					)}
 				</Combobox>
 			</div>
@@ -209,7 +219,7 @@ const Searchbar = () => {
 const GameMenu = () => {
 	return (
 		<div className={"flex h-full pr-2"}>
-			<Menu as={"div"} className={"relative inline-block"}>
+			<Menu as={"div"} className={"inline-block"}>
 				<Menu.Button
 					className={"inline-flex items-center text-gray-700 h-full text-base whitespace-nowrap font-bold pl-4 pr-1"}>
 					All games
@@ -247,7 +257,7 @@ const GameMenu = () => {
 const RegionMenu = (region: IRegion) => {
 	return (
 		<div className={"flex h-full pr-2 items-center"}>
-			<Menu as={"div"} className={"relative w-full inline-block"}>
+			<Menu as={"div"} className={"w-full inline-block"}>
 				<Menu.Button className={`text-white text-base font-bold px-2 py-1 rounded-xl ${region.color}`}>
 					{region.short}
 				</Menu.Button>
@@ -260,7 +270,7 @@ const RegionMenu = (region: IRegion) => {
 					leaveFrom="transform opacity-100 scale-100"
 					leaveTo="transform opacity-0 scale-95"
 				>
-					<Menu.Items className={"absolute -right[200px] bg-neutral-200 mt-6 rounded w-64"}>
+					<Menu.Items className={"absolute left-0 bg-neutral-200 mt-6 rounded w-64"}>
 						<div className={"p-3"}>
 							<div className={"inline-flex items-center"}>
 								<div className={"mr-4"}>
@@ -293,11 +303,11 @@ const UnifiedOption = (props: UnifiedOption) => {
 
 	return (
 		<Combobox.Option value={props}>
-			{({active, selected}) => (
+			{({active}) => (
 				<>
 					<Link href={link} passHref>
 						<div
-							className={`cursor-pointer hover:bg-neutral-200 ${active ? "bg-neutral-400" : "bg-neutral-200"}`}>
+							className={`cursor-pointer hover:bg-neutral-200 ${active ? "bg-neutral-300" : "bg-neutral-200"}`}>
 							<div className={"flex w-full flex-row p-2 pl-4"}>
 								<div className={"relative w-6 h-6"}>
 									{img && (
