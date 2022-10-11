@@ -14,7 +14,7 @@ const SummonerPage: NextPage = () => {
 	const region = router.query.region as string;
 	const summonerName = router.query.summonerName as string;
 
-	const {data: summoner} = trpc.summoner.byName.useQuery({summonerName: summonerName, region: region})
+	const {data: summoner} = trpc.summoner.byName.useQuery({name: summonerName, region: region})
 
 	if (!summoner) return <div className={"text-white"}>Loading...</div>
 
