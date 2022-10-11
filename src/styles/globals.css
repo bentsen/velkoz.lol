@@ -8,10 +8,11 @@
 @tailwind utilities;
 
 
-body{
-  background-color: rgb(14, 16, 21);
+body {
+    background-color: rgb(14, 16, 21);
+    color: rgb(255, 255, 255);
 }
 
-textarea:focus, input:focus{
-  outline: none;
+textarea:focus, input:focus {
+    outline: none;
 }

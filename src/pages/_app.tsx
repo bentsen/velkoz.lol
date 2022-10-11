@@ -4,6 +4,7 @@ import Layout from "../components/Layout/Layout"
 import VersionContext from "../store/VersionContext";
 import ChampionListProvider from "../store/ChampionContext";
 import StaticProvider from "../store/StaticProvider";
+import {Transition} from "@headlessui/react";
 
 function MyApp({Component, pageProps}: AppProps) {
 	return (

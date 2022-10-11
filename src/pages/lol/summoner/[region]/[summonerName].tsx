@@ -5,6 +5,7 @@ import {fetcher, useSummoner} from "../../../../hooks/useSummoner";
 import useSWR from "swr";
 import {useProfileIcon} from "../../../../data/useProfileIcon";
 import Image from "next/future/image"
+import Container from "../../../../components/Container";
 
 const SummonerPage: NextPage = () => {
 	const router = useRouter();
@@ -18,24 +19,32 @@ const SummonerPage: NextPage = () => {
 	if (!summoner) return <div className={"text-white"}>Loading...</div>
 
 	return (
-		<div className={"flex mx-auto px-52"}>
+		<Container>
 			<SummonerHeader summoner={summoner}/>
-		</div>
+			<div>
+				Matches
+			</div>
+		</Container>
 	)
 }
 
 const SummonerHeader = ({summoner}: { summoner: ISummoner }) => {
 	return (
-		<div className={"mt-28"}>
-			<div className={"flex flex-row"}>
+		<div className={"py-6 flex flex-row w-full"}>
+			<div className={"block"}>
 				<Avatar
 					img={useProfileIcon(summoner.profileIconId)}
 					lvl={summoner.summonerLevel}
 				/>
+			</div>
 				<div className={"flex flex-col ml-4"}>
 					<h2 className={"text-white font-bold text-4xl"}>{summoner.name}</h2>
+					<div className={"flex justify-start mt-4"}>
+						<button className={"bg-neutral-800 text-white rounded-2xl px-4 py-2 border-2 border-neutral-800 hover:border-neutral-600 outline-none focus:border-neutral-600 transition-all duration-100"}>
+							Update
+						</button>
+					</div>
 				</div>
-			</div>
 		</div>
 	)
 }
@@ -48,7 +57,7 @@ const Avatar = ({img, lvl}: { img: string, lvl: number }) => {
 				{lvl}
 			</div>
 			<div className={"relative border-2 border-neutral-800 rounded-2xl overflow-hidden"}>
-				<div className={"w-28 h-28"}>
+				<div className={"w-24 h-24					"}>
 					<Image src={img} alt={`Profile icon`} fill/>
 				</div>
 			</div>
