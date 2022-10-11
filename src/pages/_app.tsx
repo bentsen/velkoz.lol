@@ -1,12 +1,11 @@
 import '../styles/globals.css'
-import type {AppProps} from 'next/app'
 import Layout from "../components/Layout/Layout"
-import VersionContext from "../store/VersionContext";
-import ChampionListProvider from "../store/ChampionContext";
 import StaticProvider from "../store/StaticProvider";
-import {Transition} from "@headlessui/react";
 
-function MyApp({Component, pageProps}: AppProps) {
+
+import type { AppType } from 'next/app';
+import { trpc } from '../utils/trpc';
+const MyApp: AppType = ({ Component, pageProps }) => {
 	return (
 		<StaticProvider>
 			<Layout>
@@ -14,6 +13,5 @@ function MyApp({Component, pageProps}: AppProps) {
 			</Layout>
 		</StaticProvider>
 	)
-}
-
-export default MyApp
+};
+export default trpc.withTRPC(MyApp);

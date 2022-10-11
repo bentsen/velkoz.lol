@@ -1,9 +1,5 @@
 import {IMatch} from "../../utils/@types/lol/match";
 
-export function fetchSummoner() {
-
-}
-
 export function updateSummoner() {
 
 }
