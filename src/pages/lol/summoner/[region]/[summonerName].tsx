@@ -1,20 +1,20 @@
 import {NextPage} from "next";
 import {useRouter} from "next/router";
-import {ISummoner} from "../../../../utils/@types/summoner.t";
-import {fetcher, useSummoner} from "../../../../hooks/useSummoner";
-import useSWR from "swr";
+import {inferProcedureOutput} from "@trpc/server";
 import {useProfileIcon} from "../../../../data/useProfileIcon";
 import Image from "next/future/image"
 import Container from "../../../../components/Container";
+import {trpc} from "@/utils/trpc";
+import {AppRouter} from "@/server/routers/_app";
+
+type Summoner = inferProcedureOutput<AppRouter['summoner']['byName']>
 
 const SummonerPage: NextPage = () => {
 	const router = useRouter();
-	let {region, summonerName} = router.query;
+	const region = router.query.region as string;
+	const summonerName = router.query.summonerName as string;
 
-	const {
-		data: summoner,
-		error
-	} = useSWR<ISummoner>(summonerName ? `/api/lol/summoners/by-name/${summonerName}?region=${region}` : null, fetcher)
+	const {data: summoner} = trpc.summoner.byName.useQuery({summonerName: summonerName, region: region})
 
 	if (!summoner) return <div className={"text-white"}>Loading...</div>
 
@@ -28,17 +28,17 @@ const SummonerPage: NextPage = () => {
 	)
 }
 
-const SummonerHeader = ({summoner}: { summoner: ISummoner }) => {
+const SummonerHeader = ({summoner}: {summoner: Summoner}) => {
 	return (
 		<div className={"py-6 flex flex-row w-full"}>
 			<div className={"block"}>
 				<Avatar
-					img={useProfileIcon(summoner.profileIconId)}
-					lvl={summoner.summonerLevel}
+					img={useProfileIcon(summoner!.profileIconId)}
+					lvl={summoner!.summonerLevel}
 				/>
 			</div>
 				<div className={"flex flex-col ml-4"}>
-					<h2 className={"text-white font-bold text-4xl"}>{summoner.name}</h2>
+					<h2 className={"text-white font-bold text-4xl"}>{summoner!.name}</h2>
 					<div className={"flex justify-start mt-4"}>
 						<button className={"bg-neutral-800 text-white rounded-2xl px-4 py-2 border-2 border-neutral-800 hover:border-neutral-600 outline-none focus:border-neutral-600 transition-all duration-100"}>
 							Update

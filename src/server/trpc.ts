@@ -6,6 +6,7 @@ import { initTRPC, TRPCError } from '@trpc/server';
 const t = initTRPC.create();
 
 // Base router and procedure helpers
+export const middleware = t.middleware;
 export const router = t.router;
 export const publicProcedure = t.procedure;
 

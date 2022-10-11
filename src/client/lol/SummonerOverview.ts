@@ -1,4 +1,4 @@
-import {IMatch} from "../../utils/@types/lol/match";
+import {IMatch} from "@/utils/@types/lol/match";
 
 export function updateSummoner() {
 
