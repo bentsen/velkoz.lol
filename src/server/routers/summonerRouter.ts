@@ -73,4 +73,20 @@ export const summonerRouter = router({
 				}
 			});
 		}),
+	/*
+	matches: publicProcedure
+		.input(
+			z.object({
+				name: z.string(),
+				region: z.string(),
+			})
+		)
+		.query( async({input}) => {
+			const mathes = await prisma.match.findMany({
+				where: {
+					summonerId: input.
+				}
+			})
+		})
+	*/
 })

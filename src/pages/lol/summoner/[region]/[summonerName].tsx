@@ -6,6 +6,7 @@ import Image from "next/future/image"
 import Container from "../../../../components/Container";
 import {trpc} from "@/utils/trpc";
 import {AppRouter} from "@/server/routers/_app";
+import {IMatch} from "@/utils/@types/lol/match";
 
 type Summoner = inferProcedureOutput<AppRouter['summoner']['byName']>
 
@@ -47,6 +48,10 @@ const SummonerHeader = ({summoner}: {summoner: Summoner}) => {
 				</div>
 		</div>
 	)
+}
+
+const MatchHistory = ({match}: {match: IMatch[]}) => {
+
 }
 
 const Avatar = ({img, lvl}: { img: string, lvl: number }) => {

@@ -106,7 +106,7 @@ const Searchbar = () => {
 		<>
 			<div className={"px-3 lg:px-0 w-full max-w-4xl"}>
 				<div className={`relative bg-neutral-200 ${search ? "rounded-t-xl" : "rounded-xl"}`}>
-					<Combobox value={selected} onChange={handleLink} nullable>
+					<Combobox value={selected} onChange={handleLink} nullable as={"div"}>
 						<div
 							className={`flex flex-row justify-center items-center text-black text-2xl`}>
 							<div
@@ -179,7 +179,7 @@ const Searchbar = () => {
 										key={search}
 										name={search}
 										img={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/0.png`}
-										link={`/lol/summoner/${region}/${search}`}
+										link={`/lol/summoner/${region.keyValue}/${search}`}
 										region={region.short}
 									/>
 								) : (
