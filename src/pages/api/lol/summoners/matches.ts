@@ -368,11 +368,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
                                     },
                                     tournamentCode: match.info.tournamentCode,
                                 }
-                            },
-                            summoner: {
-                                connect: {
-                                    id: summonerData.id
-                                }
                             }
                         }
                     })
