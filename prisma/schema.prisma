@@ -23,16 +23,14 @@ model Summoner {
   revisionDate  String
   region        String
   lastUpdated   DateTime @default(now())
-  matches       Match[]
 }
 
 //Match table
 model Match {
   id         Int       @id @unique @default(autoincrement())
+  lastUpdated DateTime @default(now())
   metaData   Metadata?
   info       Info?
-  summoner   Summoner  @relation(fields: [summonerId], references: [id], onDelete: Cascade)
-  summonerId String
 }
 
 //Meta table

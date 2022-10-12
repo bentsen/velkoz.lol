@@ -1,6 +1,6 @@
 import {prisma} from "@/server/util/prisma";
 import {z} from "zod"
-import {publicProcedure, router} from "../trpc";
+import {publicProcedure, router} from "../../trpc";
 import axios from "axios";
 import {ISummoner} from "@/utils/@types/summoner.t";
 
@@ -73,20 +73,4 @@ export const summonerRouter = router({
 				}
 			});
 		}),
-	/*
-	matches: publicProcedure
-		.input(
-			z.object({
-				name: z.string(),
-				region: z.string(),
-			})
-		)
-		.query( async({input}) => {
-			const mathes = await prisma.match.findMany({
-				where: {
-					summonerId: input.
-				}
-			})
-		})
-	*/
 })

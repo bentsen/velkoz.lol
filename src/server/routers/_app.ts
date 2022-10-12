@@ -1,7 +1,7 @@
 import { router, publicProcedure } from '../trpc';
-import {summonerRouter} from "./summonerRouter";
+import {summonerRouter} from "./lol/summonerRouter";
 import * as trpc from "@trpc/server"
-import {matchRouter} from "@/server/routers/matchRouter";
+import {matchRouter} from "@/server/routers/lol/matchRouter";
 
 
 export const appRouter = router({
