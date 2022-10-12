@@ -7,8 +7,10 @@ import Container from "../../../../components/Container";
 import {trpc} from "@/utils/trpc";
 import {AppRouter} from "@/server/routers/_app";
 import {IMatch} from "@/utils/@types/lol/match";
+import App from "next/app";
 
 type Summoner = inferProcedureOutput<AppRouter['summoner']['byName']>
+type match = inferProcedureOutput<AppRouter['match']>
 
 const SummonerPage: NextPage = () => {
 	const router = useRouter();
@@ -16,14 +18,19 @@ const SummonerPage: NextPage = () => {
 	const summonerName = router.query.summonerName as string;
 
 	const {data: summoner} = trpc.summoner.byName.useQuery({name: summonerName, region: region})
+	const {data: matches} = trpc.match.getMatches.useQuery({name: summonerName, region: region})
 
-	if (!summoner) return <div className={"text-white"}>Loading...</div>
+	if (!summoner || !matches) return <div className={"text-white"}>Loading...</div>
 
 	return (
 		<Container>
 			<SummonerHeader summoner={summoner}/>
 			<div>
-				Matches
+				{matches.map((match) => (
+					<div key={match.id}>
+						{match.info?.matchId}
+					</div>
+				))}
 			</div>
 		</Container>
 	)
