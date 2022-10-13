@@ -21,8 +21,7 @@ const platformObj = {
 
 export function convertToRegion(region: string): string {
 	const converted = platformMap.get(region);
-
+	
 	if (converted == undefined) return "EUROPE";
-
 	return converted;
 }

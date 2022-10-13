@@ -1,18 +1,17 @@
 import {NextPage} from "next";
 import {useRouter} from "next/router";
 import {inferProcedureOutput} from "@trpc/server";
-import {useProfileIcon} from "../../../../data/useProfileIcon";
 import Image from "next/future/image"
 import Container from "../../../../components/Container";
 import {trpc} from "@/utils/trpc";
 import {AppRouter} from "@/server/routers/_app";
 import {IMatch} from "@/utils/@types/lol/match";
-import App from "next/app";
-import {useContext} from "react";
+import {useContext, useEffect} from "react";
 import {VersionContext} from "@/store/VersionContext";
 
-type Summoner = inferProcedureOutput<AppRouter['summoner']['byName']>
-type match = inferProcedureOutput<AppRouter['match']>
+//type Summoner = inferProcedureOutput<AppRouter['summoner']['byName']>
+type Matches = inferProcedureOutput<AppRouter['match']["getMatches"]>
+type Match = Matches[0]
 
 const SummonerPage: NextPage = () => {
 	const version = useContext(VersionContext);
@@ -20,16 +19,16 @@ const SummonerPage: NextPage = () => {
 	const region = router.query.region as string;
 	const summonerName = router.query.summonerName as string;
 
-	const {data: summoner} = trpc.summoner.byName.useQuery({name: summonerName, region: region})
-	const {data: matches} = trpc.match.getMatches.useQuery({name: summonerName, region: region})
+	const {data: summoner} = trpc.summoner.byName.useQuery({name: summonerName, region: region});
+	const {data: matches} = trpc.match.getMatches.useQuery({name: summonerName, region: region});
 
 	const mutateMatch = trpc.match.update.useMutation();
 
 	const handleUpdate = () => {
-		console.log("pressed")
 		mutateMatch.mutate({name: summonerName, region: region});
 	}
 	if (!summoner || !matches) return <div className={"text-white"}>Loading...</div>
+
 
 	return (
 		<Container>
@@ -57,11 +56,11 @@ const SummonerPage: NextPage = () => {
 				</div>
 			</div>
 			<div>
-						<p>MATCHES</p>
+				<p>MATCHES</p>
 				{matches.map((match) => (
 					<>
 						<div key={match.id}>
-							{match.info?.matchId}
+							{match.info?.gameMode}
 						</div>
 					</>
 				))}
@@ -70,8 +69,23 @@ const SummonerPage: NextPage = () => {
 	)
 }
 
-const MatchHistory = ({match}: {match: IMatch[]}) => {
+const MatchHistory = ({matchArray}: {matchArray: Matches}) => {
+	return (
+		<>
+			<div className={"w-full px-4 py-2 rounded-2xl"}>
 
+			</div>
+		</>
+	)
+}
+
+const Match = ({match, summoner}: {match: Match, summoner: Summoner}) => {
+	const matchColor = match.info.participants.find(summoner.puuid)
+	return (
+		<>
+
+		</>
+	)
 }
 
 const Avatar = ({img, lvl}: { img: string, lvl: number }) => {

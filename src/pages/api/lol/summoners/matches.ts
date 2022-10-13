@@ -40,9 +40,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
            //check if any matches for the summoner exists in database
            let matchesFromDB = await prisma.match.findMany(
                {
-                   where: {
-                       summonerId: summonerData.id
-                   },
                    include: {
                        metaData: {
                            include: {
@@ -383,9 +380,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
         if(summonerData == undefined) return
         return await prisma.match.findMany(
             {
-                where: {
-                    summonerId: summonerData.id
-                },
                 include: {
                     metaData: {
                         include: {

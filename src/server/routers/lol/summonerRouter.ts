@@ -3,7 +3,7 @@ import {z} from "zod"
 import {publicProcedure, router} from "../../trpc";
 import axios from "axios";
 import {ISummoner} from "@/utils/@types/summoner.t";
-import {apiRequest} from "@/server/util/riot/apiRequest";
+import {riotRequest} from "@/server/data/riot/riotRequest";
 
 //TODO: add update mutation.
 
@@ -24,7 +24,7 @@ export const summonerRouter = router({
 			});
 
 			if (count == 0) {
-				const summoner = await apiRequest<ISummoner>(`https://${input.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${input.name}`)
+				const summoner = await riotRequest<ISummoner>(`https://${input.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${input.name}`)
 
 				prisma.summoner.create({
 					data: {
