@@ -14,6 +14,8 @@ module.exports = {
                 'valorant-color': 'rgb(253,75,89)',
                 'tft-color': 'rgb(36, 45, 88)',
                 'tft-color2': 'rgb(16, 24, 38)',
+                'tft-color3': 'rgb(19,22,39)',
+                'tft-color4': 'rgb(16,19,39)',
                 'tft-dropdown-color': 'rgb(28, 34, 55)',
                 'lor-color': 'rgb(231,133,200)',
                 'navbar-color': 'rgb(13,13,13)',

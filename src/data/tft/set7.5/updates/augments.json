@@ -1,0 +1,80 @@
+[
+  {
+    "name": "Darkflight Heart",
+    "img": "DarkflightHeart.png",
+    "effect": "Your team counts as having 1 additional Darkflight. Gain an Aphelios.",
+    "rarity": "silver"
+  },
+  {
+    "name": "Lagoon Heart",
+    "img": "LagoonHeart.png",
+    "effect": "Your team counts as having 1 additional Lagoon. Gain a Kai'Sa.",
+    "rarity": "silver"
+  },
+  {
+    "name": "Soul Siphon",
+    "img": "SoulSiphon.png",
+    "effect": "Darkflights benefit from the top-most trait of the sacrificed unit. This does not increase the trait count for that trait.",
+    "rarity": "silver"
+  },
+  {
+    "name": "Base Camp",
+    "img": "BaseCamp.png",
+    "effect": "Scalescorns gain 8% damage each time they start combat in the same hex, stacking up to 4 times. Gain a Lillia.",
+    "rarity": "gold"
+  },
+  {
+    "name": "Birthday Present",
+    "img": "BirthdayPresent.png",
+    "effect": "Gain a 2-star champion every time you level up. The champion's tier is your level minus 4 (min: Tier 1).",
+    "rarity": "gold"
+  },
+  {
+    "name": "Consistency",
+    "img": "Consistency.png",
+    "effect": "Gain double streak gold.",
+    "rarity": "gold"
+  },
+  {
+    "name": "Darkflight Crest",
+    "img": "DarkflightCrest.png",
+    "effect": "Gain a Darkflight Emblem and a Rell.",
+    "rarity": "gold"
+  },
+  {
+    "name": "Dragon Imperialist",
+    "img": "DragonImperialist.png",
+    "effect": "If you only have 1 Dragon, Dragons execute enemies they damage who are below 25% Health. Gain a Nomsy.",
+    "rarity": "gold"
+  },
+  {
+    "name": "Dragonmancer Conference",
+    "img": "DragonmancerConference.png",
+    "effect": "After combat with a player, a random Dragonmancer appears on your bench. Gain a Kai'sa.",
+    "rarity": "gold"
+  },
+  {
+    "name": "Essence Theft",
+    "img": "EssenceTheft.png",
+    "effect": "Mages' attacks drain 8 Mana from their target and gain half of the drained Mana. Gain a Lux.",
+    "rarity": "gold"
+  },
+  {
+    "name": "Hero-In-Training",
+    "img": "Hero-In-Training.png",
+    "effect": "The Dragonmancer nearest to the Dragonmancer Hero gains 50% of the Dragonmancer trait's bonuses. Gain a Sett.",
+    "rarity": "gold"
+  },
+  {
+    "name": "High Tide",
+    "img": "HighTide.png",
+    "effect": "Until they cast 2 times, Lagoon champions have 30% reduced Attack Speed but gain 12 Mana per second. Gain a Kai'sa.",
+    "rarity": "gold"
+  },
+  {
+    "name": "Lagoon Crest",
+    "img": "LagoonCrest.png",
+    "effect": "Gain a Lagoon Emblem and a Zac.",
+    "rarity": "gold"
+  }
+]
