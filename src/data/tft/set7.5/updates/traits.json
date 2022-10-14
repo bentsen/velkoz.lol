@@ -1,0 +1,204 @@
+[
+  {
+    "name": "Astral",
+    "img": "astral.png",
+    "description": "After each player combat, gain an Astral Orb. The combined star level of your Astral champions increases the quality of the orb.",
+    "effect": "Astral champions gains bonus Ability Power",
+    "stats": [
+      {
+        "number": "3",
+        "stat": "5 Ability Power"
+      },
+      {
+        "number": "5",
+        "stat": "30 Ability Power"
+      },
+      {
+        "number": "8",
+        "stat": "75 Ability Power"
+      }
+    ],
+    "champions": [
+      {
+        "name": "Aurelion Sol",
+        "id": "TFT7_AurelionSol",
+        "cost": 8
+      },
+      {
+        "name": "Lux",
+        "id": "TFT7_Lux",
+        "cost": 2
+      },
+      {
+        "name": "Nidalee",
+        "id": "TFT7_Nidalee",
+        "cost": 1
+      },
+      {
+        "name": "Skarner",
+        "id": "TFT7_Skarner",
+        "cost": 1
+      },
+      {
+        "name": "Varus",
+        "id": "TFT7_Varus",
+        "cost": 3
+      },
+      {
+        "name": "Vladimir",
+        "id": "TFT7_Vladimir",
+        "cost": 1
+      }
+    ]
+  },
+  {
+    "name": "Darkflight",
+    "img": "darkflight.png",
+    "description": "The unit in the Darkflight hex is sacrificed at start of combat, granting a copy of a random item they have to each Darkflight champion, and bonus health to each.",
+    "effect": "Non-craftable items and Emblems are corrupted when they're copied, instead becoming Darkflight Essence.",
+    "stats": [
+      {
+        "number": "2",
+        "stat": "600 Health"
+      },
+      {
+        "number": "4",
+        "stat": "800 Health"
+      },
+      {
+        "number": "6",
+        "stat": "1000 Health"
+      },
+      {
+        "number": "8",
+        "stat": "1800 Health"
+      }
+    ],
+    "champions": [
+      {
+        "name": "Aphelios",
+        "id": "TFT7_Aphelios",
+        "cost": 2
+      },
+      {
+        "name": "Rell",
+        "id": "TFT7_Rell",
+        "cost": 2
+      },
+      {
+        "name": "Rengar",
+        "id": "TFT7_Rengar",
+        "cost": 3
+      },
+      {
+        "name": "Swain",
+        "id": "TFT7_DragonSwain",
+        "cost": 3
+      }
+    ]
+  },
+  {
+    "name": "Lagoon",
+    "img": "lagoon.png",
+    "description": "Summon a Seastone. The Seastone grants loot based on the number of ability casts by Lagoon champions over time. Lagoon champions also gain Ability Power and Attack Speed.",
+    "effect": "",
+    "stats": [
+      {
+        "number": "3",
+        "stat": "8 Ability Power, 8% Attack Speed"
+      },
+      {
+        "number": "6",
+        "stat": "30 Ability Power, 30% Attack Speed"
+      },
+      {
+        "number": "9",
+        "stat": "55 Ability Power, 55% Attack Speed"
+      },
+      {
+        "number": "12",
+        "stat": "200 Ability Power, 200% Attack Speed"
+      }
+    ],
+    "champions": [
+      {
+        "name": "Kai'sa",
+        "id": "TFT7_Kaisa",
+        "cost": 2
+      },
+      {
+        "name": "Malphite",
+        "id": "TFT7_Malphite",
+        "cost": 1
+      },
+      {
+        "name": "Nilah",
+        "id": "TFT7_Nilah",
+        "cost": 4
+      },
+      {
+        "name": "Seraphine",
+        "id": "TFT7_Seraphine",
+        "cost": 3
+      },
+      {
+        "name": "Sohm",
+        "id": "TFT7_AquaticDragon",
+        "cost": 7
+      },
+      {
+        "name": "Taliyah",
+        "id": "TFT7_Taliyah",
+        "cost": 1
+      },
+      {
+        "name": "Zac",
+        "id": "TFT7_Zac",
+        "cost": 2
+      },
+      {
+        "name": "Zeri",
+        "id": "TFT7_Zeri",
+        "cost": 3
+      }
+    ]
+  },
+  {
+    "name": "Monolith",
+    "img": "monolith.png",
+    "description": "",
+    "effect": "",
+    "stats": [
+      {
+        "number": "1",
+        "stat": "Monoliths create 3 hexes on the battlefield. Units standing in the hex at the start of combat gain 18% damage reduction."
+      }
+    ],
+    "champions": [
+      {
+        "name": "Terra",
+        "id": "TFT7_DragonEarth",
+        "cost": 8
+      }
+    ]
+  },
+  {
+    "name": "Prodigy",
+    "img": "prodigy.png",
+    "description": "",
+    "effect": "",
+    "stats": [
+      {
+        "number": "1",
+        "stat": "Nomsy gains a random trait each game (Mage, Cannoneer, or Evoker). She summons a former Trainer to aid her in battle, who also gains this trait. Trainers' Ability Power is always equal to Nomsy's Ability Power. When Nomsy dies, Trainers gain 100% Attack Speed."
+      }
+    ],
+    "champions": [
+      {
+        "name": "Nomsy",
+        "id": "TFT7_Nomsy",
+        "cost": 6
+      }
+    ]
+  }
+]

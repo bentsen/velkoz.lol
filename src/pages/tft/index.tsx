@@ -50,6 +50,12 @@ const Tft: NextPage = () => {
                         <div className={"flex flex-col w-screen h-full items-center mt-20 gap-2"}>
                             <Image className={"mb-7 w-[210px] sm:w-[410px]"} src={"/tft/logo.svg"} width={210} height={100} alt={"logo"}/>
                             <SearchBar/>
+                            <Link href={"/tft/new-set-release"}>
+                                <div className={"w-[500px] text-right pr-5 text-xs"}>
+                                    Check
+                                    <span className={"text-blue-600 cursor-pointer hover:underline pl-1"}>new path 7.5</span>
+                                </div>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -156,10 +162,10 @@ const SearchBar = () => {
                     </div>
                     <div className={"flex items-center bg-white w-[250px] sm:w-[400px] h-16 rounded-r"}>
                         <Combobox.Input as={Fragment} onChange={(e) => setSearch(e.target.value)} displayValue={(selected: SearchOptions) => selected?.name}>
-                            <input className={"ml-2 w-[350px] font-medium rounded-r"} type="text"  value={search} placeholder={"Search Summoner"} autoComplete={"off"}/>
+                            <input className={"ml-2 w-[350px] font-medium rounded-r text-black"} type="text"  value={search} placeholder={"Search Summoner"} autoComplete={"off"}/>
                         </Combobox.Input>
                         <svg onClick={inputDelete} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
-                             stroke="currentColor" className="w-6 h-6 cursor-pointer">
+                             stroke="currentColor" className="w-6 h-6 cursor-pointer text-black">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </div>
@@ -212,7 +218,7 @@ const SearchOptions = (props: SearchOptions) => {
                                         <div className={"flex justify-between items-center w-full"}>
                                             <div>
                                                 <span className={"ml-1"}>{name}</span>
-                                                <span className={"ml-1 text-xs"}>lvl {level}</span>
+                                                <span className={"ml-1 text-xs"}>lvl: {level == undefined ? "NaN": level}</span>
                                             </div>
                                             <span>{region}</span>
                                         </div>
