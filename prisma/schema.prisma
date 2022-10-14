@@ -29,6 +29,7 @@ model Summoner {
 model Match {
   id         Int       @id @unique @default(autoincrement())
   lastUpdated DateTime @default(now())
+  matchId    String
   metaData   Metadata?
   info       Info?
 }

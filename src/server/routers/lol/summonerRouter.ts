@@ -4,6 +4,8 @@ import {publicProcedure, router} from "../../trpc";
 import axios from "axios";
 import {ISummoner} from "@/utils/@types/summoner.t";
 import {riotRequest} from "@/server/data/riot/riotRequest";
+import {inferProcedureOutput} from "@trpc/server";
+import {AppRouter} from "@/server/routers/_app";
 
 //TODO: add update mutation.
 
@@ -24,22 +26,21 @@ export const summonerRouter = router({
 			});
 
 			if (count == 0) {
-				const summoner = await riotRequest<ISummoner>(`https://${input.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${input.name}`)
+				const summonerFromApi = await riotRequest<ISummoner>(`https://${input.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${input.name}`)
 
-				prisma.summoner.create({
+				const summoner = await prisma.summoner.create({
 					data: {
-						id: summoner.id,
-						accountId: summoner.accountId,
-						puuid: summoner.puuid,
-						name: summoner.name,
-						summonerLevel: summoner.summonerLevel,
-						profileIconId: summoner.profileIconId,
-						revisionDate: String(summoner.revisionDate),
+						id: summonerFromApi.id,
+						accountId: summonerFromApi.accountId,
+						puuid: summonerFromApi.puuid,
+						name: summonerFromApi.name,
+						summonerLevel: summonerFromApi.summonerLevel,
+						profileIconId: summonerFromApi.profileIconId,
+						revisionDate: String(summonerFromApi.revisionDate),
 						region: input.region
 					}
 				});
 
-				summoner.region = input.region;
 				return summoner;
 			}
 
@@ -66,3 +67,6 @@ export const summonerRouter = router({
 			});
 		}),
 })
+
+
+export type TSummoner = inferProcedureOutput<AppRouter["summoner"]["byName"]>

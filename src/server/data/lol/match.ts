@@ -2,33 +2,106 @@ import {riotRequest} from "@/server/data/riot/riotRequest";
 import {convertToRegion} from "@/server/data/lol/regions";
 import {IMatch} from "@/utils/@types/lol/match";
 import {prisma} from "@/server/util/prisma";
-import {Prisma} from "@prisma/client";
+import {TMatch} from "@/server/routers/lol/matchRouter";
 
 export const getRecentMatches = async(puuid: string, platform: string): Promise<string[]> => {
 	const url = `https://${convertToRegion(platform)}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids`;
 	return await riotRequest<string[]>(url);
 }
 
-export const getMatch = async(matchId: string, platform: string): Promise<IMatch> => {
-	const url = `https://${convertToRegion(platform)}.api.riotgames.com/lol/match/v5/matches/${matchId}`;
-	let rawMatch = await riotRequest<IMatch>(url);
-	rawMatch.info = {
-		...rawMatch.info,
-		gameCreation: rawMatch.info.gameCreation.toString(),
-		gameDuration: rawMatch.info.gameDuration.toString(),
-		gameEndTimestamp: rawMatch.info.gameEndTimestamp.toString(),
-		gameId: rawMatch.info.gameId.toString(),
-		gameStartTimestamp: rawMatch.info.gameStartTimestamp.toString(),
+export const getMatch = async(matchId: string, platform: string): Promise<IMatch | TMatch> => {
+	const count = await prisma.metadata.count({
+		where: {
+			matchId: matchId,
+		}
+	});
+
+	if (count > 0) {
+		const match =  await prisma.match.findFirst({
+			where: {
+				matchId: matchId,
+			},
+			select: {
+				lastUpdated: true,
+				matchId: true,
+				metaData: {
+					select: {
+						game: true,
+						gameId: true,
+						matchId: true,
+						dataVersion: true,
+						participants: {
+							select: {
+								metaParticipant: true,
+							}
+						},
+					},
+				},
+				info: {
+					select: {
+						gameCreation: true,
+						gameDuration: true,
+						gameEndTimestamp: true,
+						gameId: true,
+						gameMode: true,
+						gameName: true,
+						gameStartTimestamp: true,
+						gameType: true,
+						gameVersion: true,
+						mapId: true,
+						participants: true,
+						platformId: true,
+						queueId: true,
+						teams: {
+							select: {
+								bans: {
+									select: {
+										championId: true,
+										pickTurn: true,
+									},
+								},
+								objectives: true,
+								teamId: true,
+								win: true,
+							}
+						},
+						tournamentCode: true,
+					}
+				},
+			},
+
+		});
+
+		console.log(match);
+		return match;
 	}
 
-	const convertedMatch = rawMatch;
-
-	console.log(convertedMatch)
-	return convertedMatch;
+	const url = `https://${convertToRegion(platform)}.api.riotgames.com/lol/match/v5/matches/${matchId}`;
+	let match = await riotRequest<IMatch>(url);
+	match.info = {
+		...match.info,
+		gameCreation: match.info.gameCreation.toString(),
+		gameDuration: match.info.gameDuration.toString(),
+		gameEndTimestamp: match.info.gameEndTimestamp.toString(),
+		gameId: match.info.gameId.toString(),
+		gameStartTimestamp: match.info.gameStartTimestamp.toString(),
+	}
+	return match;
 }
 
 export const createMatch = async(match: IMatch) => {
-	const _match = await prisma.match.create({
+	const count = await prisma.metadata.count({
+		where: {
+			matchId: match.metadata.matchId,
+		}
+	})
+
+	if (count > 0) {
+		console.error(`Match with ID ${match.metadata.matchId} already exists! Aborting creation of match in DB!`)
+		return;
+	}
+
+	return await prisma.match.create({
 		data: {
 			metaData: {
 				create: {
@@ -245,28 +318,25 @@ export const createMatch = async(match: IMatch) => {
 			},
 		},
 	});
-	/*
-	//TODO: Try to condense this query down to this tiny call.
-	const _match = await prisma.match.create({
-		data: match
-	})
-	 */
-	return _match;
 }
 
-type ThenArg<T> = T extends PromiseLike<infer U> ? U : T;
-type dbMatch = ThenArg<ReturnType<typeof createMatch>>;
-
+export const findMatchesByPuuid = async (puuid: string) => {
+	return await prisma.match.findMany({
+		include: {
+			metaData: {
+				include: {
+					participants: {
+						where: {
+							metaParticipant: puuid,
+						}
+					}
+				}
+			},
+		},
+		select: {}
+	});
+}
 
 export const readMatch = async(matchId: string): Promise<any> => {
 
-}
-
-export const matchNotInDb = async(matchId: string): Promise<boolean> => {
-	const count = await prisma.metadata.count({
-		where: {
-			matchId: matchId
-		}
-	})
-	return count == 0;
 }

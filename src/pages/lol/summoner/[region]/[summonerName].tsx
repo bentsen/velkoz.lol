@@ -8,9 +8,7 @@ import {AppRouter} from "@/server/routers/_app";
 import {IMatch} from "@/utils/@types/lol/match";
 import {useContext} from "react";
 import {VersionContext} from "@/store/VersionContext";
-import {ISummoner} from "@/utils/@types/summoner.t";
-
-//type Summoner = inferProcedureOutput<AppRouter['summoner']['byName']>
+import {TMatches} from "@/server/routers/lol/matchRouter";
 
 const SummonerPage: NextPage = () => {
 	const version = useContext(VersionContext);
@@ -19,8 +17,8 @@ const SummonerPage: NextPage = () => {
 	const summonerName = router.query.summonerName as string;
 
 	const {data: summoner} = trpc.summoner.byName.useQuery({name: summonerName, region: region});
-	const {data: matches} = trpc.match.getMatches.useQuery({name: summonerName, region: region});
 
+	const {data: matches} = trpc.match.getMatches.useQuery({name: summonerName, region: region});
 	const mutateMatch = trpc.match.update.useMutation();
 
 	const handleUpdate = () => {
@@ -54,34 +52,36 @@ const SummonerPage: NextPage = () => {
 					</div>
 				</div>
 			</div>
-			<div>
-				<p>MATCHES</p>
-				{matches.map((match) => (
-					<>
-						<div key={match.id}>
-							{match.info?.gameMode}
-						</div>
-					</>
-				))}
+			<div className={"flex flex-row"}>
+				<MatchHistory summonerName={summonerName} matches={matches}/>
 			</div>
 		</Container>
 	)
 }
 
-const MatchHistory = ({matchArray}: {matchArray: IMatch[]}) => {
+const MatchHistory = ({summonerName, matches}: {summonerName: string, matches: TMatches}) => {
 	return (
 		<>
 			<div className={"w-full px-4 py-2 rounded-2xl"}>
-
+				{matches.map((match) => (
+					<Match key={match.id} match={match} summonerName={summonerName}/>
+				))}
 			</div>
 		</>
 	)
 }
 
-const Match = ({match, summoner}: {match: IMatch, summoner: ISummoner}) => {
+const Match = ({match, summonerName}: {match: TMatches[0], summonerName: string}) => {
+	const sumInfo = match.info?.participants.find((e) => e.summonerName == summonerName);
+	console.log(sumInfo?.win)
+	const winColor = sumInfo?.win ? "bg-blue-700" : "bg-red-600";
 	return (
 		<>
-
+			<div className={`w-full ${winColor} my-2 rounded-lg`}>
+				<div className={"flex flex-row px-2 py-4"}>
+					{match.id} {match.metaData?.matchId}
+				</div>
+			</div>
 		</>
 	)
 }
