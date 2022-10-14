@@ -7,6 +7,7 @@ import {convertToRegion} from "@/server/data/lol/regions";
 import {createMatch, findMatchesByPuuid, getMatch} from "@/server/data/lol/match";
 import {inferProcedureOutput} from "@trpc/server";
 import {AppRouter} from "@/server/routers/_app";
+import {IMatch} from "@/utils/@types/lol/match";
 
 export const matchRouter = router({
 	getMatches: publicProcedure
@@ -58,7 +59,7 @@ export const matchRouter = router({
 				})
 
 				if (count == 0) {
-					const match = await getMatch(_matchId, input.region);
+					const match = await getMatch(_matchId, input.region) as IMatch;
 					await createMatch(match);
 				}
 			}

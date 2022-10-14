@@ -9,7 +9,7 @@ export const getRecentMatches = async(puuid: string, platform: string): Promise<
 	return await riotRequest<string[]>(url);
 }
 
-export const getMatch = async(matchId: string, platform: string): Promise<IMatch | TMatch> => {
+export const getMatch = async(matchId: string, platform: string) => {
 	const count = await prisma.metadata.count({
 		where: {
 			matchId: matchId,
@@ -69,10 +69,8 @@ export const getMatch = async(matchId: string, platform: string): Promise<IMatch
 					}
 				},
 			},
-
 		});
 
-		console.log(match);
 		return match;
 	}
 
@@ -103,6 +101,7 @@ export const createMatch = async(match: IMatch) => {
 
 	return await prisma.match.create({
 		data: {
+			matchId: match.metadata.matchId,
 			metaData: {
 				create: {
 					matchId: match.metadata.matchId,
@@ -322,18 +321,57 @@ export const createMatch = async(match: IMatch) => {
 
 export const findMatchesByPuuid = async (puuid: string) => {
 	return await prisma.match.findMany({
-		include: {
+		select: {
+			lastUpdated: true,
+			matchId: true,
 			metaData: {
-				include: {
+				select: {
+					game: true,
+					gameId: true,
+					matchId: true,
+					dataVersion: true,
 					participants: {
 						where: {
 							metaParticipant: puuid,
+						},
+						select: {
+							metaParticipant: true,
 						}
-					}
+					},
+				},
+			},
+			info: {
+				select: {
+					gameCreation: true,
+					gameDuration: true,
+					gameEndTimestamp: true,
+					gameId: true,
+					gameMode: true,
+					gameName: true,
+					gameStartTimestamp: true,
+					gameType: true,
+					gameVersion: true,
+					mapId: true,
+					participants: true,
+					platformId: true,
+					queueId: true,
+					teams: {
+						select: {
+							bans: {
+								select: {
+									championId: true,
+									pickTurn: true,
+								},
+							},
+							objectives: true,
+							teamId: true,
+							win: true,
+						}
+					},
+					tournamentCode: true,
 				}
 			},
 		},
-		select: {}
 	});
 }
 

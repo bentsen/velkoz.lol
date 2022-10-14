@@ -64,7 +64,7 @@ const MatchHistory = ({summonerName, matches}: {summonerName: string, matches: T
 		<>
 			<div className={"w-full px-4 py-2 rounded-2xl"}>
 				{matches.map((match) => (
-					<Match key={match.id} match={match} summonerName={summonerName}/>
+					<Match key={match.matchId} match={match} summonerName={summonerName}/>
 				))}
 			</div>
 		</>
@@ -72,14 +72,13 @@ const MatchHistory = ({summonerName, matches}: {summonerName: string, matches: T
 }
 
 const Match = ({match, summonerName}: {match: TMatches[0], summonerName: string}) => {
-	const sumInfo = match.info?.participants.find((e) => e.summonerName == summonerName);
-	console.log(sumInfo?.win)
+	const sumInfo = match.info?.participants.find(e => e.summonerName);
 	const winColor = sumInfo?.win ? "bg-blue-700" : "bg-red-600";
 	return (
 		<>
 			<div className={`w-full ${winColor} my-2 rounded-lg`}>
 				<div className={"flex flex-row px-2 py-4"}>
-					{match.id} {match.metaData?.matchId}
+					{match.matchId}
 				</div>
 			</div>
 		</>
