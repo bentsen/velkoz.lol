@@ -5,7 +5,7 @@ import {riotRequest} from "@/server/data/riot/riotRequest";
 import {ISummoner} from "@/utils/@types/summoner.t";
 import {convertToRegion} from "@/server/data/lol/regions";
 import {IMatch} from "@/utils/@types/lol/match";
-import {createMatch, matchNotInDb} from "@/server/data/lol/match";
+import {createMatch, getMatch, matchNotInDb} from "@/server/data/lol/match";
 
 export const matchRouter = router({
 	getMatches: publicProcedure
@@ -62,16 +62,14 @@ export const matchRouter = router({
 				return await matchNotInDb(matchId);
 			});
 
-			const newMatchesFromApiPromise = Promise.all(filteredMatchIds!.map(async(matchId) => {
-				const match = await riotRequest<IMatch>(`https://${convertedRegion}.api.riotgames.com/lol/match/v5/matches/${matchId}`);
-				console.log(match);
-				return match;
+			const newMatchesFromApiPromise = Promise.all(filteredMatchIds!.map(async(matchId): Promise<IMatch> => {
+				return await getMatch(matchId, convertedRegion)
 			}));
 
 			const newMatches = await newMatchesFromApiPromise;
 
 			/**
-			 * TODO: I need to make this LOOONG query.
+			 * TODO: I need to make this LOOONG query.1
 			 *  I really want a nice solution but it seems like I need to go through
 			 *  all values one by one to serialize it. Help me pls :/
 			 */

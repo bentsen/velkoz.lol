@@ -4,13 +4,13 @@ export interface IMatch {
 }
 
 export interface Info {
-	gameCreation:       number;
-	gameDuration:       number;
-	gameEndTimestamp:   number;
-	gameId:             number;
+	gameCreation:       string;
+	gameDuration:       string;
+	gameEndTimestamp:   string;
+	gameId:             string;
 	gameMode:           string;
 	gameName:           string;
-	gameStartTimestamp: number;
+	gameStartTimestamp: string;
 	gameType:           string;
 	gameVersion:        string;
 	mapId:              number;

@@ -1,5 +1,5 @@
-import {useContext, useState} from "react";
-import {VersionContext} from "../store/VersionContext";
+import {useContext} from "react";
+import {VersionContext} from "@/store/VersionContext";
 
 export const useProfileIcon = (id: number | string) => {
 	const version = useContext(VersionContext);

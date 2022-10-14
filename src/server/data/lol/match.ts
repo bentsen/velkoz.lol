@@ -9,9 +9,22 @@ export const getRecentMatches = async(puuid: string, platform: string): Promise<
 	return await riotRequest<string[]>(url);
 }
 
-export const getMatch = async(matchId: string, platform: string) => {
+export const getMatch = async(matchId: string, platform: string): Promise<IMatch> => {
 	const url = `https://${convertToRegion(platform)}.api.riotgames.com/lol/match/v5/matches/${matchId}`;
-	return await riotRequest<IMatch>(url);
+	let rawMatch = await riotRequest<IMatch>(url);
+	rawMatch.info = {
+		...rawMatch.info,
+		gameCreation: rawMatch.info.gameCreation.toString(),
+		gameDuration: rawMatch.info.gameDuration.toString(),
+		gameEndTimestamp: rawMatch.info.gameEndTimestamp.toString(),
+		gameId: rawMatch.info.gameId.toString(),
+		gameStartTimestamp: rawMatch.info.gameStartTimestamp.toString(),
+	}
+
+	const convertedMatch = rawMatch;
+
+	console.log(convertedMatch)
+	return convertedMatch;
 }
 
 export const createMatch = async(match: IMatch) => {
@@ -30,13 +43,13 @@ export const createMatch = async(match: IMatch) => {
 			},
 			info: {
 				create: {
-					gameCreation: match.info.gameCreation.toString(),
-					gameDuration: match.info.gameDuration.toString(),
-					gameEndTimestamp: match.info.gameEndTimestamp.toString(),
-					gameId: match.info.gameId.toString(),
+					gameCreation: match.info.gameCreation,
+					gameDuration: match.info.gameDuration,
+					gameEndTimestamp: match.info.gameEndTimestamp,
+					gameId: match.info.gameId,
 					gameMode: match.info.gameMode,
 					gameName: match.info.gameName,
-					gameStartTimestamp: match.info.gameStartTimestamp.toString(),
+					gameStartTimestamp: match.info.gameStartTimestamp,
 					gameType: match.info.gameType,
 					gameVersion: match.info.gameVersion,
 					mapId: match.info.mapId,
@@ -232,9 +245,8 @@ export const createMatch = async(match: IMatch) => {
 			},
 		},
 	});
-
-	//TODO: Try to condense this query down to this tiny call.
 	/*
+	//TODO: Try to condense this query down to this tiny call.
 	const _match = await prisma.match.create({
 		data: match
 	})

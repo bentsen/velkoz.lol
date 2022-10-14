@@ -6,12 +6,11 @@ import Container from "../../../../components/Container";
 import {trpc} from "@/utils/trpc";
 import {AppRouter} from "@/server/routers/_app";
 import {IMatch} from "@/utils/@types/lol/match";
-import {useContext, useEffect} from "react";
+import {useContext} from "react";
 import {VersionContext} from "@/store/VersionContext";
+import {ISummoner} from "@/utils/@types/summoner.t";
 
 //type Summoner = inferProcedureOutput<AppRouter['summoner']['byName']>
-type Matches = inferProcedureOutput<AppRouter['match']["getMatches"]>
-type Match = Matches[0]
 
 const SummonerPage: NextPage = () => {
 	const version = useContext(VersionContext);
@@ -69,7 +68,7 @@ const SummonerPage: NextPage = () => {
 	)
 }
 
-const MatchHistory = ({matchArray}: {matchArray: Matches}) => {
+const MatchHistory = ({matchArray}: {matchArray: IMatch[]}) => {
 	return (
 		<>
 			<div className={"w-full px-4 py-2 rounded-2xl"}>
@@ -79,8 +78,7 @@ const MatchHistory = ({matchArray}: {matchArray: Matches}) => {
 	)
 }
 
-const Match = ({match, summoner}: {match: Match, summoner: Summoner}) => {
-	const matchColor = match.info.participants.find(summoner.puuid)
+const Match = ({match, summoner}: {match: IMatch, summoner: ISummoner}) => {
 	return (
 		<>
 
