@@ -76,5 +76,83 @@
     "img": "LagoonCrest.png",
     "effect": "Gain a Lagoon Emblem and a Zac.",
     "rarity": "gold"
+  },
+  {
+    "name": "Oasis",
+    "img": "Oasis.png",
+    "effect": "When Lagoon champions gain a shield, they remove all negative effects on themselves and heal for 20% of their missing Health.",
+    "rarity": "gold"
+  },
+  {
+    "name": "Protectors Of The Cosmos",
+    "img": "ProtectorsOfTheCosmos.png",
+    "effect": "Combat start: Your team gains a 30 Health shield for every item component equipped on an Astral Champion, including those that are part of a full item. Gain a Lux.",
+    "rarity": "gold"
+  },
+  {
+    "name": "Scoped Weapons 1",
+    "img": "ScopedWeapons1.png",
+    "effect": "Your units that start combat in the back 2 rows gain +2 Attack Range and 15% Attack Speed.",
+    "rarity": "gold"
+  },
+  {
+    "name": "Terrify",
+    "img": "Terrify.png",
+    "effect": "Your units take 15% less damage from enemies shrunken by Whispers champions. Gain a Sylas.",
+    "rarity": "gold"
+  },
+  {
+    "name": "Age Of Dragons",
+    "img": "AgeOfDragons.png",
+    "effect": "If you only have Dragons, every 5th attack from a Dragon fires a Dragonsoul blast that deals magic damage equal to 15% of their target's max Health. Gain a Nomsy, Zippy, and a random Tier 4 Dragon.",
+    "rarity": "prismatic"
+  },
+  {
+    "name": "Darkflight Crown",
+    "img": "DarkflightCrown.png",
+    "effect": "Gain a Darkflight Emblem, a Giant Slayer, and an Rengar.",
+    "rarity": "prismatic"
+  },
+  {
+    "name": "Dragon Soul",
+    "img": "DragonSoul.png",
+    "effect": "Your team counts as having 1 additional Dragon. Gain a Zippy.",
+    "rarity": "prismatic"
+  },
+  {
+    "name": "Lagoon Crown",
+    "img": "LagoonCrown.png",
+    "effect": "Gain a Lagoon Emblem, a Spear of Shojin and a Zeri.",
+    "rarity": "prismatic"
+  },
+  {
+    "name": "Lucky Gloves",
+    "img": "LuckyGloves.png",
+    "effect": "Thief's Gloves will always give your champions items that they can use well. Gain a Thief's Gloves.",
+    "rarity": "prismatic"
+  },
+  {
+    "name": "Part-Time Assassins",
+    "img": "Part-TimeAssassins.png",
+    "effect": "The Assassin trait grants its bonuses to your champions that start combat in the back 2 rows. This does not increase your number of Assassins. Gain a Kayn.",
+    "rarity": "prismatic"
+  },
+  {
+    "name": "Ragewing Soul",
+    "img": "RagewingSoul.png",
+    "effect": "Your team counts as having 1 additional Ragewing. Gain a Guinsoo's Rageblade and a Rakan.",
+    "rarity": "prismatic"
+  },
+  {
+    "name": "Scoped Weapons 2",
+    "img": "ScopedWeapons2.png",
+    "effect": "Your units that start combat in the back 2 rows gain infinite Attack Range and 25% Attack Speed.",
+    "rarity": "prismatic"
+  },
+  {
+    "name": "Woodland Charm",
+    "img": "WoodlandCharm.png",
+    "effect": "Your highest Health champion is cloned. Clones cannot hold items.",
+    "rarity": "prismatic"
   }
 ]

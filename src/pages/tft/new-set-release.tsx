@@ -169,7 +169,7 @@ const Augments = () => {
                                 <span>{augment.name}</span>
                             </div>
                         </div>
-                        <div className={"bg-tft-color4 h-40 rounded-b p-2 text-summoner-gray"}>
+                        <div className={"bg-tft-color4 h-52 rounded-b p-2 text-summoner-gray"}>
                             <span>{augment.effect}</span>
                         </div>
                     </div>
