@@ -36,7 +36,7 @@ export const summonerRouter = router({
 						name: summonerFromApi.name,
 						summonerLevel: summonerFromApi.summonerLevel,
 						profileIconId: summonerFromApi.profileIconId,
-						revisionDate: String(summonerFromApi.revisionDate),
+						revisionDate: summonerFromApi.revisionDate.toString(),
 						region: input.region
 					}
 				});

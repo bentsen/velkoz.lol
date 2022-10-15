@@ -24,12 +24,12 @@ export const matchRouter = router({
 	getMatch: publicProcedure
 		.input(
 			z.object({
-				name: z.string(),
+				matchId: z.string(),
 				region: z.string(),
 			})
 		)
 		.query(async ({input}) => {
-			const summoner = await riotRequest<ISummoner>(`https://${input.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${input.name}`);
+			return await getMatch(input.matchId, convertToRegion(input.region))
 		}),
 	update: publicProcedure
 		.input(
@@ -44,13 +44,6 @@ export const matchRouter = router({
 			const summoner = await riotRequest<ISummoner>(`https://${input.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${input.name}`);
 			const latestMatches = await riotRequest<string[]>(`https://${convertedRegion}.api.riotgames.com/lol/match/v5/matches/by-puuid/${summoner.puuid}/ids?start=0&count=20`)
 
-
-			/**
-			 * TODO: I need to make this LOOONG query.1
-			 *  I really want a nice solution but it seems like I need to go through
-			 *  all values one by one to serialize it. Help me pls :/
-			 */
-
 			for (const _matchId of latestMatches) {
 				const count = await prisma.metadata.count({
 					where: {
@@ -64,7 +57,9 @@ export const matchRouter = router({
 				}
 			}
 
-			return await findMatchesByPuuid(summoner.puuid);
+			const matches: IMatch[] = await findMatchesByPuuid(summoner.puuid)
+
+			return matches;
 		})
 })
 

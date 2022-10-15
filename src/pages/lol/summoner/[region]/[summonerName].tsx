@@ -8,7 +8,7 @@ import {AppRouter} from "@/server/routers/_app";
 import {IMatch} from "@/utils/@types/lol/match";
 import {useContext} from "react";
 import {VersionContext} from "@/store/VersionContext";
-import {TMatches} from "@/server/routers/lol/matchRouter";
+import {TMatch, TMatches} from "@/server/routers/lol/matchRouter";
 
 const SummonerPage: NextPage = () => {
 	const version = useContext(VersionContext);
@@ -60,10 +60,11 @@ const SummonerPage: NextPage = () => {
 }
 
 const MatchHistory = ({summonerName, matches}: {summonerName: string, matches: TMatches}) => {
+	const sortedMatches = matches?.sort((a, b) => parseInt(a.info!.gameEndTimestamp) - parseInt(b.info!.gameEndTimestamp));
 	return (
 		<>
 			<div className={"w-full px-4 py-2 rounded-2xl"}>
-				{matches.map((match) => (
+				{sortedMatches.map((match) => (
 					<Match key={match.matchId} match={match} summonerName={summonerName}/>
 				))}
 			</div>
@@ -71,14 +72,18 @@ const MatchHistory = ({summonerName, matches}: {summonerName: string, matches: T
 	)
 }
 
-const Match = ({match, summonerName}: {match: TMatches[0], summonerName: string}) => {
+const Match = ({match, summonerName}: {match: TMatch, summonerName: string}) => {
+	if (!match) return <div>Loading...</div>
+
+	console.log(match.metaData)
+
 	const sumInfo = match.info?.participants.find(e => e.summonerName);
 	const winColor = sumInfo?.win ? "bg-blue-700" : "bg-red-600";
 	return (
 		<>
 			<div className={`w-full ${winColor} my-2 rounded-lg`}>
 				<div className={"flex flex-row px-2 py-4"}>
-					{match.matchId}
+					{match.metadata.dataVersion} {match.info?.gameEndTimestamp}
 				</div>
 			</div>
 		</>
