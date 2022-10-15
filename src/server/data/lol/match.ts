@@ -318,7 +318,6 @@ export const createMatch = async(match: IMatch) => {
 }
 
 export const findMatchesByPuuid = async (puuid: string) => {
-	/*
 	return await prisma.match.findMany({
 		where: {
 			metaData: {
@@ -334,67 +333,6 @@ export const findMatchesByPuuid = async (puuid: string) => {
 			matchId: true,
 			metaData: {
 				select: {
-					game: true,
-					gameId: true,
-					matchId: true,
-					dataVersion: true,
-					participants: {
-						select: {
-							metaParticipant: true,
-						}
-					},
-				},
-			},
-			info: {
-				select: {
-					gameCreation: true,
-					gameDuration: true,
-					gameEndTimestamp: true,
-					gameId: true,
-					gameMode: true,
-					gameName: true,
-					gameStartTimestamp: true,
-					gameType: true,
-					gameVersion: true,
-					mapId: true,
-					participants: true,
-					platformId: true,
-					queueId: true,
-					teams: {
-						select: {
-							bans: {
-								select: {
-									championId: true,
-									pickTurn: true,
-								},
-							},
-							objectives: true,
-							teamId: true,
-							win: true,
-						}
-					},
-					tournamentCode: true,
-				}
-			},
-		},
-	});
-	 */
-
-	const matches = await prisma.match.findMany({
-		where: {
-			metaData: {
-				participants: {
-					some: {
-						metaParticipant: puuid,
-					}
-				}
-			}
-		},
-		select: {
-			lastUpdated: true,
-			matchId: true,
-			metaData: {
-				select: {
 					dataVersion: true,
 					matchId: true,
 					participants: {
@@ -437,12 +375,6 @@ export const findMatchesByPuuid = async (puuid: string) => {
 			},
 		},
 	});
-
-	matches.map((m) => {
-		console.log(m.metaData)
-	})
-
-	return matches
 }
 
 export const readMatch = async(matchId: string): Promise<any> => {
