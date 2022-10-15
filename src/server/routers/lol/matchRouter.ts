@@ -57,11 +57,9 @@ export const matchRouter = router({
 				}
 			}
 
-			const matches: IMatch[] = await findMatchesByPuuid(summoner.puuid)
-
-			return matches;
+			return await findMatchesByPuuid(summoner.puuid)
 		})
 })
 
 export type TMatches = inferProcedureOutput<AppRouter["match"]["getMatches"]>
-export type TMatch = inferProcedureOutput<AppRouter["match"]["getMatch"]>
+export type TMatch = TMatches[0]
