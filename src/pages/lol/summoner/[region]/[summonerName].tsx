@@ -3,13 +3,12 @@ import {useRouter} from "next/router";
 import Image from "next/future/image"
 import Container from "../../../../components/Container";
 import {trpc} from "@/utils/trpc";
-import {useContext, useState} from "react";
+import {useContext} from "react";
 import {VersionContext} from "@/data/VersionContext";
 import {TMatch, TMatches} from "@/server/routers/lol/matchRouter";
 import {TSummoner} from "@/server/routers/lol/summonerRouter";
 import {ChampionContext} from "@/data/ChampionContext";
 import {formatTime} from "@/utils/formatTime";
-import {time} from "@motionone/utils";
 import {convertLaneName} from "@/utils/lanePosition";
 import {ItemContext} from "@/data/ItemContext";
 import {useItem} from "@/hooks/useItem";
@@ -18,6 +17,7 @@ import LeagueHoverIcon from "@/components/LeagueHoverIcon";
 import {calcKDA} from "@/utils/calcMatchInfo";
 import Link from "next/link";
 import {useSummonerSpell} from "@/hooks/useSummonerSpell";
+import {RiCopperCoinLine} from "react-icons/ri";
 
 const SummonerPage: NextPage = () => {
 	const version = useContext(VersionContext);
@@ -28,8 +28,8 @@ const SummonerPage: NextPage = () => {
 	const summoner = trpc.summoner.byName.useQuery({name: summonerName, region: region});
 	const mutateSummoner = trpc.summoner.update.useMutation({
 		onSuccess: async () => {
-			await summoner.refetch();
-		}
+			await summoner.refetch()
+		},
 	});
 
 	const matches = trpc.match.getMatches.useQuery({name: summonerName, region: region});
@@ -44,58 +44,74 @@ const SummonerPage: NextPage = () => {
 		mutateSummoner.mutate({name: summonerName, region: region});
 	}
 
-	const date = new Date(summoner.data ? summoner.data.lastUpdated : Date.now());
-	const lastUpdated = formatTime(date.getTime());
-
-	if (!summoner.data || !matches.data) return <div className={"text-white"}>Loading...</div>
-
 
 	return (
 		<Container>
-			<div className={"py-6 flex flex-row w-full"}>
-				<div className={"block"}>
-					<Avatar
-						img={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${summoner.data.profileIconId}.png`}
-						lvl={summoner.data.summonerLevel}
-					/>
+			<SummonerHeader summoner={summoner.data} handleUpdate={handleUpdate} isLoading={mutateSummoner.isLoading}/>
+			{summoner.data && (
+				<div className={"flex flex-row"}>
+					<MatchHistory summoner={summoner.data} matches={matches.data}/>
 				</div>
-				<div className={"flex flex-col ml-4"}>
-					<h2 className={"text-white font-bold text-4xl"}>{summoner.data.name}</h2>
-					<div className={"flex justify-start mt-4"}>
-						<button
-							className={"bg-neutral-900 text-white rounded-2xl px-4 py-2 border-2 border-neutral-900 hover:border-neutral-700 outline-none focus:border-neutral-700 transition-all duration-100"}
-							onClick={handleUpdate}
-							disabled={mutateMatch.isLoading}
-						>
-							{mutateMatch.isLoading ? (
-								"Updating..."
-							) : (
-								<>
-									{mutateMatch.isError ? (
-										"Update failed!"
-									) : null}
-									{mutateMatch.isSuccess ? "Updated" : null}
-									{!mutateMatch.isLoading && !mutateMatch.isSuccess && "Update"}
-								</>
-							)}
-						</button>
-						<div>
-							{mutateMatch.error && <p>Fetch from server failed :( <br/> {mutateMatch.error.message}</p>}
-						</div>
-					</div>
-					{summoner.data.lastUpdated &&
-                        <p className={"text-sm text-neutral-700 font-semibold"}>{lastUpdated}</p>
-					}
-				</div>
-			</div>
-			<div className={"flex flex-row"}>
-				<MatchHistory summoner={summoner.data} matches={matches.data}/>
-			</div>
+			)}
 		</Container>
 	)
 }
 
-const MatchHistory = ({summoner, matches}: { summoner: TSummoner, matches: TMatches }) => {
+const SummonerHeader = ({
+							summoner,
+							handleUpdate,
+							isLoading
+						}: { summoner: TSummoner | undefined, handleUpdate: () => void, isLoading: boolean }) => {
+	const version = useContext(VersionContext);
+	const date = new Date(summoner ? summoner.lastUpdated : Date.now());
+	const lastUpdated = formatTime(date.getTime());
+
+	return (
+		<>
+			<div className={"py-6 flex flex-row w-full"}>
+				{!summoner ? (
+					<>
+						<div className={"block"}>
+							<div
+								className={"relative border-2 border-neutral-900 bg-neutral-800 rounded-2xl w-24 h-24"}/>
+						</div>
+					</>
+				) : (
+					<>
+						<div className={"block"}>
+							<Avatar
+								img={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${summoner.profileIconId}.png`}
+								lvl={summoner.summonerLevel}
+							/>
+						</div>
+						<div className={"flex flex-col ml-4"}>
+							<h2 className={"text-white font-bold text-4xl"}>{summoner.name}</h2>
+							<div className={"flex justify-start mt-4"}>
+								<button
+									className={"bg-neutral-900 text-white rounded-2xl px-4 py-2 outline-none border-2 border-neutral-900 hover:border-neutral-700 focus:border-neutral-700 transition-all duration-100"}
+									onClick={handleUpdate}
+									disabled={isLoading}
+								>
+									{isLoading ? (
+										"Updating..."
+									) : (
+										"Update"
+									)}
+								</button>
+							</div>
+							{summoner.lastUpdated &&
+                                <p className={"text-sm text-neutral-700 font-semibold"}>{lastUpdated}</p>
+							}
+						</div>
+					</>
+				)}
+			</div>
+		</>
+	)
+}
+
+const MatchHistory = ({summoner, matches}: { summoner: TSummoner, matches: TMatches | undefined }) => {
+	if (!matches) return <div>Loading...</div>
 	const sortedMatches = matches?.sort((a, b) => parseInt(b.info!.gameEndTimestamp) - parseInt(a.info!.gameEndTimestamp));
 	return (
 		<>
@@ -126,7 +142,7 @@ const Match = ({match, summoner}: { match: TMatch, summoner: TSummoner }) => {
 		<>
 			<Link href={"/"} passHref>
 				<div
-					className={`bg-grad w-full my-2 rounded-md bg-neutral-900 hover:bg-neutral-800 border-l-8 ${winBorder} cursor-pointer transition-all duration-100`}>
+					className={`bg-grad w-full my-2 rounded-md bg-neutral-900 active:bg-neutral-800 hover:bg-neutral-800 border-l-8 ${winBorder} cursor-pointer  transition-all duration-100`}>
 					<div className={"flex flex-col px-4"}>
 						<div className={"mx-2 flex flex-row items-center justify-between"}>
 							<h2 className={`text-2xl font-bold ${winText}`}>{win ? "Victory" : "Defeat"}</h2>
@@ -180,11 +196,12 @@ const ItemIcon = ({itemId}: { itemId: number | undefined }) => {
 	const item = useItem(itemId);
 	return (
 		<LeagueHoverIcon img={item?.image.full}>
-			<div className={"flex flex-row items-center"}>
+			<div className={"flex flex-row max-w-sm"}>
 				<LeagueIcon img={item?.image.full}/>
 				<div className={"flex flex-col pl-4"}>
 					<h2>{item?.name}</h2>
-					<p>{item?.gold.total}</p>
+					<span className={"inline-flex items-center"}><RiCopperCoinLine
+						className={"fill-yellow-500 mr-2"}/> {item?.gold.total}</span>
 				</div>
 			</div>
 		</LeagueHoverIcon>
@@ -195,10 +212,11 @@ const SumSpellIcon = ({spellId}: { spellId: number | undefined }) => {
 	const sumSpell = useSummonerSpell(spellId);
 	return (
 		<LeagueHoverIcon img={sumSpell?.image.full}>
-			<div className={"flex flex-row items-center"}>
+			<div className={"flex flex-row max-w-sm"}>
 				<LeagueIcon img={sumSpell?.image.full}/>
 				<div className={"flex flex-col pl-4"}>
-					<h2>{sumSpell?.name}</h2>
+					<h2 className={"font-bold text-md"}>{sumSpell?.name}</h2>
+					<p className={"text-neutral-400"}>{sumSpell?.description}</p>
 				</div>
 			</div>
 		</LeagueHoverIcon>
@@ -213,7 +231,7 @@ const Avatar = ({img, lvl}: { img: string, lvl: number }) => {
 				{lvl}
 			</div>
 			<div className={"relative border-2 border-neutral-800 rounded-2xl overflow-hidden"}>
-				<div className={"w-24 h-24"}>
+				<div className={"w-24 h-24 flex-shrink-0"}>
 					<Image src={img} alt={`Profile icon`} fill priority/>
 				</div>
 			</div>

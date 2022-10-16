@@ -4,7 +4,7 @@ import {ReactNode} from "react";
 
 export const LeagueIcon = ({img}: { img: string | undefined }) => {
 	return (
-		<div className={"w-8 h-8 relative rounded-md overflow-hidden"}>
+		<div className={"w-8 h-8 flex-shrink-0 relative rounded-md"}>
 			{img ? (
 				<Image src={img} alt={"Item"} fill sizes={"32px"} priority/>
 			) : (
