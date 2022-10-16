@@ -14,22 +14,21 @@ datasource db {
 
 //Summoner table
 model Summoner {
-  uuid          String   @id @unique @default(uuid())
-  id            String
-  accountId     String
-  puuid         String
+  id            String   @id @unique
+  accountId     String   @unique
+  puuid         String   @unique
   name          String
   summonerLevel Int
   profileIconId Int
   revisionDate  String
   region        String
-  lastUpdated   DateTime @default(now())
+  lastUpdated   DateTime @updatedAt
 }
 
 //Match table
 model Match {
   id         String       @id @unique @default(uuid())
-  lastUpdated DateTime @default(now())
+  lastUpdated DateTime    @default(now())
   matchId    String
   metaData   Metadata?
   info       Info?

@@ -259,10 +259,7 @@ CREATE TABLE "Objective" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Summoner_accountId_key" ON "Summoner"("accountId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Summoner_puuid_key" ON "Summoner"("puuid");
+CREATE UNIQUE INDEX "Summoner_id_accountId_puuid_key" ON "Summoner"("id", "accountId", "puuid");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Match_id_key" ON "Match"("id");

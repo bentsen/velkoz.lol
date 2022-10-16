@@ -9,6 +9,7 @@ import {FiChevronDown, FiX} from "react-icons/fi";
 import Link from "next/link";
 import Image from "next/future/image";
 import RegionTag from "../RegionTag";
+import {trpc} from "@/utils/trpc";
 
 interface IRegion {
 	short: string,
@@ -64,7 +65,8 @@ const regionMap = new Map<string, IRegion>([
 const Searchbar = () => {
 	const [search, setSearch] = useState("");
 	const [selected, setSelected] = useState<UnifiedOption>();
-	const [summoners, setSummoners] = useState<ISummoner[]>([]);
+	//const [summoners, setSummoners] = useState<ISummoner[]>([]);
+	const {data: summoners} = trpc.summoner.byPart.useQuery(search[0]);
 	const [region, setRegion] = useState<IRegion>({
 		short: "EUW",
 		long: "Europe West",
@@ -81,6 +83,7 @@ const Searchbar = () => {
 		setSelected(state);
 	}
 
+	/*
 	useEffect(() => {
 		const handleSummoners = async () => {
 			if (search.length == 1) {
@@ -93,10 +96,11 @@ const Searchbar = () => {
 		}
 		handleSummoners()
 	}, [search])
+	 */
 
 	const filteredSummoners = !search
 		? summoners
-		: summoners.filter((s) => s.name.toLowerCase().startsWith(search.toLowerCase()));
+		: summoners?.filter((s) => s.name.toLowerCase().startsWith(search.toLowerCase()));
 
 	const filteredChamps = !search
 		? champions!
@@ -174,7 +178,7 @@ const Searchbar = () => {
 								<div className={"bg-neutral-200 py-2"}>
 									<p className={"ml-5 text-gray-600 font-bold"}>Summoner</p>
 								</div>
-								{filteredSummoners.length === 0 ? (
+								{filteredSummoners?.length === 0 ? (
 									<UnifiedOption
 										key={search}
 										name={search}
@@ -183,7 +187,7 @@ const Searchbar = () => {
 										region={region.short}
 									/>
 								) : (
-									filteredSummoners.map((s) => (
+									filteredSummoners?.map((s) => (
 										<UnifiedOption
 											key={s.id}
 											img={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${s.profileIconId}.png`}

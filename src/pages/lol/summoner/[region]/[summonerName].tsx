@@ -16,6 +16,8 @@ import {useItem} from "@/hooks/useItem";
 import {LeagueIcon} from "@/components/LeagueHoverIcon/LeagueIcon";
 import LeagueHoverIcon from "@/components/LeagueHoverIcon";
 import {calcKDA} from "@/utils/calcMatchInfo";
+import Link from "next/link";
+import {useSummonerSpell} from "@/hooks/useSummonerSpell";
 
 const SummonerPage: NextPage = () => {
 	const version = useContext(VersionContext);
@@ -24,18 +26,26 @@ const SummonerPage: NextPage = () => {
 	const summonerName = router.query.summonerName as string;
 
 	const summoner = trpc.summoner.byName.useQuery({name: summonerName, region: region});
+	const mutateSummoner = trpc.summoner.update.useMutation({
+		onSuccess: async () => {
+			await summoner.refetch();
+		}
+	});
 
 	const matches = trpc.match.getMatches.useQuery({name: summonerName, region: region});
 	const mutateMatch = trpc.match.update.useMutation({
 		onSuccess: async () => {
-			await summoner.refetch();
 			await matches.refetch();
 		}
 	});
 
 	const handleUpdate = async () => {
 		mutateMatch.mutate({name: summonerName, region: region});
+		mutateSummoner.mutate({name: summonerName, region: region});
 	}
+
+	const date = new Date(summoner.data ? summoner.data.lastUpdated : Date.now());
+	const lastUpdated = formatTime(date.getTime());
 
 	if (!summoner.data || !matches.data) return <div className={"text-white"}>Loading...</div>
 
@@ -73,6 +83,9 @@ const SummonerPage: NextPage = () => {
 							{mutateMatch.error && <p>Fetch from server failed :( <br/> {mutateMatch.error.message}</p>}
 						</div>
 					</div>
+					{summoner.data.lastUpdated &&
+                        <p className={"text-sm text-neutral-700 font-semibold"}>{lastUpdated}</p>
+					}
 				</div>
 			</div>
 			<div className={"flex flex-row"}>
@@ -107,53 +120,58 @@ const Match = ({match, summoner}: { match: TMatch, summoner: TSummoner }) => {
 	const winText = win ? "text-blue-400" : "text-red-500";
 	const timeSince = formatTime(match.info.gameEndTimestamp);
 	const lane = convertLaneName(sumInfo?.individualPosition ?? "Invalid");
-	console.log(sumInfo?.individualPosition);
 
 	const champ = champContext?.find((c) => parseInt(c.key) == sumInfo?.championId);
-
 	return (
 		<>
-			<div
-				className={`bg-grad w-full my-2 rounded-md bg-neutral-900 hover:bg-neutral-800 border-l-8 ${winBorder} cursor-pointer transition-all duration-100`}>
-				<div className={"flex flex-col px-4"}>
-					<div className={"mx-2 flex flex-row items-center justify-between"}>
-						<h2 className={`text-2xl font-bold ${winText}`}>{win ? "Victory" : "Defeat"}</h2>
-						<div className={"flex flex-row text-neutral-500 font-semibold items-center justify-end gap-2"}>
-							<div className={"w-4 h-4 relative"}>
-								<Image src={lane.imgUrl} alt={lane.role} fill sizes={"16px"}/>
+			<Link href={"/"} passHref>
+				<div
+					className={`bg-grad w-full my-2 rounded-md bg-neutral-900 hover:bg-neutral-800 border-l-8 ${winBorder} cursor-pointer transition-all duration-100`}>
+					<div className={"flex flex-col px-4"}>
+						<div className={"mx-2 flex flex-row items-center justify-between"}>
+							<h2 className={`text-2xl font-bold ${winText}`}>{win ? "Victory" : "Defeat"}</h2>
+							<div
+								className={"flex flex-row text-neutral-500 font-semibold items-center justify-end gap-2"}>
+								<div className={"w-4 h-4 relative"}>
+									<Image src={lane.imgUrl} alt={lane.role} fill sizes={"16px"}/>
+								</div>
+								<p>{lane.role}</p>
+								<p> • </p>
+								<p>{timeSince}</p>
 							</div>
-							<p>{lane.role}</p>
-							<p> • </p>
-							<p>{timeSince}</p>
 						</div>
-					</div>
-					<div className={"flex flex-row px-2 py-4"}>
-						<div className={"w-16 h-16 relative rounded-xl overflow-hidden mx-2"}>
-							{champ ? (
-								<Image src={champ ? champ.image.sprite : ""} alt={`Image of ${champ?.name}`}
-									   className={"scale-[1.1]"} fill sizes={"128px"}/>
-							) : (
-								<div className={"bg-neutral-900 w-full h-full"}/>
-							)}
-						</div>
+						<div className={"flex flex-row px-2 py-4"}>
+							<div className={"w-16 h-16 relative rounded-xl overflow-hidden mx-2"}>
+								{champ ? (
+									<Image src={champ ? champ.image.sprite : ""} alt={`Image of ${champ?.name}`}
+										   className={"scale-[1.1]"} fill sizes={"128px"}/>
+								) : (
+									<div className={"bg-neutral-900 w-full h-full"}/>
+								)}
+							</div>
+							<div className={"flex flex-col pr-2 gap-1.5"}>
+								<SumSpellIcon spellId={sumInfo?.summoner1Id}/>
+								<SumSpellIcon spellId={sumInfo?.summoner2Id}/>
+							</div>
 
-						<div className={"flex flex-col"}>
-							<div className={"text-neutral-500"}>
-								<h3 className={"text-md font-semibold"}>{calcKDA(sumInfo!.kills, sumInfo!.deaths, sumInfo!.assists)} KDA</h3>
-								<p>{sumInfo?.kills}/{sumInfo?.deaths}/{sumInfo?.assists}</p>
-							</div>
-							<div className={"flex flex-row items-end gap-1.5"}>
-								<ItemIcon itemId={sumInfo?.item0}/>
-								<ItemIcon itemId={sumInfo?.item1}/>
-								<ItemIcon itemId={sumInfo?.item2}/>
-								<ItemIcon itemId={sumInfo?.item3}/>
-								<ItemIcon itemId={sumInfo?.item4}/>
-								<ItemIcon itemId={sumInfo?.item5}/>
+							<div className={"flex flex-col"}>
+								<div className={"text-neutral-500"}>
+									<h3 className={"text-md font-semibold"}>{calcKDA(sumInfo!.kills, sumInfo!.deaths, sumInfo!.assists)} KDA</h3>
+									<p>{sumInfo?.kills}/{sumInfo?.deaths}/{sumInfo?.assists}</p>
+								</div>
+								<div className={"flex flex-row items-end gap-1.5"}>
+									<ItemIcon itemId={sumInfo?.item0}/>
+									<ItemIcon itemId={sumInfo?.item1}/>
+									<ItemIcon itemId={sumInfo?.item2}/>
+									<ItemIcon itemId={sumInfo?.item3}/>
+									<ItemIcon itemId={sumInfo?.item4}/>
+									<ItemIcon itemId={sumInfo?.item5}/>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
+			</Link>
 		</>
 	)
 }
@@ -173,6 +191,19 @@ const ItemIcon = ({itemId}: { itemId: number | undefined }) => {
 	)
 }
 
+const SumSpellIcon = ({spellId}: { spellId: number | undefined }) => {
+	const sumSpell = useSummonerSpell(spellId);
+	return (
+		<LeagueHoverIcon img={sumSpell?.image.full}>
+			<div className={"flex flex-row items-center"}>
+				<LeagueIcon img={sumSpell?.image.full}/>
+				<div className={"flex flex-col pl-4"}>
+					<h2>{sumSpell?.name}</h2>
+				</div>
+			</div>
+		</LeagueHoverIcon>
+	)
+}
 
 const Avatar = ({img, lvl}: { img: string, lvl: number }) => {
 	return (

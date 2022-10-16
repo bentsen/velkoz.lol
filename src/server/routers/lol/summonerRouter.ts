@@ -1,5 +1,5 @@
 import {prisma} from "@/server/util/prisma";
-import {z} from "zod"
+import {date, z} from "zod"
 import {publicProcedure, router} from "../../trpc";
 import {ISummoner} from "@/utils/@types/summoner.t";
 import {riotRequest} from "@/server/data/riot/riotRequest";
@@ -19,13 +19,16 @@ export const summonerRouter = router({
 		.query(async({input}) => {
 			const count = await prisma.summoner.count({
 				where: {
-					name: input.name,
+					name: {
+						equals: input.name,
+						mode: "insensitive",
+					},
 					region: input.region,
 				}
 			});
 
 			if (count == 0) {
-				const summonerFromApi = await riotRequest<ISummoner>(`https://${input.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${input.name}`)
+				const summonerFromApi = await riotRequest<ISummoner>(`https://${input.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${input.name}`);
 
 				return await prisma.summoner.create({
 					data: {
@@ -39,15 +42,16 @@ export const summonerRouter = router({
 						region: input.region
 					}
 				});
+			} else {
+				return await prisma.summoner.findFirst({
+					where: {
+						name: input.name,
+						region: input.region,
+					}
+				})
 			}
-
-			return await prisma.summoner.findFirst({
-				where: {
-					name: input.name,
-					region: input.region,
-				}
-			});
 		}),
+
 	byPuuid: publicProcedure
 		.input(
 			z.object({
@@ -63,6 +67,47 @@ export const summonerRouter = router({
 				}
 			});
 		}),
+
+	byPart: publicProcedure
+		.input(
+			z.string(),
+		)
+		.query( async({input}) => {
+			return await prisma.summoner.findMany({
+				where: {
+					name: {
+						startsWith: input,
+						mode: "insensitive",
+					},
+				},
+			});
+		}),
+
+	update: publicProcedure
+		.input(
+			z.object({
+				name: z.string(),
+				region: z.string(),
+			})
+		)
+		.mutation(async({input}) => {
+			const summonerFromApi = await riotRequest<ISummoner>(`https://${input.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${input.name}`);
+			return await prisma.summoner.update({
+				where: {
+					puuid: summonerFromApi.puuid,
+				},
+				data: {
+					id: summonerFromApi.id,
+					accountId: summonerFromApi.accountId,
+					puuid: summonerFromApi.puuid,
+					name: summonerFromApi.name,
+					summonerLevel: summonerFromApi.summonerLevel,
+					profileIconId: summonerFromApi.profileIconId,
+					revisionDate: summonerFromApi.revisionDate.toString(),
+					region: input.region,
+				},
+			});
+		})
 })
 
 
