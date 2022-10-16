@@ -34,6 +34,16 @@ module.exports = {
                 'tft-yellow': 'rgb(230,179,58)',
                 'brand': 'rgb(14, 16, 21)'
             },
+            keyframes: {
+                "slide-up-fade": {
+                    "0%": { opacity: 0, transform: "translateY(2px)" },
+                    "100%": { opacity: 1, transform: "translateY(0)" },
+                },
+                "slide-down-fade": {
+                    "0%": { opacity: 0, transform: "translateY(-2px)" },
+                    "100%": { opacity: 1, transform: "translateY(0)" },
+                },
+            },
             /**
              fontFamily: {
         'sans': ['Rajdhani', 'sans-serif'],
@@ -41,6 +51,15 @@ module.exports = {
       }
              */
         },
+        animation: {
+            "slide-up-fade": "slide-up-fade 0.2s ease-in-out",
+            "slide-down-fade": "slide-down-fade 0.2s ease-in-out",
+        }
     },
-    plugins: [],
+    plugins: [
+        require("tailwindcss-radix")({
+            // Default: `radix`
+            variantPrefix: "rdx",
+        }),
+    ],
 }

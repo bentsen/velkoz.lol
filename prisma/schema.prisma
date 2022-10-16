@@ -14,9 +14,10 @@ datasource db {
 
 //Summoner table
 model Summoner {
-  id            String   @id
-  accountId     String   @unique
-  puuid         String   @unique
+  uuid          String   @id @unique @default(uuid())
+  id            String
+  accountId     String
+  puuid         String
   name          String
   summonerLevel Int
   profileIconId Int

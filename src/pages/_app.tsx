@@ -1,6 +1,6 @@
 import '../styles/globals.css'
 import Layout from "../components/Layout/Layout"
-import StaticProvider from "../store/StaticProvider";
+import StaticProvider from "../data/StaticProvider";
 
 
 import type { AppType } from 'next/app';

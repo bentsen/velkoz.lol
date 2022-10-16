@@ -1,7 +1,6 @@
 import {prisma} from "@/server/util/prisma";
 import {z} from "zod"
 import {publicProcedure, router} from "../../trpc";
-import axios from "axios";
 import {ISummoner} from "@/utils/@types/summoner.t";
 import {riotRequest} from "@/server/data/riot/riotRequest";
 import {inferProcedureOutput} from "@trpc/server";
@@ -28,7 +27,7 @@ export const summonerRouter = router({
 			if (count == 0) {
 				const summonerFromApi = await riotRequest<ISummoner>(`https://${input.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${input.name}`)
 
-				const summoner = await prisma.summoner.create({
+				return await prisma.summoner.create({
 					data: {
 						id: summonerFromApi.id,
 						accountId: summonerFromApi.accountId,
@@ -40,8 +39,6 @@ export const summonerRouter = router({
 						region: input.region
 					}
 				});
-
-				return summoner;
 			}
 
 			return await prisma.summoner.findFirst({

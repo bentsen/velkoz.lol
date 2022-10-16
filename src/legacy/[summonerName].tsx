@@ -10,7 +10,7 @@ import {useRouter} from "next/router";
 import {ILeagueEntry} from "reksai/src/@types/league";
 import {useContext, useState} from "react";
 import Link from "next/link";
-import {VersionContext} from "../store/VersionContext";
+import {VersionContext} from "../data/VersionContext";
 
 
 const Account = () => {

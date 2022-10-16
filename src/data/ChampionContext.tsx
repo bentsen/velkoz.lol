@@ -31,7 +31,7 @@ export default function ChampionProvider({children}: {children: ReactNode}) {
 			}
 			setChampions(champs)
         }
-        getChampions()
+        getChampions();
     },[latestVersion])
 
     return (

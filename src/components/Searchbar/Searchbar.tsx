@@ -1,8 +1,8 @@
 import React, {Fragment, ReactNode, ReactText, useContext, useEffect, useState} from "react";
 import {ISummoner} from "../../utils/@types/summoner.t";
-import {ChampionContext} from "../../store/ChampionContext";
+import {ChampionContext} from "../../data/ChampionContext";
 import {useRouter} from "next/router";
-import {VersionContext} from "../../store/VersionContext";
+import {VersionContext} from "../../data/VersionContext";
 import axios from "axios";
 import {Combobox, Menu, Transition} from "@headlessui/react";
 import {FiChevronDown, FiX} from "react-icons/fi";

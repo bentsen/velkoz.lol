@@ -6,7 +6,7 @@ import {ISummoner} from "reksai/src/@types/summoner";
 import axios from "axios";
 import useSWR from "swr";
 import {Entry} from "../../utils/@types/league.t";
-import {VersionContext} from "../../store/VersionContext";
+import {VersionContext} from "../../data/VersionContext";
 import { Combobox } from '@headlessui/react'
 import {useRouter} from "next/router";
 

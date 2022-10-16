@@ -2,7 +2,7 @@ import {useContext, useEffect, useState} from "react";
 import {ddragon} from "reksai";
 import {ChampionResponse, IChampion} from "reksai/src/@types/champion";
 import {useRouter} from "next/router";
-import {VersionContext} from "../../../store/VersionContext";
+import {VersionContext} from "../../../data/VersionContext";
 import axios from "axios";
 
 const ChampionPage = () => {
