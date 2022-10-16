@@ -70,9 +70,12 @@ export const summonerRouter = router({
 
 	byPart: publicProcedure
 		.input(
-			z.string(),
+			z.string().nullish(),
 		)
 		.query( async({input}) => {
+			if (input == null) {
+				input = "";
+			}
 			return await prisma.summoner.findMany({
 				where: {
 					name: {
