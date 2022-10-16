@@ -209,7 +209,7 @@ const Searchbar = () => {
 
 const GameMenu = () => {
 	return (
-		<div className={"flex h-full pr-2"}>
+		<div className={"flex h-full pr-2 z-10"}>
 			<Menu as={"div"} className={"inline-block"}>
 				<Menu.Button
 					className={"inline-flex items-center text-gray-700 h-full text-base whitespace-nowrap font-bold pl-4 pr-1"}>
@@ -250,7 +250,7 @@ const RegionMenu = ({
 						setRegion
 					}: { region: IRegion, setRegion: React.Dispatch<React.SetStateAction<IRegion>> }) => {
 	return (
-		<div className={"flex h-full pr-2 items-center"}>
+		<div className={"flex h-full pr-2 items-center z-10"}>
 			<Menu as={"div"} className={"w-full inline-block"}>
 				<Menu.Button>
 					<RegionTag {...region} />

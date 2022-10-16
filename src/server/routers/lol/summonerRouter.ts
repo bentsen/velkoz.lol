@@ -45,7 +45,10 @@ export const summonerRouter = router({
 			} else {
 				return await prisma.summoner.findFirst({
 					where: {
-						name: input.name,
+						name: {
+							equals: input.name,
+							mode: "insensitive",
+						},
 						region: input.region,
 					}
 				})
