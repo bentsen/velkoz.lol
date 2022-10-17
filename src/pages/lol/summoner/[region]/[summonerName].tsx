@@ -126,7 +126,6 @@ const MatchHistory = ({summoner, matches}: { summoner: TSummoner, matches: TMatc
 
 const Match = ({match, summoner}: { match: TMatch, summoner: TSummoner }) => {
 	const champContext = useContext(ChampionContext);
-	const itemContext = useContext(ItemContext);
 	if (!match || !match.info || !match.metaData || !summoner) return <div>Loading...</div>
 
 
@@ -194,16 +193,23 @@ const Match = ({match, summoner}: { match: TMatch, summoner: TSummoner }) => {
 
 const ItemIcon = ({itemId}: { itemId: number | undefined }) => {
 	const item = useItem(itemId);
+
 	return (
 		<LeagueHoverIcon img={item?.image.full}>
+			{item &&
 			<div className={"flex flex-row max-w-sm"}>
-				<LeagueIcon img={item?.image.full}/>
+				<LeagueIcon img={item.image.full}/>
 				<div className={"flex flex-col pl-4"}>
-					<h2>{item?.name}</h2>
+					<h2>{item.name}</h2>
 					<span className={"inline-flex items-center"}><RiCopperCoinLine
 						className={"fill-yellow-500 mr-2"}/> {item?.gold.total}</span>
+					<div
+						className={"pt-3 item-parser"}
+						dangerouslySetInnerHTML={{__html: item.description}}
+					/>
 				</div>
 			</div>
+			}
 		</LeagueHoverIcon>
 	)
 }

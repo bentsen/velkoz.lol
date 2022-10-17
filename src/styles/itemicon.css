@@ -1,0 +1,12 @@
+.item-parser {
+    margin-bottom: 2rem;
+}
+
+.item-parser attention {
+    font-weight: bold;
+}
+
+.item-parser li {
+    list-style-type: none;
+}
+

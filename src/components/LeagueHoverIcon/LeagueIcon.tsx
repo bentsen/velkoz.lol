@@ -4,11 +4,11 @@ import {ReactNode} from "react";
 
 export const LeagueIcon = ({img}: { img: string | undefined }) => {
 	return (
-		<div className={"w-8 h-8 flex-shrink-0 relative rounded-md"}>
+		<div className={"w-8 h-8 flex-shrink-0 relative rounded-lg overflow-hidden"}>
 			{img ? (
 				<Image src={img} alt={"Item"} fill sizes={"32px"} priority/>
 			) : (
-				<div className={"bg-neutral-700 w-full h-full"}/>
+				<div className={"bg-neutral-700 w-full h-full rounded-lg"}/>
 			)}
 		</div>
 	)
@@ -33,7 +33,7 @@ const LeagueHoverContent = ({children}: { children: ReactNode }) => {
 	return (
 		<>
 			<HoverCard.Portal>
-				<HoverCard.Content className={"px-4 py-4 bg-neutral-900 rounded-lg transform rdx-side-top:animate-slide-up-fade rdx-side-bottom:animate-slide-down-fade"} side={"top"} sideOffset={5} >
+				<HoverCard.Content className={"px-4 py-4 bg-neutral-900 rounded-lg transform rdx-side-top:animate-slide-up-fade rdx-side-bottom:animate-slide-down-fade z-50"} side={"top"} sideOffset={5} >
 					{children}
 					<HoverCard.Arrow className={"fill-neutral-900"} />
 				</HoverCard.Content>
