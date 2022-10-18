@@ -65,7 +65,6 @@ const regionMap = new Map<string, IRegion>([
 const Searchbar = () => {
 	const [search, setSearch] = useState("");
 	const [selected, setSelected] = useState<UnifiedOption>();
-	//const [summoners, setSummoners] = useState<ISummoner[]>([]);
 	const {data: summoners} = trpc.summoner.byPart.useQuery(search[0]);
 	const [region, setRegion] = useState<IRegion>({
 		short: "EUW",
@@ -82,21 +81,6 @@ const Searchbar = () => {
 		state.link && await router.push(state.link);
 		setSelected(state);
 	}
-
-	/*
-	useEffect(() => {
-		const handleSummoners = async () => {
-			if (search.length == 1) {
-				const res = await axios.get<ISummoner[]>(`/api/lol/summoners/by-part/?name=${search[0]}`);
-				const summoner = await res.data;
-				summoner.length == 0
-					? setSummoners([])
-					: setSummoners(summoner)
-			}
-		}
-		handleSummoners()
-	}, [search])
-	 */
 
 	const filteredSummoners = !search
 		? summoners

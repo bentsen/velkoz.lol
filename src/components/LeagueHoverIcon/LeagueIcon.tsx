@@ -16,7 +16,7 @@ export const LeagueIcon = ({img}: { img: string | undefined }) => {
 
 export const LeagueHoverIcon = ({children, img}: {children: ReactNode, img: string | undefined}) => {
 	return (
-		<HoverCard.Root openDelay={0} closeDelay={0}>
+		<HoverCard.Root openDelay={1} closeDelay={0.5}>
 			{img &&
 				<LeagueHoverContent>
 					{children}
@@ -33,9 +33,9 @@ const LeagueHoverContent = ({children}: { children: ReactNode }) => {
 	return (
 		<>
 			<HoverCard.Portal>
-				<HoverCard.Content className={"px-4 py-4 bg-neutral-900 rounded-lg transform rdx-side-top:animate-slide-up-fade rdx-side-bottom:animate-slide-down-fade z-50"} side={"top"} sideOffset={5} >
+				<HoverCard.Content className={"px-4 py-4 bg-stone-900 max-w-lg rounded-lg transform rdx-side-top:animate-slide-up-fade rdx-side-bottom:animate-slide-down-fade z-50"} side={"top"} sideOffset={5} >
 					{children}
-					<HoverCard.Arrow className={"fill-neutral-900"} />
+					<HoverCard.Arrow className={"fill-stone-900"} />
 				</HoverCard.Content>
 			</HoverCard.Portal>
 		</>

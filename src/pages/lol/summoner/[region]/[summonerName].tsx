@@ -14,7 +14,7 @@ import {ItemContext} from "@/data/ItemContext";
 import {useItem} from "@/hooks/useItem";
 import {LeagueIcon} from "@/components/LeagueHoverIcon/LeagueIcon";
 import LeagueHoverIcon from "@/components/LeagueHoverIcon";
-import {calcKDA} from "@/utils/calcMatchInfo";
+import {calcChampFreq, calcKDA, calcWinRate} from "@/utils/calcMatchInfo";
 import Link from "next/link";
 import {useSummonerSpell} from "@/hooks/useSummonerSpell";
 import {RiCopperCoinLine} from "react-icons/ri";
@@ -68,7 +68,7 @@ const SummonerHeader = ({
 
 	return (
 		<>
-			<div className={"py-6 flex flex-row w-full"}>
+			<header className={"py-6 flex flex-row w-full"}>
 				{!summoner ? (
 					<>
 						<div className={"block"}>
@@ -105,7 +105,7 @@ const SummonerHeader = ({
 						</div>
 					</>
 				)}
-			</div>
+			</header>
 		</>
 	)
 }
@@ -113,12 +113,34 @@ const SummonerHeader = ({
 const MatchHistory = ({summoner, matches}: { summoner: TSummoner, matches: TMatches | undefined }) => {
 	if (!matches) return <div>Loading...</div>
 	const sortedMatches = matches?.sort((a, b) => parseInt(b.info!.gameEndTimestamp) - parseInt(a.info!.gameEndTimestamp));
+	const times = 20;
+	const champFreq = calcChampFreq(summoner?.puuid, matches, times);
+	const [wins, loses] = calcWinRate(summoner?.puuid, matches, times);
 	return (
 		<>
-			<div className={"w-full py-2 rounded-2xl"}>
-				{sortedMatches.map((match) => (
-					<Match key={match.matchId} match={match} summoner={summoner}/>
-				))}
+			<div className={"w-full flex flex-col"}>
+				<div className={"bg-neutral-900 mb-2 rounded-xl"}>
+					<div className={"flex flex-row justify-between items-center px-7 py-2"}>
+						<div className={"inline-block"}>
+							<p>Last {times} games</p>
+							<p>{wins}W-{loses}L</p>
+						</div>
+						<div className={"flex flex-row gap-4"}>
+							{champFreq?.map((c) => (
+								<div key={c.champId} className={"flex flex-col"}>
+									<p>{c.name} {c.played}</p>
+									<p>{c.wins}W - {c.played - c.wins}L</p>
+									<p>{calcKDA(c.kills, c.deaths, c.assists)}</p>
+								</div>
+							))}
+						</div>
+					</div>
+				</div>
+				<div className={"rounded-xl bg-neutral-900 overflow-auto"}>
+					{sortedMatches.map((match) => (
+						<Match key={match.matchId} match={match} summoner={summoner}/>
+					))}
+				</div>
 			</div>
 		</>
 	)
@@ -141,8 +163,8 @@ const Match = ({match, summoner}: { match: TMatch, summoner: TSummoner }) => {
 		<>
 			<Link href={"/"} passHref>
 				<div
-					className={`bg-grad w-full my-2 rounded-md bg-neutral-900 active:bg-neutral-800 hover:bg-neutral-800 border-l-8 ${winBorder} cursor-pointer  transition-all duration-100`}>
-					<div className={"flex flex-col px-4"}>
+					className={`w-full bg-neutral-900 active:bg-neutral-800 hover:bg-neutral-800 border-l-8 ${winBorder} cursor-pointer transition-all duration-100`}>
+					<div className={"flex flex-col px-4 border-b border-b-neutral-800"}>
 						<div className={"mx-2 flex flex-row items-center justify-between"}>
 							<h2 className={`text-2xl font-bold ${winText}`}>{win ? "Victory" : "Defeat"}</h2>
 							<div
@@ -196,20 +218,23 @@ const ItemIcon = ({itemId}: { itemId: number | undefined }) => {
 
 	return (
 		<LeagueHoverIcon img={item?.image.full}>
-			{item &&
-			<div className={"flex flex-row max-w-sm"}>
-				<LeagueIcon img={item.image.full}/>
-				<div className={"flex flex-col pl-4"}>
-					<h2>{item.name}</h2>
-					<span className={"inline-flex items-center"}><RiCopperCoinLine
-						className={"fill-yellow-500 mr-2"}/> {item?.gold.total}</span>
+			{item && (
+				<>
+					<div className={"flex flex-row max-w-sm"}>
+						<LeagueIcon img={item.image.full}/>
+						<div className={"flex flex-col pl-4"}>
+							<h2 className={"font-bold"}>{item.name}</h2>
+							<span className={"inline-flex items-center"}><RiCopperCoinLine
+								className={"fill-yellow-500 mr-2"}/> {item?.gold.total}</span>
+						</div>
+					</div>
 					<div
 						className={"pt-3 item-parser"}
 						dangerouslySetInnerHTML={{__html: item.description}}
 					/>
-				</div>
-			</div>
-			}
+				</>
+			)}
+
 		</LeagueHoverIcon>
 	)
 }
