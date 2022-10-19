@@ -32,7 +32,11 @@ module.exports = {
                 'tft-gray': 'rgb(83,84,97)',
                 'tft-green': 'rgb(51,102,60)',
                 'tft-yellow': 'rgb(230,179,58)',
-                'brand': 'rgb(14, 16, 21)'
+                'brand': {
+                    400: 'hsl(222, 13%, 15%)',
+                    600: 'hsl(240, 11%, 18%)',
+                    800: 'hsl(230, 10%, 11%)',
+                }
             },
             keyframes: {
                 "slide-up-fade": {
