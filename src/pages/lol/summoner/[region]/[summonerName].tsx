@@ -107,7 +107,7 @@ const SummonerHeader = ({
               <div className={"flex justify-start mt-4"}>
                 <button
                   className={
-                    "bg-neutral-900 text-white rounded-2xl px-4 py-2 outline-none border-2 border-neutral-900 hover:border-neutral-700 focus:border-neutral-700 transition-all duration-100"
+                    "bg-brand-500 text-white rounded-2xl px-4 py-2 outline-none border-2 border-brand-500 hover:border-brand-400 focus:border-brand-400 transition-all duration-100"
                   }
                   onClick={handleUpdate}
                   disabled={isLoading}
@@ -146,7 +146,7 @@ const MatchHistory = ({
   return (
     <>
       <div className={"w-full flex flex-col"}>
-        <div className={"bg-neutral-900 mb-2 rounded-xl"}>
+        <div className={"bg-brand-500 mb-2 rounded-xl"}>
           <div
             className={"flex flex-row justify-between items-center px-7 py-2"}
           >
@@ -171,7 +171,7 @@ const MatchHistory = ({
             </div>
           </div>
         </div>
-        <div className={"rounded-xl bg-neutral-900 overflow-auto"}>
+        <div className={"rounded-xl bg-brand-500 overflow-auto"}>
           {sortedMatches.map((match) => (
             <Match key={match.matchId} match={match} summoner={summoner} />
           ))}
@@ -202,7 +202,7 @@ const Match = ({ match, summoner }: { match: TMatch; summoner: TSummoner }) => {
     <>
       <Link href={"/"} passHref>
         <div
-          className={`w-full bg-neutral-900 active:bg-neutral-800 hover:bg-neutral-800 border-l-8 ${winBorder} cursor-pointer transition-all duration-100`}
+          className={`w-full bg-brand-500 active:bg-brand-400 hover:bg-brand-400 border-l-8 ${winBorder} cursor-pointer transition-all duration-100`}
         >
           <div className={"flex flex-col px-4 border-b border-b-neutral-800"}>
             <div className={"mx-2 flex flex-row items-center justify-between"}>
@@ -227,37 +227,40 @@ const Match = ({ match, summoner }: { match: TMatch; summoner: TSummoner }) => {
                 <p>{timeSince}</p>
               </div>
             </div>
-            <div className={"flex flex-row px-2 py-4"}>
-              <div
-                className={"w-16 h-16 relative rounded-xl overflow-hidden mx-2"}
-              >
-                {champ ? (
-                  <Image
-                    src={champ ? champ.image.sprite : ""}
-                    alt={`Image of ${champ?.name}`}
-                    className={"scale-[1.1]"}
-                    fill
-                    sizes={"128px"}
-                  />
-                ) : (
-                  <div className={"bg-neutral-900 w-full h-full"} />
-                )}
-              </div>
-              <div className={"flex flex-col pr-2 gap-1.5"}>
-                <SumSpellIcon spellId={sumInfo?.summoner1Id} />
-                <SumSpellIcon spellId={sumInfo?.summoner2Id} />
-              </div>
+            <div className={"flex flex-row items-center justify-between px-2 py-4"}>
+				<span className={"flex flex-row items-center"}>
 
-              <div className={"flex flex-col"}>
-                <div className={"text-neutral-500"}>
-                  <h3 className={"text-md font-semibold"}>
-                    {calcKDA(sumInfo!.kills, sumInfo!.deaths, sumInfo!.assists)}{" "}
-                    KDA
+              <div
+				  className={"w-20 h-20 relative rounded-xl overflow-hidden mx-2"}
+			  >
+                {champ ? (
+					<Image
+						src={champ ? champ.image.sprite : ""}
+						alt={`Image of ${champ?.name}`}
+						className={"scale-[1.1]"}
+						fill
+						sizes={"128px"}
+					/>
+				) : (
+					<div className={"bg-neutral-900 w-full h-full"}/>
+				)}
+              </div>
+				<div className={"flex flex-col pr-2 gap-1.5"}>
+					<SumSpellIcon spellId={sumInfo?.summoner1Id}/>
+					<SumSpellIcon spellId={sumInfo?.summoner2Id}/>
+				</div>
+				</span>
+
+                <div className={"flex flex-col justify-center text-neutral-200"}>
+                  <h3 className={"text-4xl font-semibold"}>
+                    {sumInfo?.kills}/{sumInfo?.deaths}/{sumInfo?.assists}
                   </h3>
                   <p>
-                    {sumInfo?.kills}/{sumInfo?.deaths}/{sumInfo?.assists}
+                    {calcKDA(sumInfo!.kills, sumInfo!.deaths, sumInfo!.assists)}{" "}
+                    KDA
                   </p>
                 </div>
+              <div className={"flex flex-col"}>
                 <div className={"flex flex-row items-end gap-1.5"}>
                   <ItemIcon itemId={sumInfo?.item0} />
                   <ItemIcon itemId={sumInfo?.item1} />
@@ -283,7 +286,7 @@ const ItemIcon = ({ itemId }: { itemId: number | undefined }) => {
       {item && (
         <>
           <div className={"flex flex-row max-w-sm"}>
-            <LeagueIcon img={item.image.full} />
+            <LeagueIcon img={item.image.full} size={"lg"}/>
             <div className={"flex flex-col pl-4"}>
               <h2 className={"font-bold"}>{item.name}</h2>
               <span className={"inline-flex items-center"}>
@@ -307,7 +310,7 @@ const SumSpellIcon = ({ spellId }: { spellId: number | undefined }) => {
   return (
     <LeagueHoverIcon img={sumSpell?.image.full}>
       <div className={"flex flex-row max-w-sm"}>
-        <LeagueIcon img={sumSpell?.image.full} />
+        <LeagueIcon img={sumSpell?.image.full} size={"lg"}/>
         <div className={"flex flex-col pl-4"}>
           <h2 className={"font-bold text-md"}>{sumSpell?.name}</h2>
           <p className={"text-neutral-400"}>{sumSpell?.description}</p>

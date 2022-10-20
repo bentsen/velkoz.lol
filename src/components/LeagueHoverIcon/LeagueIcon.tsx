@@ -2,9 +2,32 @@ import Image from "next/future/image";
 import * as HoverCard from '@radix-ui/react-hover-card';
 import {ReactNode} from "react";
 
-export const LeagueIcon = ({img}: { img: string | undefined }) => {
+interface IconProps {
+	img: string | undefined
+	size?: "xs" | "sm" | "md" | "lg" | "xl"
+}
+
+export const LeagueIcon = ({img, size = "md"}: IconProps) => {
+	let sizeString = "";
+	if (size == "xs") {
+		sizeString = "w-4 h-4";
+	}
+	if (size == "sm") {
+		sizeString = "w-6 h-6";
+	}
+	if (size == "md") {
+		sizeString = "w-8 h-8";
+	}
+	if (size == "lg") {
+		sizeString = "w-12 h-12";
+	}
+	if (size == "xl") {
+		sizeString = "w-16 h-16";
+	}
+
+
 	return (
-		<div className={"w-8 h-8 flex-shrink-0 relative rounded-lg overflow-hidden"}>
+		<div className={`${sizeString} flex-shrink-0 relative rounded-lg overflow-hidden`}>
 			{img ? (
 				<Image src={img} alt={"Item"} fill sizes={"32px"} priority/>
 			) : (
@@ -23,7 +46,7 @@ export const LeagueHoverIcon = ({children, img}: {children: ReactNode, img: stri
 				</LeagueHoverContent>
 			}
 			<HoverCard.Trigger>
-				<LeagueIcon img={img} />
+				<LeagueIcon img={img}/>
 			</HoverCard.Trigger>
 		</HoverCard.Root>
 	)
