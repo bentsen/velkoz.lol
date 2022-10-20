@@ -251,7 +251,8 @@ const Match = ({ match, summoner }: { match: TMatch; summoner: TSummoner }) => {
 				</div>
 				</span>
 
-                <div className={"flex flex-col justify-center text-neutral-200"}>
+
+                <div className={"flex flex-col text-center text-white"}>
                   <h3 className={"text-4xl font-semibold"}>
                     {sumInfo?.kills}/{sumInfo?.deaths}/{sumInfo?.assists}
                   </h3>
