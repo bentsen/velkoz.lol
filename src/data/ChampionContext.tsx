@@ -1,7 +1,7 @@
 import React, {ReactNode, useContext, useEffect, useState} from "react";
 import axios from "axios";
 import {VersionContext} from "./VersionContext";
-import {ChampionResponse, IChampion} from "reksai/src/@types/champion";
+import {ChampionResponse, IChampion} from "@/utils/@types/lol/champion";
 
 export const ChampionContext = React.createContext<IChampion[] | undefined>([]);
 
@@ -19,7 +19,8 @@ export default function ChampionProvider({children}: {children: ReactNode}) {
 			for (let key in data.data) {
 				const champ = data.data[key];
 				champ.image = {
-					full: `https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/champion/${champ.id}_0.png`,
+					full: `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${champ.id}_0.png`,
+					loading: `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${champ.id}_0.png`,
 					sprite: `https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/champion/${champ.id}.png`,
 					group: "champion",
 					x: champ.image.x,
