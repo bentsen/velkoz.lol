@@ -18,7 +18,23 @@ export const matchRouter = router({
 			})
 		)
 		.query(async ({input}) => {
+			const convertedRegion = convertToRegion(input.region);
+
 			const summoner = await riotRequest<ISummoner>(`https://${input.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${input.name}`);
+			const latestMatches = await riotRequest<string[]>(`https://${convertedRegion}.api.riotgames.com/lol/match/v5/matches/by-puuid/${summoner.puuid}/ids?start=0&count=20`)
+
+			for (const _matchId of latestMatches) {
+				const count = await prisma.metadata.count({
+					where: {
+						matchId: _matchId
+					}
+				})
+
+				if (count == 0) {
+					const match = await getMatch(_matchId, input.region) as IMatch;
+					await createMatch(match);
+				}
+			}
 			return await findMatchesByPuuid(summoner.puuid);
 		}),
 	getMatch: publicProcedure

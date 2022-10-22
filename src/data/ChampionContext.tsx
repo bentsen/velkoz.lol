@@ -19,7 +19,7 @@ export default function ChampionProvider({children}: {children: ReactNode}) {
 			for (let key in data.data) {
 				const champ = data.data[key];
 				champ.image = {
-					full: `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${champ.id}_0.png`,
+					full: `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${champ.id}_0.jpg`,
 					loading: `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${champ.id}_0.png`,
 					sprite: `https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/champion/${champ.id}.png`,
 					group: "champion",

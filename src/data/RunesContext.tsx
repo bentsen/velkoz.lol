@@ -5,7 +5,7 @@ import {IPath} from "@/utils/@types/lol/runes";
 
 export const RunesContext = React.createContext<IPath[] | undefined>([]);
 
-export default function ChampionProvider({children}: {children: ReactNode}) {
+export default function RunesProvider({children}: {children: ReactNode}) {
 	const [paths, setPaths] = useState<IPath[]>([]);
 	const latestVersion = useContext(VersionContext);
 

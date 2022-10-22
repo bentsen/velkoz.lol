@@ -107,8 +107,13 @@ export const getMatch = async(matchId: string, platform: string) => {
 								pentaKills: true,
 								perks: {
 									select: {
-										id: true,
-										statPerks: true,
+										statPerks: {
+											select: {
+												defense: true,
+												flex: true,
+												offense: true,
+											}
+										},
 										styles: {
 											select: {
 												description: true,
@@ -542,8 +547,13 @@ export const findMatchesByPuuid = async (puuid: string) => {
 							pentaKills: true,
 							perks: {
 								select: {
-									id: true,
-									statPerks: true,
+									statPerks: {
+										select: {
+											defense: true,
+											flex: true,
+											offense: true,
+										}
+									},
 									styles: {
 										select: {
 											description: true,

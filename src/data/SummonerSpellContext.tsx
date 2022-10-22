@@ -35,6 +35,7 @@ export default function SummonerSpellProvider({children}: {children: ReactNode})
 
 				counter++;
 				_spells.push(currentSpell);
+
 			}
 			setSpells(_spells);
 		}

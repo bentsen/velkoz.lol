@@ -10,15 +10,16 @@ import {TSummoner} from "@/server/routers/lol/summonerRouter";
 import {ChampionContext} from "@/data/ChampionContext";
 import {formatTime} from "@/utils/formatTime";
 import {convertLaneName} from "@/utils/lanePosition";
-import {ItemContext} from "@/data/ItemContext";
-import {useItem} from "@/hooks/useItem";
-import {LeagueIcon} from "@/components/LeagueHoverIcon/LeagueIcon";
-import LeagueHoverIcon from "@/components/LeagueHoverIcon";
 import {calcChampFreq, calcKDA, calcWinRate} from "@/utils/calcMatchInfo";
 import Link from "next/link";
-import {useSummonerSpell} from "@/hooks/useSummonerSpell";
-import {RiCopperCoinLine} from "react-icons/ri";
-import {useRune} from "@/hooks/useRune";
+import ItemIcon from "@/components/LeagueIcons/ItemIcon";
+import SumSpellIcon from "@/components/LeagueIcons/SumSpellIcon";
+import SecRuneIcon from "@/components/LeagueIcons/SecRuneIcon";
+import RuneIcon from "@/components/LeagueIcons/RuneIcon";
+import Avatar from "@/components/LeagueIcons/Avatar";
+import ChampImg from "@/components/LeagueIcons/ChampImg";
+import {Participant} from "@/utils/@types/lol/match";
+import {ISummoner} from "@/utils/@types/summoner.t";
 
 const SummonerPage: NextPage = () => {
 	const version = useContext(VersionContext);
@@ -187,16 +188,20 @@ const Match = ({match, summoner}: { match: TMatch; summoner: TSummoner }) => {
 	if (!match || !match.info || !match.metaData || !summoner)
 		return <div>Loading...</div>;
 
+	const team1Participants = match.info.participants.slice(0, 5);
+	const team2Participants = match.info.participants.slice(5, 10);
+
 	const sumInfo = match.info.participants.find(
 		(e) => e.puuid == summoner?.puuid
 	);
-
-	console.log(sumInfo);
 	const win = sumInfo?.win;
 	const winBorder = win ? "border-blue-400" : "border-red-500";
 	const winText = win ? "text-blue-400" : "text-red-500";
 	const timeSince = formatTime(match.info.gameEndTimestamp);
 	const lane = convertLaneName(sumInfo?.individualPosition ?? "Invalid");
+
+	const keyStoneId = sumInfo?.perks?.styles[0].selections[0].perk;
+	const secondRune = sumInfo?.perks?.styles[1].style;
 
 	const champ = champContext?.find(
 		(c) => parseInt(c.key) == sumInfo?.championId
@@ -208,10 +213,7 @@ const Match = ({match, summoner}: { match: TMatch; summoner: TSummoner }) => {
 					className={`w-full bg-brand-500 active:bg-brand-400 hover:bg-brand-400 border-l-8 ${winBorder} cursor-pointer transition-all duration-100`}
 				>
 					<div className={"flex flex-col px-4 border-b border-b-neutral-800"}>
-						<div className={"mx-2 flex flex-row items-center justify-between"}>
-							<h2 className={`text-2xl font-bold ${winText}`}>
-								{win ? "Victory" : "Defeat"}
-							</h2>
+						<div className={"mx-2 flex flex-row items-center justify-end"}>
 							<div
 								className={
 									"flex flex-row text-neutral-500 font-semibold items-center justify-end gap-2"
@@ -232,57 +234,80 @@ const Match = ({match, summoner}: { match: TMatch; summoner: TSummoner }) => {
 						</div>
 						<div className={"flex flex-row items-center justify-between px-2 py-4"}>
 							<div className={"flex flex-row items-center"}>
-
-								<div className={"w-20 h-20 relative rounded-xl overflow-hidden mx-2"}>
-									{champ ? (
-										<Image
-											src={champ ? champ.image.sprite : ""}
-											alt={`Image of ${champ?.name}`}
-											className={"scale-[1.1]"}
-											fill
-											sizes={"128px"}
-										/>
-									) : (
-										<div className={"bg-neutral-900 w-full h-full"}/>
-									)}
+								{champ && <ChampImg champId={champ.key} size={"2xl"}/>}
+								<div className={"flex flex-col items-center pr-2 gap-1.5"}>
+									<RuneIcon keystoneId={keyStoneId}/>
+									<SecRuneIcon keystoneId={secondRune}/>
 								</div>
-								<div className={"flex flex-col pr-2 gap-1.5"}>
-									<SumSpellIcon spellId={sumInfo?.summoner1Id}/>
-									<SumSpellIcon spellId={sumInfo?.summoner2Id}/>
-								</div>
-								<div className={"flex flex-col pr-2 gap-1.5"}>
+								<div className={"flex flex-col items-center pr-2 gap-1.5"}>
 									<SumSpellIcon spellId={sumInfo?.summoner1Id}/>
 									<SumSpellIcon spellId={sumInfo?.summoner2Id}/>
 								</div>
 							</div>
 
-							<div className={"flex flex-col text-center text-white"}>
-								<div className={"block text-4xl"}>
-									<span className={" font-semibold"}>
+							<div className={"flex flex-col text-center text-white gap-1.5"}>
+								<h2 className={`text-3xl font-bold ${winText} justify-center`}>
+									{win ? "Victory" : "Defeat"}
+								</h2>
+								<div className={"block text-neutral-400 text-4xl"}>
+									<span className={"text-white font-semibold"}>
 										{sumInfo?.kills}
 									</span>
 									{" / "}
-									<span className={"font-semibold text-red-500"}>
+									<span className={"font-semibold text-white"}>
 										{sumInfo?.deaths}
 									</span>
 									{" / "}
-									<span className={"font-semibold inline-flex"}>
+									<span className={"text-white font-semibold"}>
 										{sumInfo?.assists}
 									</span>
 								</div>
-								<p className={"font-semibold text-neutral-500 text-lg"}>
+								<p className={"font-semibold text-neutral-400 text-lg"}>
 									{calcKDA(sumInfo!.kills, sumInfo!.deaths, sumInfo!.assists)}{" "}
 									KDA
 								</p>
 							</div>
-							<div className={"flex flex-col"}>
-								<div className={"flex flex-row items-end gap-1.5"}>
+							<div className={"flex flex-col gap-1"}>
+								<div className={"flex flex-row items-end gap-1"}>
 									<ItemIcon itemId={sumInfo?.item0}/>
 									<ItemIcon itemId={sumInfo?.item1}/>
 									<ItemIcon itemId={sumInfo?.item2}/>
+									<ItemIcon itemId={sumInfo?.item6}/>
+								</div>
+								<div className={"flex flex-row items-end gap-1"}>
 									<ItemIcon itemId={sumInfo?.item3}/>
 									<ItemIcon itemId={sumInfo?.item4}/>
 									<ItemIcon itemId={sumInfo?.item5}/>
+								</div>
+							</div>
+							<div className={"flex flex-row gap-2"}>
+								<div className={"flex flex-col text-neutral-500"}>
+									{team1Participants.map((p) => (
+										<div key={p.summonerName}>
+											<Link href={`/lol/summoner/euw1/${p.summonerName}`} passHref>
+												<div className={"flex flex-row items-center w-32"}>
+													<ChampImg champId={p.championId.toString()}/>
+													<a className={`pl-1 pt-1 truncate ${p.summonerName == summoner.name && "font-bold"} hover:underline`}>
+														{p.summonerName}
+													</a>
+												</div>
+											</Link>
+										</div>
+									))}
+								</div>
+								<div className={"flex flex-col text-neutral-500"}>
+									{team2Participants.map((p) => (
+										<div key={p.summonerName}>
+											<Link href={`/lol/summoner/euw1/${p.summonerName}`} passHref>
+												<div className={"flex flex-row items-center w-32"}>
+													<ChampImg champId={p.championId.toString()}/>
+													<a className={`pl-1 pt-1 truncate ${p.summonerName == summoner.name && "font-bold"} hover:underline`}>
+														{p.summonerName}
+													</a>
+												</div>
+											</Link>
+										</div>
+									))}
 								</div>
 							</div>
 						</div>
@@ -290,86 +315,6 @@ const Match = ({match, summoner}: { match: TMatch; summoner: TSummoner }) => {
 				</div>
 			</Link>
 		</>
-	);
-};
-
-const ItemIcon = ({itemId}: { itemId: number | undefined }) => {
-	const item = useItem(itemId);
-
-	return (
-		<LeagueHoverIcon img={item?.image.full}>
-			{item && (
-				<>
-					<div className={"flex flex-row max-w-sm"}>
-						<LeagueIcon img={item.image.full} size={"lg"}/>
-						<div className={"flex flex-col pl-4"}>
-							<h2 className={"font-bold"}>{item.name}</h2>
-							<span className={"inline-flex items-center"}>
-                <RiCopperCoinLine className={"fill-yellow-500 mr-2"}/>{" "}
-								{item?.gold.total}
-              </span>
-						</div>
-					</div>
-					<div
-						className={"pt-3 item-parser"}
-						dangerouslySetInnerHTML={{__html: item.description}}
-					/>
-				</>
-			)}
-		</LeagueHoverIcon>
-	);
-};
-
-const SumSpellIcon = ({spellId}: { spellId: number | undefined }) => {
-	const sumSpell = useSummonerSpell(spellId);
-	return (
-		<LeagueHoverIcon img={sumSpell?.image.full}>
-			<div className={"flex flex-row max-w-sm"}>
-				<LeagueIcon img={sumSpell?.image.full} size={"lg"}/>
-				<div className={"flex flex-col pl-4"}>
-					<h2 className={"font-bold text-md"}>{sumSpell?.name}</h2>
-					<p className={"text-neutral-400"}>{sumSpell?.description}</p>
-				</div>
-			</div>
-		</LeagueHoverIcon>
-	);
-};
-
-const RuneIcon = ({runeId}: { runeId: number | undefined }) => {
-	const rune = useRune(runeId);
-	return (
-		<LeagueHoverIcon img={rune?.icon}>
-			<div className={"flex flex-row max-w-sm"}>
-				<LeagueIcon img={rune?.icon} size={"lg"}/>
-				<div className={"flex flex-col pl-4"}>
-					<h2 className={"font-bold text-md"}>{rune?.name}</h2>
-					<p className={"text-neutral-400"}>{rune?.name}</p>
-				</div>
-			</div>
-		</LeagueHoverIcon>
-	);
-};
-
-const Avatar = ({img, lvl}: { img: string; lvl: number }) => {
-	return (
-		<div className={"relative"}>
-			<div
-				className={
-					"absolute flex justify-center items-center border-2 border-neutral-800 z-10 -bottom-4 left-1/2 -translate-x-1/2 bg-brand text-white rounded-2xl px-2"
-				}
-			>
-				{lvl}
-			</div>
-			<div
-				className={
-					"relative border-2 border-neutral-800 rounded-2xl overflow-hidden"
-				}
-			>
-				<div className={"w-24 h-24 flex-shrink-0"}>
-					<Image src={img} alt={`Profile icon`} fill priority/>
-				</div>
-			</div>
-		</div>
 	);
 };
 

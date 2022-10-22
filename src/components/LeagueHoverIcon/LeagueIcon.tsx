@@ -7,6 +7,8 @@ interface IconProps {
 	size?: "xs" | "sm" | "md" | "lg" | "xl"
 }
 
+type SizeProps = "xs" | "sm" | "md" | "lg" | "xl"
+
 export const LeagueIcon = ({img, size = "md"}: IconProps) => {
 	let sizeString = "";
 	if (size == "xs") {
@@ -29,7 +31,7 @@ export const LeagueIcon = ({img, size = "md"}: IconProps) => {
 	return (
 		<div className={`${sizeString} flex-shrink-0 relative rounded-lg overflow-hidden`}>
 			{img ? (
-				<Image src={img} alt={"Item"} fill sizes={"32px"} priority/>
+				<Image src={img} alt={"Item"} fill sizes={"64px"} priority/>
 			) : (
 				<div className={"bg-neutral-700 w-full h-full rounded-lg"}/>
 			)}
@@ -37,7 +39,7 @@ export const LeagueIcon = ({img, size = "md"}: IconProps) => {
 	)
 }
 
-export const LeagueHoverIcon = ({children, img}: {children: ReactNode, img: string | undefined}) => {
+export const LeagueHoverIcon = ({children, img, size = "md"}: {children: ReactNode, img: string | undefined, size?: SizeProps}) => {
 	return (
 		<HoverCard.Root openDelay={1} closeDelay={0.5}>
 			{img &&
@@ -46,7 +48,7 @@ export const LeagueHoverIcon = ({children, img}: {children: ReactNode, img: stri
 				</LeagueHoverContent>
 			}
 			<HoverCard.Trigger>
-				<LeagueIcon img={img}/>
+				<LeagueIcon img={img} size={size}/>
 			</HoverCard.Trigger>
 		</HoverCard.Root>
 	)
