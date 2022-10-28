@@ -60,11 +60,22 @@ const SummonerPage: NextPage = () => {
 				handleUpdate={handleUpdate}
 				isLoading={mutateSummoner.isLoading}
 			/>
-			{summoner.data && (
-				<div className={"flex flex-row"}>
-					<MatchHistory summoner={summoner.data} matches={matches.data}/>
+			<div className={"grid gap-2 grid-cols-4"}>
+				<div className={"col-span-1"}>
+					<div className={"bg-brand-500 w-full h-12 rounded-xl"}>
+						<h1>
+							{summoner.data?.id}
+						</h1>
+					</div>
 				</div>
-			)}
+				<div className={"col-span-3"}>
+					{summoner.data && (
+						<div className={"flex flex-row"}>
+							<MatchHistory summoner={summoner.data} matches={matches.data}/>
+						</div>
+					)}
+				</div>
+			</div>
 		</Container>
 	);
 };
@@ -87,13 +98,14 @@ const SummonerHeader = ({
 
 	useEffect(() => {
 		window.addEventListener("scroll", () => {
-			setScrolled(window.scrollY < scrollDistance);
+			setScrolled(window.scrollY > scrollDistance);
 		});
 	}, [setScrolled])
 
 	return (
 		<>
-			<header className={`${!scrolled ? "opacity-0" : "opacity-100 translate-y-8"} flex bg-bg-brand-600 flex-row w-full transition-all duration-200`}>
+			<header
+				className={`${scrolled ? "opacity-0" : "opacity-100 translate-y-8"} flex bg-bg-brand-600 flex-row w-full transition-all duration-200`}>
 				{!summoner ? (
 					<>
 						<div className={"block"}>
@@ -136,7 +148,8 @@ const SummonerHeader = ({
 					</>
 				)}
 			</header>
-			<header className={`${scrolled ? "opacity-0" : "opacity-100"} transition-all duration-200 bg-bg-brand sticky top-0 py-4 z-50`}>
+			<header
+				className={`${scrolled ? "opacity-100" : "opacity-0"} transition-all duration-200 bg-bg-brand sticky top-0 py-4 z-50`}>
 				{!summoner ? (
 					<>
 						<div className={"block"}>
@@ -149,7 +162,8 @@ const SummonerHeader = ({
 					</>
 				) : (
 					<>
-						<div className={`flex flex-row ${scrolled ? "translate-y-5" : "translate-y-0"} transition-all duration-200`}>
+						<div
+							className={`flex flex-row ${scrolled ? "translate-y-0" : "translate-y-5"} transition-all duration-200`}>
 							<div className={"block mx-3"}>
 								<Avatar
 									img={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${summoner.profileIconId}.png`}
@@ -200,19 +214,20 @@ const MatchHistory = ({
 						<div className={"flex flex-row gap-4"}>
 							{champFreq ? (
 								champFreq.map((c) => (
-									<div key={c.champId} className={"flex flex-row items-center"}>
-										<ChampImg champId={c.champId} size={"lg"}/>
-										<div className={"mx-3 flex flex-col"}>
-											<div className={"inline-flex"}>
-												<p>
-													{calcChampWinRate(c.wins, c.played)}% - {c.wins}W - {c.played - c.wins}L
-												</p>
+										<div key={c.champId} className={"flex flex-row items-center"}>
+											<ChampImg champId={c.champId} size={"lg"}/>
+											<div className={"mx-3 flex flex-col"}>
+												<div className={"inline-flex"}>
+													<p>
+														{calcChampWinRate(c.wins, c.played)}% - {c.wins}W
+														- {c.played - c.wins}L
+													</p>
+												</div>
+												<p className={"text-neutral-500"}>{calcKDA(c.kills, c.deaths, c.assists)} KDA</p>
 											</div>
-										<p className={"text-neutral-500"}>{calcKDA(c.kills, c.deaths, c.assists)} KDA</p>
 										</div>
-									</div>
-							)
-							)): <p>Could not calculate :(</p>}
+									)
+								)) : <p>Could not calculate :(</p>}
 						</div>
 					</div>
 				</div>
