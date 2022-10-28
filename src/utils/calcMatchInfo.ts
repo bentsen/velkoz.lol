@@ -21,7 +21,7 @@ export function calcChampFreq(puuid: string | undefined, matches: TMatches | und
 	if (matches == undefined || puuid == undefined) return;
 
 	const champsPlayed: ChampPlayed[] = []
-	for (let i = 0; i <= iter; i++) {
+	for (let i = 0; i < iter; i++) {
 		if (matches[i] == undefined) return;
 		const summoner = matches[i].info?.participants.find((a) => a.puuid == puuid);
 		if (summoner == undefined) return;
@@ -47,13 +47,17 @@ export function calcChampFreq(puuid: string | undefined, matches: TMatches | und
 			updateChamp.deaths = updateChamp.deaths + summoner.deaths;
 			updateChamp.assists = updateChamp.assists + summoner.assists;
 		}
-
 	}
-
 
 	return champsPlayed
 		.sort((a, b) => b.played - a.played)
 		.slice(0, 3);
+
+}
+
+export function calcChampWinRate(wins: number, played: number) {
+	const percent = wins / played * 100
+	return Math.floor(percent);
 }
 
 export function calcWinRate(puuid: string | undefined, matches: TMatches | undefined, iter: number): number[] {

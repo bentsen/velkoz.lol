@@ -23,7 +23,7 @@ export const matchRouter = router({
 			const summoner = await riotRequest<ISummoner>(`https://${input.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${input.name}`);
 			const latestMatches = await riotRequest<string[]>(`https://${convertedRegion}.api.riotgames.com/lol/match/v5/matches/by-puuid/${summoner.puuid}/ids?start=0&count=20`)
 
-			for (const _matchId of latestMatches) {
+			await Promise.all(latestMatches.map(async (_matchId) => {
 				const count = await prisma.metadata.count({
 					where: {
 						matchId: _matchId
@@ -34,7 +34,8 @@ export const matchRouter = router({
 					const match = await getMatch(_matchId, input.region) as IMatch;
 					await createMatch(match);
 				}
-			}
+			}));
+
 			return await findMatchesByPuuid(summoner.puuid);
 		}),
 	getMatch: publicProcedure
@@ -60,7 +61,7 @@ export const matchRouter = router({
 			const summoner = await riotRequest<ISummoner>(`https://${input.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${input.name}`);
 			const latestMatches = await riotRequest<string[]>(`https://${convertedRegion}.api.riotgames.com/lol/match/v5/matches/by-puuid/${summoner.puuid}/ids?start=0&count=20`)
 
-			for (const _matchId of latestMatches) {
+			await Promise.all(latestMatches.map(async (_matchId) => {
 				const count = await prisma.metadata.count({
 					where: {
 						matchId: _matchId
@@ -71,7 +72,7 @@ export const matchRouter = router({
 					const match = await getMatch(_matchId, input.region) as IMatch;
 					await createMatch(match);
 				}
-			}
+			}));
 
 			return await findMatchesByPuuid(summoner.puuid)
 		})

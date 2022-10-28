@@ -9,7 +9,7 @@ const ChampImg = ({
 					  champName,
 					  img,
 					  size = "sm"
-				  }: { champId?: string, champName?: string, img?: string, size?: SizeProps }) => {
+				  }: { champId?: string | number, champName?: string, img?: string, size?: SizeProps }) => {
 	let sizeString = "";
 	if (size == "xs") {
 		sizeString = "w-4 h-4";

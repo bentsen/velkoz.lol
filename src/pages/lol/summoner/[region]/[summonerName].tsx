@@ -3,14 +3,14 @@ import {useRouter} from "next/router";
 import Image from "next/future/image";
 import Container from "../../../../components/Container";
 import {trpc} from "@/utils/trpc";
-import {useContext} from "react";
+import {useContext, useEffect, useState} from "react";
 import {VersionContext} from "@/data/VersionContext";
 import {TMatch, TMatches} from "@/server/routers/lol/matchRouter";
 import {TSummoner} from "@/server/routers/lol/summonerRouter";
 import {ChampionContext} from "@/data/ChampionContext";
 import {formatTime} from "@/utils/formatTime";
 import {convertLaneName} from "@/utils/lanePosition";
-import {calcChampFreq, calcKDA, calcWinRate} from "@/utils/calcMatchInfo";
+import {calcChampFreq, calcChampWinRate, calcKDA, calcWinRate} from "@/utils/calcMatchInfo";
 import Link from "next/link";
 import ItemIcon from "@/components/LeagueIcons/ItemIcon";
 import SumSpellIcon from "@/components/LeagueIcons/SumSpellIcon";
@@ -20,6 +20,7 @@ import Avatar from "@/components/LeagueIcons/Avatar";
 import ChampImg from "@/components/LeagueIcons/ChampImg";
 import {Participant} from "@/utils/@types/lol/match";
 import {ISummoner} from "@/utils/@types/summoner.t";
+import {set} from "zod";
 
 const SummonerPage: NextPage = () => {
 	const version = useContext(VersionContext);
@@ -80,10 +81,19 @@ const SummonerHeader = ({
 	const version = useContext(VersionContext);
 	const date = new Date(summoner ? summoner.lastUpdated : Date.now());
 	const lastUpdated = formatTime(date.getTime());
+	const [scrolled, setScrolled] = useState(false);
+
+	const scrollDistance = 150;
+
+	useEffect(() => {
+		window.addEventListener("scroll", () => {
+			setScrolled(window.scrollY < scrollDistance);
+		});
+	}, [setScrolled])
 
 	return (
 		<>
-			<header className={"py-6 flex flex-row w-full"}>
+			<header className={`${!scrolled ? "opacity-0" : "opacity-100 translate-y-8"} flex bg-bg-brand-600 flex-row w-full transition-all duration-200`}>
 				{!summoner ? (
 					<>
 						<div className={"block"}>
@@ -126,6 +136,33 @@ const SummonerHeader = ({
 					</>
 				)}
 			</header>
+			<header className={`${scrolled ? "opacity-0" : "opacity-100"} transition-all duration-200 bg-bg-brand sticky top-0 py-4 z-50`}>
+				{!summoner ? (
+					<>
+						<div className={"block"}>
+							<div
+								className={
+									"relative border-2 border-neutral-900 bg-neutral-800 rounded-2xl w-12 h-12"
+								}
+							/>
+						</div>
+					</>
+				) : (
+					<>
+						<div className={`flex flex-row ${scrolled ? "translate-y-5" : "translate-y-0"} transition-all duration-200`}>
+							<div className={"block mx-3"}>
+								<Avatar
+									img={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${summoner.profileIconId}.png`}
+									size={"sm"}
+								/>
+							</div>
+							<h2 className={"text-white font-bold text-2xl"}>
+								{summoner.name}
+							</h2>
+						</div>
+					</>
+				)}
+			</header>
 		</>
 	);
 };
@@ -142,7 +179,9 @@ const MatchHistory = ({
 		(a, b) =>
 			parseInt(b.info!.gameEndTimestamp) - parseInt(a.info!.gameEndTimestamp)
 	);
+
 	const times = 20;
+
 	const champFreq = calcChampFreq(summoner?.puuid, matches, times);
 	const [wins, loses] = calcWinRate(summoner?.puuid, matches, times);
 	return (
@@ -159,17 +198,21 @@ const MatchHistory = ({
 							</p>
 						</div>
 						<div className={"flex flex-row gap-4"}>
-							{champFreq?.map((c) => (
-								<div key={c.champId} className={"flex flex-col"}>
-									<p>
-										{c.name} {c.played}
-									</p>
-									<p>
-										{c.wins}W - {c.played - c.wins}L
-									</p>
-									<p>{calcKDA(c.kills, c.deaths, c.assists)}</p>
-								</div>
-							))}
+							{champFreq ? (
+								champFreq.map((c) => (
+									<div key={c.champId} className={"flex flex-row items-center"}>
+										<ChampImg champId={c.champId} size={"lg"}/>
+										<div className={"mx-3 flex flex-col"}>
+											<div className={"inline-flex"}>
+												<p>
+													{calcChampWinRate(c.wins, c.played)}% - {c.wins}W - {c.played - c.wins}L
+												</p>
+											</div>
+										<p className={"text-neutral-500"}>{calcKDA(c.kills, c.deaths, c.assists)} KDA</p>
+										</div>
+									</div>
+							)
+							)): <p>Could not calculate :(</p>}
 						</div>
 					</div>
 				</div>
