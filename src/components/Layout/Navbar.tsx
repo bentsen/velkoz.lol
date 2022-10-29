@@ -64,43 +64,25 @@ const Navbar = () => {
 	const selectedColor = filterGames()[0].color
 
 	return (
-		<>
-			<nav className={"h-10 "+bgColor}>
-				<div className={`flex flex-row h-full`}>
-					<div className={`flex justify-between md:justify-start items-center text-white ${selectedColor} h-full w-full sm:w-fit`}>
-						<div className={"block sm:hidden"} aria-describedby={"Mobile menu"}>
-							<div className={"text-white ml-2 cursor-pointer"}>
-								<FiMenu className={"w-6 h-6"}/>
-							</div>
-						</div>
-						<Link href={"/"} passHref>
-							<p className={"mx-5 font-extrabold cursor-pointer text-2xl"}>Velkoz</p>
+		<div className={"py-4 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"}>
+			<header className={"relative"}>
+				<nav className={"relative flex items-center justify-between"}>
+					<div className={"flex flex-1 items-center"}>
+						<Link href={"/"}>
+							<a className={"font-bold text-2xl"}>
+								Velkoz
+							</a>
 						</Link>
-						<div className={"block sm:hidden"} aria-describedby={"Sorry screen reader :("} />
+						<div className={"ml-2"}>
+							<Link href={"/features"} className={"font-bold text-2xl"}>Features</Link>
+						</div>
 					</div>
-					<div className={"hidden sm:flex"} aria-describedby={"Desktop Menu"}>
-						{filterGames().map((game, i) => (
-							<NavLink key={game.name} {...game} selectedColor={selectedColor} iter={i}/>
-						))}
+					<div className={"flex"}>
+						<FiMenu/>
 					</div>
-
-				</div>
-			</nav>
-			<div className={`hidden sm:flex flex-row items-center h-10 text-white ${selectedColor}`}>
-				<div>
-					Test
-				</div>
-				<div>
-					Test
-				</div>
-				<div>
-					Test
-				</div>
-				<div>
-					Test
-				</div>
-			</div>
-		</>
+				</nav>
+			</header>
+		</div>
 	)
 }
 
@@ -112,8 +94,10 @@ const NavLink = (props: IGameIter) => {
 
 	return (
 		<Link href={link} passHref>
-			<div className={`hidden sm:flex flex-row justify-center items-center cursor-pointer ${secondLink ? selectedColor : bgColor}`}>
-				<div className={`relative flex justify-center items-center h-full w-full ${secondLink ? "rounded-bl-2xl" : ""} ${first ? color : bgColor} ${!first && "hover:bg-neutral-900"}`}>
+			<div
+				className={`hidden sm:flex flex-row justify-center items-center cursor-pointer ${secondLink ? selectedColor : bgColor}`}>
+				<div
+					className={`relative flex justify-center items-center h-full w-full ${secondLink ? "rounded-bl-2xl" : ""} ${first ? color : bgColor} ${!first && "hover:bg-neutral-900"}`}>
 					<div className={"flex justify-center items-center text-white font-medium mx-5"}>
 						<div className={"h-6 w-6 relative"}>
 							<Image src={svg} alt={name} fill/>

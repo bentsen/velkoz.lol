@@ -82,6 +82,10 @@ const SummonerPage: NextPage = () => {
 	);
 };
 
+const PageGrid = () => {
+
+}
+
 const SummonerHeader = ({
 							summoner,
 							handleUpdate,
@@ -285,9 +289,9 @@ const Match = ({match, summoner}: { match: TMatch; summoner: TSummoner }) => {
 								</div>
 								<p>{lane.role}</p>
 								<p> • </p>
-								<p>{timeSince}</p>
-								<p> • </p>
 								<p>{queue}</p>
+								<p> • </p>
+								<p>{timeSince}</p>
 							</div>
 						</div>
 						<div className={"flex flex-row items-center justify-between px-2 py-4"}>
