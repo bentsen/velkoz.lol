@@ -29,11 +29,11 @@ export const LeagueIcon = ({img, size = "md"}: IconProps) => {
 
 
 	return (
-		<div className={`${sizeString} flex-shrink-0 relative rounded-lg overflow-hidden`}>
+		<div className={`${sizeString} flex-shrink-0 relative rounded overflow-hidden`}>
 			{img ? (
 				<Image src={img} alt={"Item"} fill sizes={"64px"} priority/>
 			) : (
-				<div className={"bg-neutral-700 w-full h-full rounded-lg"}/>
+				<div className={"bg-neutral-700 w-full h-full rounded"}/>
 			)}
 		</div>
 	)

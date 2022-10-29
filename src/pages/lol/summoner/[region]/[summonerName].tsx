@@ -21,6 +21,8 @@ import ChampImg from "@/components/LeagueIcons/ChampImg";
 import {Participant} from "@/utils/@types/lol/match";
 import {ISummoner} from "@/utils/@types/summoner.t";
 import {set} from "zod";
+import {useScrollDistance} from "@/hooks/useScrollDistance";
+import getQueueType from "@/data/getQueueType";
 
 const SummonerPage: NextPage = () => {
 	const version = useContext(VersionContext);
@@ -92,15 +94,10 @@ const SummonerHeader = ({
 	const version = useContext(VersionContext);
 	const date = new Date(summoner ? summoner.lastUpdated : Date.now());
 	const lastUpdated = formatTime(date.getTime());
-	const [scrolled, setScrolled] = useState(false);
 
-	const scrollDistance = 150;
+	const scrolled = useScrollDistance(150);
 
-	useEffect(() => {
-		window.addEventListener("scroll", () => {
-			setScrolled(window.scrollY > scrollDistance);
-		});
-	}, [setScrolled])
+
 
 	return (
 		<>
@@ -257,6 +254,7 @@ const Match = ({match, summoner}: { match: TMatch; summoner: TSummoner }) => {
 	const winText = win ? "text-blue-400" : "text-red-500";
 	const timeSince = formatTime(match.info.gameEndTimestamp);
 	const lane = convertLaneName(sumInfo?.individualPosition ?? "Invalid");
+	const queue = getQueueType(match.info.queueId);
 
 	const keyStoneId = sumInfo?.perks?.styles[0].selections[0].perk;
 	const secondRune = sumInfo?.perks?.styles[1].style;
@@ -288,6 +286,8 @@ const Match = ({match, summoner}: { match: TMatch; summoner: TSummoner }) => {
 								<p>{lane.role}</p>
 								<p> • </p>
 								<p>{timeSince}</p>
+								<p> • </p>
+								<p>{queue}</p>
 							</div>
 						</div>
 						<div className={"flex flex-row items-center justify-between px-2 py-4"}>
@@ -343,9 +343,9 @@ const Match = ({match, summoner}: { match: TMatch; summoner: TSummoner }) => {
 									{team1Participants.map((p) => (
 										<div key={p.summonerName}>
 											<Link href={`/lol/summoner/euw1/${p.summonerName}`} passHref>
-												<div className={"flex flex-row items-center w-32"}>
-													<ChampImg champId={p.championId.toString()}/>
-													<a className={`pl-1 pt-1 truncate ${p.summonerName == summoner.name && "font-bold"} hover:underline`}>
+												<div className={"flex flex-row items-center w-28"}>
+													<ChampImg champId={p.championId.toString()} size={"sm"}/>
+													<a className={`pl-1 pt-1 truncate text-sm ${p.summonerName == summoner.name && "font-bold"} hover:underline`}>
 														{p.summonerName}
 													</a>
 												</div>
@@ -357,9 +357,9 @@ const Match = ({match, summoner}: { match: TMatch; summoner: TSummoner }) => {
 									{team2Participants.map((p) => (
 										<div key={p.summonerName}>
 											<Link href={`/lol/summoner/euw1/${p.summonerName}`} passHref>
-												<div className={"flex flex-row items-center w-32"}>
-													<ChampImg champId={p.championId.toString()}/>
-													<a className={`pl-1 pt-1 truncate ${p.summonerName == summoner.name && "font-bold"} hover:underline`}>
+												<div className={"flex flex-row items-center w-28"}>
+													<ChampImg champId={p.championId.toString()} size={"sm"}/>
+													<a className={`pl-1 pt-1 truncate text-sm ${p.summonerName == summoner.name && "font-bold"} hover:underline`}>
 														{p.summonerName}
 													</a>
 												</div>
