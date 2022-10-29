@@ -64,18 +64,20 @@ const Navbar = () => {
 	const selectedColor = filterGames()[0].color
 
 	return (
-		<div className={"py-4 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"}>
+		<div className={"py-4 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"}>
 			<header className={"relative"}>
 				<nav className={"relative flex items-center justify-between"}>
 					<div className={"flex flex-1 items-center"}>
 						<Link href={"/"}>
-							<a className={"font-bold text-2xl"}>
+							<a className={"flex font-bold text-2xl"}>
 								Velkoz
 							</a>
 						</Link>
-						<div className={"ml-2"}>
-							<Link href={"/features"} className={"font-bold text-2xl"}>Features</Link>
-						</div>
+						<Link href={"/features"}>
+							<a className={"p-4"}>
+								Features
+							</a>
+						</Link>
 					</div>
 					<div className={"flex"}>
 						<FiMenu/>
