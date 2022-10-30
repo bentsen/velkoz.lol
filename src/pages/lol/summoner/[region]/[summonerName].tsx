@@ -184,7 +184,7 @@ const MatchHistory = ({
 }) => {
 	if (!matches) return <div>Loading...</div>;
 
-	const sortedMatches = matches?.sort((a, b) => {
+	const sortedMatches = matches?.sort((a: TMatch, b: TMatch) => {
 		if (!a.info || !b.info) return -1;
 		return parseInt(b.info.gameEndTimestamp) - parseInt(a.info.gameEndTimestamp);
 	});
