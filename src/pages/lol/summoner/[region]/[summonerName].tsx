@@ -82,10 +82,6 @@ const SummonerPage: NextPage = () => {
 	);
 };
 
-const PageGrid = () => {
-
-}
-
 const SummonerHeader = ({
 							summoner,
 							handleUpdate,
@@ -98,10 +94,7 @@ const SummonerHeader = ({
 	const version = useContext(VersionContext);
 	const date = new Date(summoner ? summoner.lastUpdated : Date.now());
 	const lastUpdated = formatTime(date.getTime());
-
 	const scrolled = useScrollDistance(150);
-
-
 
 	return (
 		<>
