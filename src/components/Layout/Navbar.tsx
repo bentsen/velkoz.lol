@@ -1,8 +1,8 @@
 import Link from "next/link"
-import Image from "next/future/image";
 import {useState} from "react";
 import {useRouter} from "next/router";
 import {FiMenu} from "react-icons/fi";
+import {UrlObject} from "url";
 
 
 interface IGamesProps {
@@ -67,48 +67,31 @@ const Navbar = () => {
 		<div className={"py-4 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"}>
 			<header className={"relative"}>
 				<nav className={"relative flex items-center justify-between"}>
-					<div className={"flex flex-1 items-center"}>
+					<div className={"flex flex-1 items-center justify-start"}>
 						<Link href={"/"}>
-							<a className={"flex font-bold text-2xl"}>
+							<a className={"flex font-bold text-2xl text-white hover:text-neutral-300 transition-all duration-100"}>
 								Velkoz
 							</a>
 						</Link>
 						<Link href={"/features"}>
-							<a className={"p-4"}>
+							<a className={"flex items-center p-4"}>
 								Features
 							</a>
 						</Link>
 					</div>
-					<div className={"flex"}>
-						<FiMenu/>
-					</div>
+					<button className={"flex"}>
+						<FiMenu className={"fill-white hover: fill-neutral-300"}/>
+					</button>
 				</nav>
 			</header>
 		</div>
 	)
 }
 
-const NavLink = (props: IGameIter) => {
-	const {nick, name, link, color, svg, selectedColor} = props
-
-	const first = props.iter == 0;
-	const secondLink = props.iter == 1
-
+const NavLink = (href: string | UrlObject) => {
 	return (
-		<Link href={link} passHref>
-			<div
-				className={`hidden sm:flex flex-row justify-center items-center cursor-pointer ${secondLink ? selectedColor : bgColor}`}>
-				<div
-					className={`relative flex justify-center items-center h-full w-full ${secondLink ? "rounded-bl-2xl" : ""} ${first ? color : bgColor} ${!first && "hover:bg-neutral-900"}`}>
-					<div className={"flex justify-center items-center text-white font-medium mx-5"}>
-						<div className={"h-6 w-6 relative"}>
-							<Image src={svg} alt={name} fill/>
-						</div>
-						<p className={"text-xs font-heading"}>{name}</p>
-					</div>
-				</div>
-			</div>
-		</Link>
+		<>
+		</>
 	)
 }
 
