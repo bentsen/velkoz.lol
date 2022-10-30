@@ -1,6 +1,6 @@
 import {NextApiRequest, NextApiResponse} from "next";
 import axios from "axios";
-import {Runes} from "../../../../utils/@types/runes.t";
+import {Runes} from "../../../utils/@types/runes.t";
 
 
 export default async (req: NextApiRequest, res: NextApiResponse) =>  {

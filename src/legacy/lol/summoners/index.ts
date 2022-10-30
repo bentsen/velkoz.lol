@@ -1,7 +1,7 @@
 import Reksai from "reksai";
 import {ISummoner} from "reksai/src/@types/summoner";
 import type {NextApiRequest, NextApiResponse} from "next";
-import { prisma } from "../../../../lib/prisma";
+import { prisma } from "../../../lib/prisma";
 import axios from "axios";
 
 /*
