@@ -1,11 +1,11 @@
 import Image from "next/image";
 import {useContext, useEffect, useState} from "react";
-import {VersionContext} from "../../../store/VersionContext";
+import {VersionContext} from "../../../data/VersionContext";
 import {useRouter} from "next/router";
 import {ddragon} from "reksai";
 import {IChampion} from "reksai/src/@types/champion";
 import Link from "next/link";
-import {ChampionContext} from "../../../store/ChampionContext";
+import {ChampionContext} from "../../../data/ChampionContext";
 
 const Champions = () => {
     const router = useRouter()

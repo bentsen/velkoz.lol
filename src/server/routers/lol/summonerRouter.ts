@@ -1,9 +1,10 @@
 import {prisma} from "@/server/util/prisma";
-import {z} from "zod"
+import {date, z} from "zod"
 import {publicProcedure, router} from "../../trpc";
-import axios from "axios";
 import {ISummoner} from "@/utils/@types/summoner.t";
 import {riotRequest} from "@/server/data/riot/riotRequest";
+import {inferProcedureOutput} from "@trpc/server";
+import {AppRouter} from "@/server/routers/_app";
 
 //TODO: add update mutation.
 
@@ -18,38 +19,42 @@ export const summonerRouter = router({
 		.query(async({input}) => {
 			const count = await prisma.summoner.count({
 				where: {
-					name: input.name,
+					name: {
+						equals: input.name,
+						mode: "insensitive",
+					},
 					region: input.region,
 				}
 			});
 
 			if (count == 0) {
-				const summoner = await riotRequest<ISummoner>(`https://${input.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${input.name}`)
+				const summonerFromApi = await riotRequest<ISummoner>(`https://${input.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${input.name}`);
 
-				prisma.summoner.create({
+				return await prisma.summoner.create({
 					data: {
-						id: summoner.id,
-						accountId: summoner.accountId,
-						puuid: summoner.puuid,
-						name: summoner.name,
-						summonerLevel: summoner.summonerLevel,
-						profileIconId: summoner.profileIconId,
-						revisionDate: String(summoner.revisionDate),
+						id: summonerFromApi.id,
+						accountId: summonerFromApi.accountId,
+						puuid: summonerFromApi.puuid,
+						name: summonerFromApi.name,
+						summonerLevel: summonerFromApi.summonerLevel,
+						profileIconId: summonerFromApi.profileIconId,
+						revisionDate: summonerFromApi.revisionDate.toString(),
 						region: input.region
 					}
 				});
-
-				summoner.region = input.region;
-				return summoner;
+			} else {
+				return await prisma.summoner.findFirst({
+					where: {
+						name: {
+							equals: input.name,
+							mode: "insensitive",
+						},
+						region: input.region,
+					}
+				})
 			}
-
-			return await prisma.summoner.findFirst({
-				where: {
-					name: input.name,
-					region: input.region,
-				}
-			});
 		}),
+
 	byPuuid: publicProcedure
 		.input(
 			z.object({
@@ -65,4 +70,51 @@ export const summonerRouter = router({
 				}
 			});
 		}),
+
+	byPart: publicProcedure
+		.input(
+			z.string().nullish(),
+		)
+		.query( async({input}) => {
+			if (input == null) {
+				input = "";
+			}
+			return await prisma.summoner.findMany({
+				where: {
+					name: {
+						startsWith: input,
+						mode: "insensitive",
+					},
+				},
+			});
+		}),
+
+	update: publicProcedure
+		.input(
+			z.object({
+				name: z.string(),
+				region: z.string(),
+			})
+		)
+		.mutation(async({input}) => {
+			const summonerFromApi = await riotRequest<ISummoner>(`https://${input.region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${input.name}`);
+			return await prisma.summoner.update({
+				where: {
+					puuid: summonerFromApi.puuid,
+				},
+				data: {
+					id: summonerFromApi.id,
+					accountId: summonerFromApi.accountId,
+					puuid: summonerFromApi.puuid,
+					name: summonerFromApi.name,
+					summonerLevel: summonerFromApi.summonerLevel,
+					profileIconId: summonerFromApi.profileIconId,
+					revisionDate: summonerFromApi.revisionDate.toString(),
+					region: input.region,
+				},
+			});
+		})
 })
+
+
+export type TSummoner = inferProcedureOutput<AppRouter["summoner"]["byName"]>

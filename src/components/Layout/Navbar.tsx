@@ -1,8 +1,8 @@
 import Link from "next/link"
-import Image from "next/future/image";
 import {useState} from "react";
 import {useRouter} from "next/router";
 import {FiMenu} from "react-icons/fi";
+import {UrlObject} from "url";
 
 
 interface IGamesProps {
@@ -64,65 +64,34 @@ const Navbar = () => {
 	const selectedColor = filterGames()[0].color
 
 	return (
-		<>
-			<nav className={"h-10 "+bgColor}>
-				<div className={`flex flex-row h-full`}>
-					<div className={`flex justify-between md:justify-start items-center text-white ${selectedColor} h-full w-full sm:w-fit`}>
-						<div className={"block sm:hidden"} aria-describedby={"Mobile menu"}>
-							<div className={"text-white ml-2 cursor-pointer"}>
-								<FiMenu className={"w-6 h-6"}/>
-							</div>
-						</div>
-						<Link href={"/"} passHref>
-							<p className={"mx-5 font-extrabold cursor-pointer text-2xl"}>Velkoz</p>
+		<div className={"py-4 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"}>
+			<header className={"relative"}>
+				<nav className={"relative flex items-center justify-between"}>
+					<div className={"flex flex-1 items-center justify-start"}>
+						<Link href={"/"}>
+							<a className={"flex font-bold text-2xl text-white hover:text-neutral-300 transition-all duration-100"}>
+								Velkoz
+							</a>
 						</Link>
-						<div className={"block sm:hidden"} aria-describedby={"Sorry screen reader :("} />
+						<Link href={"/features"}>
+							<a className={"flex items-center p-4"}>
+								Features
+							</a>
+						</Link>
 					</div>
-					<div className={"hidden sm:flex"} aria-describedby={"Desktop Menu"}>
-						{filterGames().map((game, i) => (
-							<NavLink key={game.name} {...game} selectedColor={selectedColor} iter={i}/>
-						))}
-					</div>
-
-				</div>
-			</nav>
-			<div className={`hidden sm:flex flex-row items-center h-10 text-white ${selectedColor}`}>
-				<div>
-					Test
-				</div>
-				<div>
-					Test
-				</div>
-				<div>
-					Test
-				</div>
-				<div>
-					Test
-				</div>
-			</div>
-		</>
+					<button className={"flex"}>
+						<FiMenu className={"fill-white hover: fill-neutral-300"}/>
+					</button>
+				</nav>
+			</header>
+		</div>
 	)
 }
 
-const NavLink = (props: IGameIter) => {
-	const {nick, name, link, color, svg, selectedColor} = props
-
-	const first = props.iter == 0;
-	const secondLink = props.iter == 1
-
+const NavLink = (href: string | UrlObject) => {
 	return (
-		<Link href={link} passHref>
-			<div className={`hidden sm:flex flex-row justify-center items-center cursor-pointer ${secondLink ? selectedColor : bgColor}`}>
-				<div className={`relative flex justify-center items-center h-full w-full ${secondLink ? "rounded-bl-2xl" : ""} ${first ? color : bgColor} ${!first && "hover:bg-neutral-900"}`}>
-					<div className={"flex justify-center items-center text-white font-medium mx-5"}>
-						<div className={"h-6 w-6 relative"}>
-							<Image src={svg} alt={name} fill/>
-						</div>
-						<p className={"text-xs font-heading"}>{name}</p>
-					</div>
-				</div>
-			</div>
-		</Link>
+		<>
+		</>
 	)
 }
 

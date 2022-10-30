@@ -2,34 +2,237 @@ import {riotRequest} from "@/server/data/riot/riotRequest";
 import {convertToRegion} from "@/server/data/lol/regions";
 import {IMatch} from "@/utils/@types/lol/match";
 import {prisma} from "@/server/util/prisma";
-import {Prisma} from "@prisma/client";
+import {TMatch} from "@/server/routers/lol/matchRouter";
 
 export const getRecentMatches = async(puuid: string, platform: string): Promise<string[]> => {
 	const url = `https://${convertToRegion(platform)}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids`;
 	return await riotRequest<string[]>(url);
 }
 
-export const getMatch = async(matchId: string, platform: string): Promise<IMatch> => {
-	const url = `https://${convertToRegion(platform)}.api.riotgames.com/lol/match/v5/matches/${matchId}`;
-	let rawMatch = await riotRequest<IMatch>(url);
-	rawMatch.info = {
-		...rawMatch.info,
-		gameCreation: rawMatch.info.gameCreation.toString(),
-		gameDuration: rawMatch.info.gameDuration.toString(),
-		gameEndTimestamp: rawMatch.info.gameEndTimestamp.toString(),
-		gameId: rawMatch.info.gameId.toString(),
-		gameStartTimestamp: rawMatch.info.gameStartTimestamp.toString(),
+export const getMatch = async(matchId: string, platform: string) => {
+	const count = await prisma.metadata.count({
+		where: {
+			matchId: matchId,
+		}
+	});
+
+	if (count > 0) {
+		const match =  await prisma.match.findFirst({
+			where: {
+				matchId: matchId,
+			},
+			select: {
+				lastUpdated: true,
+				matchId: true,
+				metaData: {
+					select: {
+						dataVersion: true,
+						matchId: true,
+						participants: {
+							select: {
+								metaParticipant: true,
+							}
+						}
+					},
+				},
+				info: {
+					select: {
+						gameCreation: true,
+						gameDuration: true,
+						gameEndTimestamp: true,
+						gameId: true,
+						gameMode: true,
+						gameName: true,
+						gameStartTimestamp: true,
+						gameType: true,
+						gameVersion: true,
+						mapId: true,
+						participants: {
+							select: {
+								id: true,
+								assists: true,
+								baronKills: true,
+								bountyLevel: true,
+								champExperience: true,
+								champLevel: true,
+								championId: true,
+								championName: true,
+								championTransform: true,
+								consumablesPurchased: true,
+								damageDealtToBuildings: true,
+								damageDealtToObjectives: true,
+								damageDealtToTurrets: true,
+								damageSelfMitigated: true,
+								deaths: true,
+								detectorWardsPlaced: true,
+								doubleKills: true,
+								dragonKills: true,
+								firstBloodAssist: true,
+								firstBloodKill: true,
+								firstTowerAssist: true,
+								firstTowerKill: true,
+								gameEndedInEarlySurrender: true,
+								gameEndedInSurrender: true,
+								goldEarned: true,
+								goldSpent: true,
+								individualPosition: true,
+								inhibitorKills: true,
+								inhibitorTakedowns: true,
+								inhibitorsLost: true,
+								item0: true,
+								item1: true,
+								item2: true,
+								item3: true,
+								item4: true,
+								item5: true,
+								item6: true,
+								itemsPurchased: true,
+								killingSprees: true,
+								kills: true,
+								lane: true,
+								largestCriticalStrike: true,
+								largestKillingSpree: true,
+								largestMultiKill: true,
+								longestTimeSpentLiving: true,
+								magicDamageDealt: true,
+								magicDamageDealtToChampions: true,
+								magicDamageTaken: true,
+								neutralMinionsKilled: true,
+								nexusKills: true,
+								nexusTakedowns: true,
+								nexusLost: true,
+								objectivesStolen: true,
+								objectivesStolenAssists: true,
+								participantId: true,
+								pentaKills: true,
+								perks: {
+									select: {
+										statPerks: {
+											select: {
+												defense: true,
+												flex: true,
+												offense: true,
+											}
+										},
+										styles: {
+											select: {
+												description: true,
+												selections: {
+													select: {
+														perk: true,
+														var1: true,
+														var2: true,
+														var3: true,
+													},
+												},
+												style: true,
+											},
+										},
+									},
+								},
+								physicalDamageDealt: true,
+								physicalDamageDealtToChampions: true,
+								physicalDamageTaken: true,
+								profileIcon: true,
+								puuid: true,
+								quadraKills: true,
+								riotIdName: true,
+								riotIdTagline: true,
+								role: true,
+								sightWardsBoughtInGame: true,
+								spell1Casts: true,
+								spell2Casts: true,
+								spell3Casts: true,
+								spell4Casts: true,
+								summoner1Casts: true,
+								summoner1Id: true,
+								summoner2Casts: true,
+								summoner2Id: true,
+								summonerId: true,
+								summonerLevel: true,
+								summonerName: true,
+								teamEarlySurrendered: true,
+								teamId: true,
+								teamPosition: true,
+								timeCCingOthers: true,
+								timePlayed: true,
+								totalDamageDealt: true,
+								totalDamageDealtToChampions: true,
+								totalDamageShieldedOnTeammates: true,
+								totalDamageTaken: true,
+								totalHeal: true,
+								totalHealsOnTeammates: true,
+								totalMinionsKilled: true,
+								totalTimeCCDealt: true,
+								totalTimeSpentDead: true,
+								totalUnitsHealed: true,
+								tripleKills: true,
+								trueDamageDealt: true,
+								trueDamageDealtToChampions: true,
+								trueDamageTaken: true,
+								turretKills: true,
+								turretTakedowns: true,
+								turretsLost: true,
+								unrealKills: true,
+								visionScore: true,
+								visionWardsBoughtInGame: true,
+								wardsKilled: true,
+								wardsPlaced: true,
+								win: true,
+							}
+						},
+						platformId: true,
+						queueId: true,
+						teams: {
+							select: {
+								bans: {
+									select: {
+										championId: true,
+										pickTurn: true,
+									},
+								},
+								objectives: true,
+								teamId: true,
+								win: true,
+							}
+						},
+						tournamentCode: true,
+					}
+				},
+			},
+		});
+
+		return match;
 	}
 
-	const convertedMatch = rawMatch;
-
-	console.log(convertedMatch)
-	return convertedMatch;
+	const url = `https://${convertToRegion(platform)}.api.riotgames.com/lol/match/v5/matches/${matchId}`;
+	let match = await riotRequest<IMatch>(url);
+	match.info = {
+		...match.info,
+		gameCreation: match.info.gameCreation.toString(),
+		gameDuration: match.info.gameDuration.toString(),
+		gameEndTimestamp: match.info.gameEndTimestamp.toString(),
+		gameId: match.info.gameId.toString(),
+		gameStartTimestamp: match.info.gameStartTimestamp.toString(),
+	}
+	return match;
 }
 
 export const createMatch = async(match: IMatch) => {
-	const _match = await prisma.match.create({
+	const count = await prisma.metadata.count({
+		where: {
+			matchId: match.metadata.matchId,
+		}
+	})
+
+	if (count > 0) {
+		console.error(`Match with ID ${match.metadata.matchId} already exists! Aborting creation of match in DB!`)
+		return;
+	}
+
+	return await prisma.match.create({
 		data: {
+			matchId: match.metadata.matchId,
 			metaData: {
 				create: {
 					matchId: match.metadata.matchId,
@@ -245,28 +448,201 @@ export const createMatch = async(match: IMatch) => {
 			},
 		},
 	});
-	/*
-	//TODO: Try to condense this query down to this tiny call.
-	const _match = await prisma.match.create({
-		data: match
-	})
-	 */
-	return _match;
 }
 
-type ThenArg<T> = T extends PromiseLike<infer U> ? U : T;
-type dbMatch = ThenArg<ReturnType<typeof createMatch>>;
-
+export const findMatchesByPuuid = async (puuid: string) => {
+	return await prisma.match.findMany({
+		where: {
+			metaData: {
+				participants: {
+					some: {
+						metaParticipant: puuid,
+					}
+				}
+			}
+		},
+		select: {
+			lastUpdated: true,
+			matchId: true,
+			metaData: {
+				select: {
+					dataVersion: true,
+					matchId: true,
+					participants: {
+						select: {
+							metaParticipant: true,
+						}
+					}
+				},
+			},
+			info: {
+				select: {
+					gameCreation: true,
+					gameDuration: true,
+					gameEndTimestamp: true,
+					gameId: true,
+					gameMode: true,
+					gameName: true,
+					gameStartTimestamp: true,
+					gameType: true,
+					gameVersion: true,
+					mapId: true,
+					participants: {
+						select: {
+							id: true,
+							assists: true,
+							baronKills: true,
+							bountyLevel: true,
+							champExperience: true,
+							champLevel: true,
+							championId: true,
+							championName: true,
+							championTransform: true,
+							consumablesPurchased: true,
+							damageDealtToBuildings: true,
+							damageDealtToObjectives: true,
+							damageDealtToTurrets: true,
+							damageSelfMitigated: true,
+							deaths: true,
+							detectorWardsPlaced: true,
+							doubleKills: true,
+							dragonKills: true,
+							firstBloodAssist: true,
+							firstBloodKill: true,
+							firstTowerAssist: true,
+							firstTowerKill: true,
+							gameEndedInEarlySurrender: true,
+							gameEndedInSurrender: true,
+							goldEarned: true,
+							goldSpent: true,
+							individualPosition: true,
+							inhibitorKills: true,
+							inhibitorTakedowns: true,
+							inhibitorsLost: true,
+							item0: true,
+							item1: true,
+							item2: true,
+							item3: true,
+							item4: true,
+							item5: true,
+							item6: true,
+							itemsPurchased: true,
+							killingSprees: true,
+							kills: true,
+							lane: true,
+							largestCriticalStrike: true,
+							largestKillingSpree: true,
+							largestMultiKill: true,
+							longestTimeSpentLiving: true,
+							magicDamageDealt: true,
+							magicDamageDealtToChampions: true,
+							magicDamageTaken: true,
+							neutralMinionsKilled: true,
+							nexusKills: true,
+							nexusTakedowns: true,
+							nexusLost: true,
+							objectivesStolen: true,
+							objectivesStolenAssists: true,
+							participantId: true,
+							pentaKills: true,
+							perks: {
+								select: {
+									statPerks: {
+										select: {
+											defense: true,
+											flex: true,
+											offense: true,
+										}
+									},
+									styles: {
+										select: {
+											description: true,
+											selections: {
+												select: {
+													perk: true,
+													var1: true,
+													var2: true,
+													var3: true,
+												},
+											},
+											style: true,
+										},
+									},
+								},
+							},
+							physicalDamageDealt: true,
+							physicalDamageDealtToChampions: true,
+							physicalDamageTaken: true,
+							profileIcon: true,
+							puuid: true,
+							quadraKills: true,
+							riotIdName: true,
+							riotIdTagline: true,
+							role: true,
+							sightWardsBoughtInGame: true,
+							spell1Casts: true,
+							spell2Casts: true,
+							spell3Casts: true,
+							spell4Casts: true,
+							summoner1Casts: true,
+							summoner1Id: true,
+							summoner2Casts: true,
+							summoner2Id: true,
+							summonerId: true,
+							summonerLevel: true,
+							summonerName: true,
+							teamEarlySurrendered: true,
+							teamId: true,
+							teamPosition: true,
+							timeCCingOthers: true,
+							timePlayed: true,
+							totalDamageDealt: true,
+							totalDamageDealtToChampions: true,
+							totalDamageShieldedOnTeammates: true,
+							totalDamageTaken: true,
+							totalHeal: true,
+							totalHealsOnTeammates: true,
+							totalMinionsKilled: true,
+							totalTimeCCDealt: true,
+							totalTimeSpentDead: true,
+							totalUnitsHealed: true,
+							tripleKills: true,
+							trueDamageDealt: true,
+							trueDamageDealtToChampions: true,
+							trueDamageTaken: true,
+							turretKills: true,
+							turretTakedowns: true,
+							turretsLost: true,
+							unrealKills: true,
+							visionScore: true,
+							visionWardsBoughtInGame: true,
+							wardsKilled: true,
+							wardsPlaced: true,
+							win: true,
+						}
+					},
+					platformId: true,
+					queueId: true,
+					teams: {
+						select: {
+							bans: {
+								select: {
+									championId: true,
+									pickTurn: true,
+								},
+							},
+							objectives: true,
+							teamId: true,
+							win: true,
+						}
+					},
+					tournamentCode: true,
+				}
+			},
+		},
+	});
+}
 
 export const readMatch = async(matchId: string): Promise<any> => {
 
-}
-
-export const matchNotInDb = async(matchId: string): Promise<boolean> => {
-	const count = await prisma.metadata.count({
-		where: {
-			matchId: matchId
-		}
-	})
-	return count == 0;
 }

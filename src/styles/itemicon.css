@@ -1,0 +1,39 @@
+.item-parser maintext {
+    color: darkgray;
+}
+
+.item-parser stats {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.item-parser passive, active {
+    font-weight: bold;
+    color: white;
+    padding-top: 1rem;
+}
+
+.item-parser scaleMana {
+    font-weight: bold;
+    color: royalblue;
+}
+
+.item-parser attention {
+    color: white;
+    font-weight: bold;
+}
+
+.item-parser li {
+    list-style-type: none;
+    padding-top: 1rem;
+}
+
+.item-parser rarityMythic {
+    font-weight: bold;
+    color: goldenrod;
+}
+
+.item-parser rules {
+    font-size: small;
+    color: gray;
+}

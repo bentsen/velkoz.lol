@@ -34,7 +34,29 @@ module.exports = {
                 'tft-gray': 'rgb(83,84,97)',
                 'tft-green': 'rgb(51,102,60)',
                 'tft-yellow': 'rgb(230,179,58)',
-                'brand': 'rgb(14, 16, 21)'
+                'brand': {
+                    200: 'hsl(240, 5%, 34%)',
+                    300: 'hsl(222, 13%, 15%)',
+                    400: 'hsl(242, 10%, 18%)',
+                    500: 'hsl(250, 10%, 14%)',
+                    600: 'hsl(222, 13%, 15%)',
+                    800: 'hsl(223, 20%, 7%)',
+                    900: 'hsl(240, 10%, 6%)',
+                },
+                'bg-brand': 'hsl(224, 14%, 9%)',
+                'brand-accent': {
+                    500: 'hsl(270, 73%, 35%)'
+                }
+            },
+            keyframes: {
+                "slide-up-fade": {
+                    "0%": { opacity: 0, transform: "translateY(2px)" },
+                    "100%": { opacity: 1, transform: "translateY(0)" },
+                },
+                "slide-down-fade": {
+                    "0%": { opacity: 0, transform: "translateY(-2px)" },
+                    "100%": { opacity: 1, transform: "translateY(0)" },
+                },
             },
             /**
              fontFamily: {
@@ -43,6 +65,15 @@ module.exports = {
       }
              */
         },
+        animation: {
+            "slide-up-fade": "slide-up-fade 0.2s ease-in-out",
+            "slide-down-fade": "slide-down-fade 0.2s ease-in-out",
+        }
     },
-    plugins: [],
+    plugins: [
+        require("tailwindcss-radix")({
+            // Default: `radix`
+            variantPrefix: "rdx",
+        }),
+    ],
 }

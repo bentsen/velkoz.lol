@@ -153,6 +153,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) =>  {
                 if (summonerData != null) {
                     await prisma.match.create({
                         data: {
+							matchId: match.metadata.matchId,
                             metaData: {
                                 create: {
                                     matchId: match.metadata.matchId,
